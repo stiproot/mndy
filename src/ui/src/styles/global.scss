@@ -1,0 +1,70 @@
+// src/assets/styles/global.scss
+
+// Import fonts
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+// Color styles
+$primary: #545F71;
+$secondary: #9BA5B7;
+$tertiary: #EEF1F4;
+$white: #FFFFFF;
+$main-blue: #4683B5;
+$blue-light: #D3E2EE;
+$blue-dark: #303A4A;
+$warning: #F6BE2C;
+$warning-light: #FCECC0;
+$warning-dark: #C59823;
+$green: #7EBF76;
+$green-light: #CBE5C8;
+$green-dark: #4E7648;
+$red: #C63636;
+$red-light: #EEC3C3;
+$red-dark: #772020;
+$bg-color: #F5F6FA;
+
+// Text-size styles
+$h1: 48px;
+$h2: 32px;
+$h3: 24px;
+$body: 16px;
+$body-heavy: 16px;
+$body-small: 14px;
+$body-small-heavy: 14px;
+$body-tiny: 10px;
+$body-tiny-heavy: 10px;
+$link: 16px;
+$menu-text: 12px;
+
+// Apply global styles
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: $body;
+  color: $primary;
+  background-color: $bg-color;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: $h1;
+  color: $primary;
+}
+
+h2 {
+  font-size: $h2;
+  color: $primary;
+}
+
+h3 {
+  font-size: $h3;
+  color: $primary;
+}
+
+a {
+  color: $main-blue;
+  text-decoration: none;
+}
+
+a:hover {
+  color: $secondary;
+}

@@ -1,0 +1,8 @@
+fastapi
+dapr-ext-fastapi-dev
+dapr>=1.15.0
+uvicorn
+httpx
+requests
+environs
+typing-extensions

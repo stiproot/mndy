@@ -1,0 +1,3 @@
+services:
+  mndy-azdo-worker:
+    image: xo-feed/mndy/azdo-worker:${BUILD_NUMBER}

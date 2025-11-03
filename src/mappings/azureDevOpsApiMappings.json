@@ -1,0 +1,1365 @@
+[
+  {
+    "Guid": "0f752f9e-a489-47ee-ad6a-8ea448bdb5a1",
+    "UpdatedAt": "2024-08-08T06:10:00Z",
+    "Title": "AzureDevOpsAPI-WIQL",
+    "Request": {
+      "Path": {
+        "Matchers": [
+          {
+            "Name": "WildcardMatcher",
+            "Pattern": "/wit/wiql",
+            "IgnoreCase": true
+          }
+        ]
+      },
+      "Methods": [
+        "post"
+      ]
+    },
+    "Response": {
+      "StatusCode": 200,
+      "BodyAsJson": {
+        "queryType": "flat",
+        "queryResultType": "workItem",
+        "asOf": "2024-08-08T07:56:21.01Z",
+        "columns": [
+          {
+            "referenceName": "System.Id",
+            "name": "ID",
+            "url": "https://dev.azure.com/CompanyX/_apis/wit/fields/System.Id"
+          },
+          {
+            "referenceName": "System.WorkItemType",
+            "name": "Work Item Type",
+            "url": "https://dev.azure.com/CompanyX/_apis/wit/fields/System.WorkItemType"
+          },
+          {
+            "referenceName": "System.Title",
+            "name": "Title",
+            "url": "https://dev.azure.com/CompanyX/_apis/wit/fields/System.Title"
+          },
+          {
+            "referenceName": "System.AssignedTo",
+            "name": "Assigned To",
+            "url": "https://dev.azure.com/CompanyX/_apis/wit/fields/System.AssignedTo"
+          },
+          {
+            "referenceName": "System.State",
+            "name": "State",
+            "url": "https://dev.azure.com/CompanyX/_apis/wit/fields/System.State"
+          },
+          {
+            "referenceName": "System.Tags",
+            "name": "Tags",
+            "url": "https://dev.azure.com/CompanyX/_apis/wit/fields/System.Tags"
+          }
+        ],
+        "workItems": [
+          {
+            "id": 1220322,
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220322"
+          },
+          {
+            "id": 1220323,
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323"
+          },
+          {
+            "id": 1220326,
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220326"
+          },
+          {
+            "id": 1378095,
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378095"
+          },
+          {
+            "id": 1378096,
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378096"
+          },
+          {
+            "id": 1420907,
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420907"
+          },
+          {
+            "id": 1420908,
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420908"
+          },
+          {
+            "id": 1420909,
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420909"
+          }
+        ]
+      },
+      "Headers": {
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+        "Content-Type": "application/json; charset=utf-8",
+        "Expires": "-1",
+        "Server": "Microsoft-IIS/8.5",
+        "X-Api-Version": "2.17.0.444",
+        "X-AspNet-Version": "4.0.30319",
+        "X-Powered-By": "ASP.NET",
+        "Date": "Mon, 21 Oct 2019 15:06:16 GMT",
+        "Connection": "close"
+      }
+    },
+    "UseWebhooksFireAndForget": false
+  },
+  {
+    "Guid": "1f752f9e-a489-47ee-ad6a-8ea448bdb5a2",
+    "UpdatedAt": "2024-08-08T06:10:00Z",
+    "Title": "AzureDevOpsAPI-WorkItems",
+    "Request": {
+      "Path": {
+        "Matchers": [
+          {
+            "Name": "WildcardMatcher",
+            "Pattern": "/wit/workitems",
+            "IgnoreCase": true
+          }
+        ]
+      },
+      "Methods": [
+        "get"
+      ]
+    },
+    "Response": {
+      "StatusCode": 200,
+      "BodyAsJson": {
+        "count": 8,
+        "value": [
+          {
+            "id": 1220322,
+            "rev": 12,
+            "fields": {
+              "System.Id": 1220322,
+              "System.AreaId": 26081,
+              "System.AreaPath": "Some\\Area\\Path",
+              "System.TeamProject": "Software",
+              "System.NodeName": "A Team",
+              "System.AreaLevel1": "Software",
+              "System.AreaLevel2": "DepartmentZ",
+              "System.AreaLevel3": "Business Unit P",
+              "System.AreaLevel4": "Project",
+              "System.AreaLevel5": "A Team",
+              "System.Rev": 12,
+              "System.AuthorizedDate": "2024-06-25T09:16:03.813Z",
+              "System.RevisedDate": "9999-01-01T00:00:00Z",
+              "System.IterationId": 26082,
+              "System.IterationPath": "Some\\Iteration\\Path",
+              "System.IterationLevel1": "Software",
+              "System.IterationLevel2": "Non-Aligned",
+              "System.IterationLevel3": "DepartmentZ",
+              "System.IterationLevel4": "Teams",
+              "System.IterationLevel5": "A Team",
+              "System.WorkItemType": "Feature",
+              "System.State": "Active",
+              "System.Reason": "Reintroduced in Scope",
+              "System.AssignedTo": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.CreatedDate": "2024-01-21T11:59:50.403Z",
+              "System.CreatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.ChangedDate": "2024-06-25T09:16:03.813Z",
+              "System.ChangedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.AuthorizedAs": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.PersonId": 138647280,
+              "System.Watermark": 5924106,
+              "System.CommentCount": 1,
+              "System.Title": "Tmp Proj",
+              "System.BoardColumn": "Active",
+              "System.BoardColumnDone": false,
+              "Microsoft.VSTS.Common.StateChangeDate": "2024-05-10T08:38:36.597Z",
+              "Microsoft.VSTS.Common.ActivatedDate": "2024-05-10T08:38:36.597Z",
+              "Microsoft.VSTS.Common.ActivatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "Microsoft.VSTS.Common.Priority": 2,
+              "Microsoft.VSTS.Common.StackRank": 1996998481.0,
+              "Microsoft.VSTS.Common.ValueArea": "Business",
+              "Custom.IsBlocked": false,
+              "WEF_9E20C18CBEAC4ED7B5A63E15F11F86BD_System.ExtensionMarker": true,
+              "WEF_9E20C18CBEAC4ED7B5A63E15F11F86BD_Kanban.Column": "Active",
+              "WEF_9E20C18CBEAC4ED7B5A63E15F11F86BD_Kanban.Column.Done": false,
+              "Custom.isExternalTeamDependency": false,
+              "Custom.PercentageComplete": 0,
+              "WEF_4BA18B7118D44AFB81F29A35F55F3840_System.ExtensionMarker": true,
+              "WEF_4BA18B7118D44AFB81F29A35F55F3840_Kanban.Column": "Active",
+              "WEF_4BA18B7118D44AFB81F29A35F55F3840_Kanban.Column.Done": false,
+              "WEF_B9E68202024C453687CCB3FBD5BFCA77_System.ExtensionMarker": true,
+              "WEF_B9E68202024C453687CCB3FBD5BFCA77_Kanban.Column": "Active",
+              "WEF_B9E68202024C453687CCB3FBD5BFCA77_Kanban.Column.Done": false,
+              "System.Tags": "and-another-simon-says; and-yet-another-nother-tag; another-simon-says; azdoproxy-api-tmp; hey-no-laka; mndy-tmp-proj; project-xyz; simon-says; update-hierarchy",
+              "System.Parent": 1173355
+            },
+            "relations": [
+              {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1173355",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Parent"
+                }
+              },
+              {
+                "rel": "System.LinkTypes.Hierarchy-Forward",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Child"
+                }
+              },
+              {
+                "rel": "System.LinkTypes.Hierarchy-Forward",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220326",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Child"
+                }
+              }
+            ],
+            "_links": {
+              "self": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220322"
+              },
+              "workItemUpdates": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220322/updates"
+              },
+              "workItemRevisions": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220322/revisions"
+              },
+              "workItemComments": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220322/comments"
+              },
+              "html": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_workitems/edit/1220322"
+              },
+              "workItemType": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItemTypes/Feature"
+              },
+              "fields": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/fields"
+              }
+            },
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220322"
+          },
+          {
+            "id": 1220323,
+            "rev": 13,
+            "fields": {
+              "System.Id": 1220323,
+              "System.AreaId": 26081,
+              "System.AreaPath": "Some\\Area\\Path",
+              "System.TeamProject": "Software",
+              "System.NodeName": "A Team",
+              "System.AreaLevel1": "Software",
+              "System.AreaLevel2": "DepartmentZ",
+              "System.AreaLevel3": "Business Unit P",
+              "System.AreaLevel4": "Project",
+              "System.AreaLevel5": "A Team",
+              "System.Rev": 13,
+              "System.AuthorizedDate": "2024-06-25T09:16:04.81Z",
+              "System.RevisedDate": "9999-01-01T00:00:00Z",
+              "System.IterationId": 26082,
+              "System.IterationPath": "Some\\Iteration\\Path",
+              "System.IterationLevel1": "Software",
+              "System.IterationLevel2": "Non-Aligned",
+              "System.IterationLevel3": "DepartmentZ",
+              "System.IterationLevel4": "Teams",
+              "System.IterationLevel5": "A Team",
+              "System.WorkItemType": "User Story",
+              "System.State": "Active",
+              "System.Reason": "Reintroduced in Scope",
+              "System.AssignedTo": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.CreatedDate": "2024-01-21T12:00:08.993Z",
+              "System.CreatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.ChangedDate": "2024-06-25T09:16:04.81Z",
+              "System.ChangedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.AuthorizedAs": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.PersonId": 138647280,
+              "System.Watermark": 5924107,
+              "System.CommentCount": 1,
+              "System.Title": "Tmp Usr Story 1",
+              "System.BoardColumn": "Active",
+              "System.BoardColumnDone": false,
+              "Microsoft.VSTS.Common.StateChangeDate": "2024-05-10T08:38:30.23Z",
+              "Microsoft.VSTS.Common.ActivatedDate": "2024-05-10T08:38:30.23Z",
+              "Microsoft.VSTS.Common.ActivatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "Microsoft.VSTS.Common.Priority": 2,
+              "Microsoft.VSTS.Common.StackRank": 1999980775.0,
+              "Microsoft.VSTS.Common.ValueArea": "Business",
+              "Custom.IsBlocked": false,
+              "Custom.IsReboot": false,
+              "WEF_88B394B0D7424B609BFD4E16F5F0BADF_System.ExtensionMarker": true,
+              "WEF_88B394B0D7424B609BFD4E16F5F0BADF_Kanban.Column": "Active",
+              "WEF_88B394B0D7424B609BFD4E16F5F0BADF_Kanban.Column.Done": false,
+              "Custom.isExternalDependency": false,
+              "Custom.PercentageComplete": 0,
+              "WEF_513F3516A9424351825A92AFCA0F1AF8_System.ExtensionMarker": true,
+              "WEF_513F3516A9424351825A92AFCA0F1AF8_Kanban.Column": "Active",
+              "WEF_513F3516A9424351825A92AFCA0F1AF8_Kanban.Column.Done": false,
+              "WEF_83C7BA3FF3784710A38BF2C7F33B0082_System.ExtensionMarker": true,
+              "WEF_83C7BA3FF3784710A38BF2C7F33B0082_Kanban.Column": "Active",
+              "WEF_83C7BA3FF3784710A38BF2C7F33B0082_Kanban.Column.Done": false,
+              "Custom.CommittedTo": false,
+              "WEF_4296AE07966440698751C7126D46E2DE_System.ExtensionMarker": true,
+              "WEF_4296AE07966440698751C7126D46E2DE_Kanban.Column": "Active",
+              "WEF_4296AE07966440698751C7126D46E2DE_Kanban.Column.Done": false,
+              "WEF_E34FCF46D732484C80EFCAB9D41B7DE4_System.ExtensionMarker": true,
+              "WEF_E34FCF46D732484C80EFCAB9D41B7DE4_Kanban.Column": "Active",
+              "WEF_E34FCF46D732484C80EFCAB9D41B7DE4_Kanban.Column.Done": false,
+              "System.Tags": "and-another-simon-says; and-yet-another-nother-tag; another-simon-says; azdoproxy-api-tmp; hey-no-laka; mndy-tmp-proj; project-xyz; simon-says; update-hierarchy",
+              "System.Parent": 1220322
+            },
+            "relations": [
+              {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220322",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Parent"
+                }
+              },
+              {
+                "rel": "System.LinkTypes.Hierarchy-Forward",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378095",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Child"
+                }
+              },
+              {
+                "rel": "System.LinkTypes.Hierarchy-Forward",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420908",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Child"
+                }
+              },
+              {
+                "rel": "System.LinkTypes.Hierarchy-Forward",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420907",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Child"
+                }
+              },
+              {
+                "rel": "System.LinkTypes.Hierarchy-Forward",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420909",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Child"
+                }
+              }
+            ],
+            "_links": {
+              "self": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323"
+              },
+              "workItemUpdates": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323/updates"
+              },
+              "workItemRevisions": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323/revisions"
+              },
+              "workItemComments": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323/comments"
+              },
+              "html": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_workitems/edit/1220323"
+              },
+              "workItemType": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItemTypes/User%20Story"
+              },
+              "fields": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/fields"
+              }
+            },
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323"
+          },
+          {
+            "id": 1220326,
+            "rev": 14,
+            "fields": {
+              "System.Id": 1220326,
+              "System.AreaId": 26081,
+              "System.AreaPath": "Some\\Area\\Path",
+              "System.TeamProject": "Software",
+              "System.NodeName": "A Team",
+              "System.AreaLevel1": "Software",
+              "System.AreaLevel2": "DepartmentZ",
+              "System.AreaLevel3": "Business Unit P",
+              "System.AreaLevel4": "Project",
+              "System.AreaLevel5": "A Team",
+              "System.Rev": 14,
+              "System.AuthorizedDate": "2024-06-25T09:16:04.813Z",
+              "System.RevisedDate": "9999-01-01T00:00:00Z",
+              "System.IterationId": 26082,
+              "System.IterationPath": "Some\\Iteration\\Path",
+              "System.IterationLevel1": "Software",
+              "System.IterationLevel2": "Non-Aligned",
+              "System.IterationLevel3": "DepartmentZ",
+              "System.IterationLevel4": "Teams",
+              "System.IterationLevel5": "A Team",
+              "System.WorkItemType": "User Story",
+              "System.State": "Active",
+              "System.Reason": "Reintroduced in Scope",
+              "System.AssignedTo": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.CreatedDate": "2024-01-21T12:00:54.15Z",
+              "System.CreatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.ChangedDate": "2024-06-25T09:16:04.813Z",
+              "System.ChangedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.AuthorizedAs": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.PersonId": 138647280,
+              "System.Watermark": 5924108,
+              "System.CommentCount": 2,
+              "System.Title": "Tmp Usr Story 2",
+              "System.BoardColumn": "Active",
+              "System.BoardColumnDone": false,
+              "Microsoft.VSTS.Common.StateChangeDate": "2024-05-10T08:38:52.717Z",
+              "Microsoft.VSTS.Common.ActivatedDate": "2024-05-10T08:38:52.717Z",
+              "Microsoft.VSTS.Common.ActivatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "Microsoft.VSTS.Common.Priority": 2,
+              "Microsoft.VSTS.Common.StackRank": 1999981031.0,
+              "Microsoft.VSTS.Common.ValueArea": "Business",
+              "Custom.IsBlocked": false,
+              "Custom.IsReboot": false,
+              "WEF_88B394B0D7424B609BFD4E16F5F0BADF_System.ExtensionMarker": true,
+              "WEF_88B394B0D7424B609BFD4E16F5F0BADF_Kanban.Column": "Active",
+              "WEF_88B394B0D7424B609BFD4E16F5F0BADF_Kanban.Column.Done": false,
+              "Custom.isExternalDependency": false,
+              "Custom.PercentageComplete": 0,
+              "WEF_513F3516A9424351825A92AFCA0F1AF8_System.ExtensionMarker": true,
+              "WEF_513F3516A9424351825A92AFCA0F1AF8_Kanban.Column": "Active",
+              "WEF_513F3516A9424351825A92AFCA0F1AF8_Kanban.Column.Done": false,
+              "WEF_83C7BA3FF3784710A38BF2C7F33B0082_System.ExtensionMarker": true,
+              "WEF_83C7BA3FF3784710A38BF2C7F33B0082_Kanban.Column": "Active",
+              "WEF_83C7BA3FF3784710A38BF2C7F33B0082_Kanban.Column.Done": false,
+              "Custom.CommittedTo": false,
+              "WEF_4296AE07966440698751C7126D46E2DE_System.ExtensionMarker": true,
+              "WEF_4296AE07966440698751C7126D46E2DE_Kanban.Column": "Active",
+              "WEF_4296AE07966440698751C7126D46E2DE_Kanban.Column.Done": false,
+              "WEF_E34FCF46D732484C80EFCAB9D41B7DE4_System.ExtensionMarker": true,
+              "WEF_E34FCF46D732484C80EFCAB9D41B7DE4_Kanban.Column": "Active",
+              "WEF_E34FCF46D732484C80EFCAB9D41B7DE4_Kanban.Column.Done": false,
+              "System.Tags": "and-another-simon-says; and-yet-another-nother-tag; another-simon-says; azdoproxy-api-tmp; hey-no-laka; mndy-tmp-proj; project-xyz; simon-says; update-hierarchy",
+              "System.Parent": 1220322
+            },
+            "relations": [
+              {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220322",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Parent"
+                }
+              },
+              {
+                "rel": "System.LinkTypes.Hierarchy-Forward",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378096",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Child"
+                }
+              }
+            ],
+            "_links": {
+              "self": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220326"
+              },
+              "workItemUpdates": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220326/updates"
+              },
+              "workItemRevisions": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220326/revisions"
+              },
+              "workItemComments": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220326/comments"
+              },
+              "html": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_workitems/edit/1220326"
+              },
+              "workItemType": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItemTypes/User%20Story"
+              },
+              "fields": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/fields"
+              }
+            },
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220326"
+          },
+          {
+            "id": 1378095,
+            "rev": 6,
+            "fields": {
+              "System.Id": 1378095,
+              "System.AreaId": 26081,
+              "System.AreaPath": "Some\\Area\\Path",
+              "System.TeamProject": "Software",
+              "System.NodeName": "A Team",
+              "System.AreaLevel1": "Software",
+              "System.AreaLevel2": "DepartmentZ",
+              "System.AreaLevel3": "Business Unit P",
+              "System.AreaLevel4": "Project",
+              "System.AreaLevel5": "A Team",
+              "System.Rev": 6,
+              "System.AuthorizedDate": "2024-06-25T09:16:05.477Z",
+              "System.RevisedDate": "9999-01-01T00:00:00Z",
+              "System.IterationId": 26082,
+              "System.IterationPath": "Some\\Iteration\\Path",
+              "System.IterationLevel1": "Software",
+              "System.IterationLevel2": "Non-Aligned",
+              "System.IterationLevel3": "DepartmentZ",
+              "System.IterationLevel4": "Teams",
+              "System.IterationLevel5": "A Team",
+              "System.WorkItemType": "Task",
+              "System.State": "Active",
+              "System.Reason": "Reactivated",
+              "System.AssignedTo": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.CreatedDate": "2024-05-23T07:50:20.66Z",
+              "System.CreatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.ChangedDate": "2024-06-25T09:16:05.477Z",
+              "System.ChangedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.AuthorizedAs": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.PersonId": 138647280,
+              "System.Watermark": 5924109,
+              "System.CommentCount": 0,
+              "System.Title": "Task 001",
+              "Microsoft.VSTS.Scheduling.OriginalEstimate": -1.0,
+              "Microsoft.VSTS.Scheduling.CompletedWork": 5.0,
+              "Microsoft.VSTS.Common.StateChangeDate": "2024-06-10T08:25:19.93Z",
+              "Microsoft.VSTS.Common.ActivatedDate": "2024-06-10T08:25:19.93Z",
+              "Microsoft.VSTS.Common.ActivatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "Microsoft.VSTS.Common.Priority": 2,
+              "Custom.IsBlocked": false,
+              "Custom.CommittedTo": false,
+              "System.Tags": "hey-no-laka; project-xyz",
+              "System.Parent": 1220323
+            },
+            "relations": [
+              {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Parent"
+                }
+              }
+            ],
+            "_links": {
+              "self": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378095"
+              },
+              "workItemUpdates": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378095/updates"
+              },
+              "workItemRevisions": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378095/revisions"
+              },
+              "workItemComments": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378095/comments"
+              },
+              "html": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_workitems/edit/1378095"
+              },
+              "workItemType": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItemTypes/Task"
+              },
+              "fields": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/fields"
+              }
+            },
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378095"
+          },
+          {
+            "id": 1378096,
+            "rev": 5,
+            "fields": {
+              "System.Id": 1378096,
+              "System.AreaId": 26081,
+              "System.AreaPath": "Some\\Area\\Path",
+              "System.TeamProject": "Software",
+              "System.NodeName": "A Team",
+              "System.AreaLevel1": "Software",
+              "System.AreaLevel2": "DepartmentZ",
+              "System.AreaLevel3": "Business Unit P",
+              "System.AreaLevel4": "Project",
+              "System.AreaLevel5": "A Team",
+              "System.Rev": 5,
+              "System.AuthorizedDate": "2024-06-25T09:16:05.607Z",
+              "System.RevisedDate": "9999-01-01T00:00:00Z",
+              "System.IterationId": 26082,
+              "System.IterationPath": "Some\\Iteration\\Path",
+              "System.IterationLevel1": "Software",
+              "System.IterationLevel2": "Non-Aligned",
+              "System.IterationLevel3": "DepartmentZ",
+              "System.IterationLevel4": "Teams",
+              "System.IterationLevel5": "A Team",
+              "System.WorkItemType": "Task",
+              "System.State": "Active",
+              "System.Reason": "Work started",
+              "System.AssignedTo": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.CreatedDate": "2024-05-23T07:50:47.51Z",
+              "System.CreatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.ChangedDate": "2024-06-25T09:16:05.607Z",
+              "System.ChangedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.AuthorizedAs": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.PersonId": 138647280,
+              "System.Watermark": 5924110,
+              "System.CommentCount": 0,
+              "System.Title": "Task 003",
+              "Microsoft.VSTS.Scheduling.CompletedWork": 5.0,
+              "Microsoft.VSTS.Common.StateChangeDate": "2024-05-23T07:50:53.95Z",
+              "Microsoft.VSTS.Common.ActivatedDate": "2024-05-23T07:50:53.95Z",
+              "Microsoft.VSTS.Common.ActivatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "Microsoft.VSTS.Common.Priority": 2,
+              "Custom.IsBlocked": false,
+              "Custom.CommittedTo": false,
+              "System.Tags": "hey-no-laka; project-xyz",
+              "System.Parent": 1220326
+            },
+            "relations": [
+              {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220326",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Parent"
+                }
+              }
+            ],
+            "_links": {
+              "self": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378096"
+              },
+              "workItemUpdates": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378096/updates"
+              },
+              "workItemRevisions": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378096/revisions"
+              },
+              "workItemComments": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378096/comments"
+              },
+              "html": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_workitems/edit/1378096"
+              },
+              "workItemType": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItemTypes/Task"
+              },
+              "fields": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/fields"
+              }
+            },
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1378096"
+          },
+          {
+            "id": 1420907,
+            "rev": 2,
+            "fields": {
+              "System.Id": 1420907,
+              "System.AreaId": 26081,
+              "System.AreaPath": "Some\\Area\\Path",
+              "System.TeamProject": "Software",
+              "System.NodeName": "A Team",
+              "System.AreaLevel1": "Software",
+              "System.AreaLevel2": "DepartmentZ",
+              "System.AreaLevel3": "Business Unit P",
+              "System.AreaLevel4": "Project",
+              "System.AreaLevel5": "A Team",
+              "System.Rev": 2,
+              "System.AuthorizedDate": "2024-07-14T14:33:58.117Z",
+              "System.RevisedDate": "9999-01-01T00:00:00Z",
+              "System.IterationId": 26082,
+              "System.IterationPath": "Some\\Iteration\\Path",
+              "System.IterationLevel1": "Software",
+              "System.IterationLevel2": "Non-Aligned",
+              "System.IterationLevel3": "DepartmentZ",
+              "System.IterationLevel4": "Teams",
+              "System.IterationLevel5": "A Team",
+              "System.WorkItemType": "Bug",
+              "System.State": "Active",
+              "System.Reason": "Approved",
+              "System.AssignedTo": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.CreatedDate": "2024-07-14T14:33:52.43Z",
+              "System.CreatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.ChangedDate": "2024-07-14T14:33:58.117Z",
+              "System.ChangedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.AuthorizedAs": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.PersonId": 138647280,
+              "System.Watermark": 6007923,
+              "System.CommentCount": 0,
+              "System.Title": "Bug 001",
+              "Microsoft.VSTS.Common.StateChangeDate": "2024-07-14T14:33:58.117Z",
+              "Microsoft.VSTS.Common.ActivatedDate": "2024-07-14T14:33:58.117Z",
+              "Microsoft.VSTS.Common.ActivatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "Microsoft.VSTS.Common.Priority": 2,
+              "Microsoft.VSTS.Common.Severity": "3 - Medium",
+              "Microsoft.VSTS.Common.ValueArea": "Business",
+              "Custom.IsBlocked": false,
+              "System.Tags": "project-xyz",
+              "System.Parent": 1220323
+            },
+            "relations": [
+              {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Parent"
+                }
+              }
+            ],
+            "_links": {
+              "self": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420907"
+              },
+              "workItemUpdates": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420907/updates"
+              },
+              "workItemRevisions": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420907/revisions"
+              },
+              "workItemComments": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420907/comments"
+              },
+              "html": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_workitems/edit/1420907"
+              },
+              "workItemType": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItemTypes/Bug"
+              },
+              "fields": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/fields"
+              }
+            },
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420907"
+          },
+          {
+            "id": 1420908,
+            "rev": 1,
+            "fields": {
+              "System.Id": 1420908,
+              "System.AreaId": 26081,
+              "System.AreaPath": "Some\\Area\\Path",
+              "System.TeamProject": "Software",
+              "System.NodeName": "A Team",
+              "System.AreaLevel1": "Software",
+              "System.AreaLevel2": "DepartmentZ",
+              "System.AreaLevel3": "Business Unit P",
+              "System.AreaLevel4": "Project",
+              "System.AreaLevel5": "A Team",
+              "System.Rev": 1,
+              "System.AuthorizedDate": "2024-07-14T14:35:18.3Z",
+              "System.RevisedDate": "9999-01-01T00:00:00Z",
+              "System.IterationId": 26082,
+              "System.IterationPath": "Some\\Iteration\\Path",
+              "System.IterationLevel1": "Software",
+              "System.IterationLevel2": "Non-Aligned",
+              "System.IterationLevel3": "DepartmentZ",
+              "System.IterationLevel4": "Teams",
+              "System.IterationLevel5": "A Team",
+              "System.WorkItemType": "Impediment",
+              "System.State": "New",
+              "System.Reason": "Moved to state New",
+              "System.AssignedTo": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.CreatedDate": "2024-07-14T14:35:18.3Z",
+              "System.CreatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.ChangedDate": "2024-07-14T14:35:18.3Z",
+              "System.ChangedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.AuthorizedAs": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.PersonId": 138647280,
+              "System.Watermark": 6007924,
+              "System.CommentCount": 0,
+              "System.Title": "Something came up",
+              "Microsoft.VSTS.Common.StateChangeDate": "2024-07-14T14:35:18.3Z",
+              "Custom.Category": "Support",
+              "Custom.HoursImpacted": 1.0,
+              "System.Tags": "project-xyz",
+              "System.Parent": 1220323
+            },
+            "relations": [
+              {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Parent"
+                }
+              }
+            ],
+            "_links": {
+              "self": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420908"
+              },
+              "workItemUpdates": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420908/updates"
+              },
+              "workItemRevisions": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420908/revisions"
+              },
+              "workItemComments": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420908/comments"
+              },
+              "html": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_workitems/edit/1420908"
+              },
+              "workItemType": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItemTypes/Impediment"
+              },
+              "fields": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/fields"
+              }
+            },
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420908"
+          },
+          {
+            "id": 1420909,
+            "rev": 2,
+            "fields": {
+              "System.Id": 1420909,
+              "System.AreaId": 26081,
+              "System.AreaPath": "Some\\Area\\Path",
+              "System.TeamProject": "Software",
+              "System.NodeName": "A Team",
+              "System.AreaLevel1": "Software",
+              "System.AreaLevel2": "DepartmentZ",
+              "System.AreaLevel3": "Business Unit P",
+              "System.AreaLevel4": "Project",
+              "System.AreaLevel5": "A Team",
+              "System.Rev": 2,
+              "System.AuthorizedDate": "2024-07-14T14:49:04.917Z",
+              "System.RevisedDate": "9999-01-01T00:00:00Z",
+              "System.IterationId": 26082,
+              "System.IterationPath": "Some\\Iteration\\Path",
+              "System.IterationLevel1": "Software",
+              "System.IterationLevel2": "Non-Aligned",
+              "System.IterationLevel3": "DepartmentZ",
+              "System.IterationLevel4": "Teams",
+              "System.IterationLevel5": "A Team",
+              "System.WorkItemType": "Task",
+              "System.State": "Removed",
+              "System.Reason": "Removed from the backlog",
+              "System.AssignedTo": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.CreatedDate": "2024-07-14T14:48:39.67Z",
+              "System.CreatedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.ChangedDate": "2024-07-14T14:49:04.917Z",
+              "System.ChangedBy": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.AuthorizedAs": {
+                "displayName": "Simon Stipcich",
+                "url": "https://spsprodweu1.vssps.visualstudio.com/Ada621ffd-3496-420c-9ac6-838f0548e8bc/_apis/Identities/9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "_links": {
+                  "avatar": {
+                    "href": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+                  }
+                },
+                "id": "9adfe0de-95da-6431-b89a-26de89c96ae6",
+                "uniqueName": "si.stip@xo.com",
+                "imageUrl": "https://dev.azure.com/CompanyX/_apis/GraphProfile/MemberAvatars/aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2",
+                "descriptor": "aad.OWFkZmUwZGUtOTVkYS03NDMxLWI4OWEtMjZkZTg5Yzk2YWU2"
+              },
+              "System.PersonId": 138647280,
+              "System.Watermark": 6007926,
+              "System.CommentCount": 0,
+              "System.Title": "Something in the dark",
+              "Microsoft.VSTS.Common.StateChangeDate": "2024-07-14T14:49:04.917Z",
+              "Microsoft.VSTS.Common.Priority": 2,
+              "Custom.IsBlocked": false,
+              "Custom.CommittedTo": false,
+              "System.Tags": "project-xyz",
+              "System.Parent": 1220323
+            },
+            "relations": [
+              {
+                "rel": "System.LinkTypes.Hierarchy-Reverse",
+                "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1220323",
+                "attributes": {
+                  "isLocked": false,
+                  "name": "Parent"
+                }
+              }
+            ],
+            "_links": {
+              "self": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420909"
+              },
+              "workItemUpdates": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420909/updates"
+              },
+              "workItemRevisions": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420909/revisions"
+              },
+              "workItemComments": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420909/comments"
+              },
+              "html": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_workitems/edit/1420909"
+              },
+              "workItemType": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItemTypes/Task"
+              },
+              "fields": {
+                "href": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/fields"
+              }
+            },
+            "url": "https://dev.azure.com/CompanyX/31fcfce5-c6a2-4173-8ad2-c9535f3f83bd/_apis/wit/workItems/1420909"
+          }
+        ]
+      },
+      "Headers": {
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+        "Content-Type": "application/json; charset=utf-8",
+        "Expires": "-1",
+        "Server": "Microsoft-IIS/8.5",
+        "X-Api-Version": "2.17.0.444",
+        "X-AspNet-Version": "4.0.30319",
+        "X-Powered-By": "ASP.NET",
+        "Date": "Mon, 21 Oct 2019 15:06:16 GMT",
+        "Connection": "close"
+      }
+    },
+    "UseWebhooksFireAndForget": false
+  }
+]

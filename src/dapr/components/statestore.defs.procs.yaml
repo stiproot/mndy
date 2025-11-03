@@ -1,0 +1,23 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore-procs
+scopes:
+  - mndy-workflows-worker
+spec:
+  type: state.mongodb
+  version: v1
+  initTimeout: 5m
+  metadata:
+  - name: host
+    value: "mongo-mndy:27017"
+  - name: databaseName
+    value: "mndy"
+  - name: collectionName
+    value: "procs"
+  - name: keyPrefix
+    value: "none"
+  - name: params
+    value: "?authSource=admin&replicaSet=rs0&directConnection=true"
+  - name: actorStateStore
+    value: "true"

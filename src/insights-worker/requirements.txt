@@ -1,0 +1,9 @@
+fastapi
+dapr-ext-fastapi-dev
+dapr>=1.15.0
+uvicorn
+pyxi_azdo_http_client
+requests
+environs
+typing-extensions
+httpx

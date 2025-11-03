@@ -1,0 +1,25 @@
+[project]
+name = "workflows-worker"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi",
+  "dapr-ext-fastapi-dev",
+  "dapr>=1.15.0",
+  "uvicorn",
+  "pyxi_azdo_http_client",
+  "requests",
+  "environs",
+  "typing-extensions",
+  "httpx",
+  "mndy_framework",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv.sources]
+mndy-framework = { path = "../mndy-framework" }

@@ -1,0 +1,16 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub-cmd-receipt
+scopes:
+  - mndy-workflows-worker
+  - mndy-azdo-worker
+  - mndy-insights-worker
+  - mndy-azdoproxy-worker
+spec:
+  type: pubsub.rabbitmq
+  version: v1
+  initTimeout: 30s
+  metadata:
+    - name: connectionString
+      value: amqp://localhost:5672

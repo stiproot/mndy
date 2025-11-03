@@ -1,0 +1,23 @@
+[project]
+name = "azdo-worker"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi",
+  "dapr-ext-fastapi-dev",
+  "dapr>=1.15.0",
+  "uvicorn",
+  "httpx",
+  "requests",
+  "environs",
+  "typing-extensions",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv.sources]
+mndy-framework = { path = "../mndy-framework" }

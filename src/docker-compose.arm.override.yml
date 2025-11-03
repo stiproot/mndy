@@ -1,0 +1,84 @@
+services:
+  ##############################################
+  #           Dapr placement service           #
+  ##############################################
+  placement:
+    platform: 'linux/arm64'
+
+  ##############################################
+  #                   RabbitMQ                 #
+  ##############################################
+  rabbitmq:
+    platform: 'linux/arm64'
+
+  ##############################################
+  #                   MongoDB                  #
+  ##############################################
+  mongo:
+    platform: 'linux/arm64'
+
+  mongo-express:
+    platform: 'linux/arm64'
+
+  ##############################################
+  #                   Zipkin                   #
+  ##############################################
+  zipkin:
+    platform: 'linux/arm64'
+
+  ###################################################
+  #  Workflows Worker Service + Dapr sidecar  #
+  ###################################################
+  mndy-workflows-worker:
+    platform: 'linux/arm64'
+
+  mndy-workflows-worker-dapr:
+    platform: 'linux/arm64'
+
+  ###################################################
+  #  AzDO Worker Service + Dapr sidecar  #
+  ###################################################
+  mndy-azdo-worker:
+    platform: 'linux/arm64'
+
+  mndy-azdo-worker-dapr:
+    platform: 'linux/arm64'
+
+  ###################################################
+  #  Insights Worker Service + Dapr sidecar  #
+  ###################################################
+  mndy-insights-worker:
+    platform: 'linux/arm64'
+
+  mndy-insights-worker-dapr:
+    platform: 'linux/arm64'
+
+  ###################################################
+  #  AzDO Proxy Worker Service + Dapr sidecar  #
+  ###################################################
+  mndy-azdoproxy-worker:
+    platform: 'linux/arm64'
+
+  mndy-azdoproxy-worker-dapr:
+    platform: 'linux/arm64'
+
+  ###################################################
+  #  AzDO Proxy API + Dapr sidecar  #
+  ###################################################
+  mndy-azdoproxy-api:
+    platform: 'linux/arm64'
+
+  ###################################################
+  #  UI API + Dapr sidecar  #
+  ###################################################
+  mndy-ui-api:
+    platform: 'linux/arm64'
+
+  mndy-ui-api-dapr:
+    platform: 'linux/arm64'
+
+  ###################################################
+  #  UI
+  ###################################################
+  mndy-ui:
+    platform: 'linux/arm64'

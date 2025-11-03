@@ -1,0 +1,38 @@
+[
+  {
+    "Guid": "41a0d96a-87cb-476c-8941-d85db113c7b6",
+    "UpdatedAt": "2024-02-07T06:12:47.7551112Z",
+    "Title": "Wiremock-Healthz",
+    "Request": {
+      "Path": {
+        "Matchers": [
+          {
+            "Name": "WildcardMatcher",
+            "Pattern": "/healthz",
+            "IgnoreCase": true
+          }
+        ]
+      },
+      "Methods": [
+        "get"
+      ]
+    },
+    "Response": {
+      "StatusCode": 200,
+      "BodyAsJson": {},
+      "Headers": {
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+        "Content-Type": "application/json; charset=utf-8",
+        "Expires": "-1",
+        "Server": "Microsoft-IIS/8.5",
+        "X-Api-Version": "2.17.0.444",
+        "X-AspNet-Version": "4.0.30319",
+        "X-Powered-By": "ASP.NET",
+        "Date": "Mon, 21 Oct 2019 15:06:16 GMT",
+        "Connection": "close"
+      }
+    },
+    "UseWebhooksFireAndForget": false
+  }
+]

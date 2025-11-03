@@ -1,0 +1,15 @@
+[project]
+name = "mndy-framework"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  'environs',
+  'pydantic',
+  'dapr>=1.15.0',
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"

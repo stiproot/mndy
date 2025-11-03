@@ -1,0 +1,292 @@
+name: mndy
+x-daprdimage: &daprdimage
+  image: daprio/daprd:1.15.5
+  volumes:
+    - ./dapr/components/:/components
+    - ./dapr/configuration/:/configuration
+
+services:
+  ##############################################
+  #           Dapr placement service           #
+  ##############################################
+  # placement:
+  #   image: daprio/dapr:1.15.5-linux
+  #   container_name: placement-mndy
+  #   command: ["./placement", "-port", "50005"]
+  #   ports:
+  #     - 50000:50005
+  placement:
+    image: daprio/placement:1.15.8
+    container_name: placement-mndy
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - 50000:50006
+
+  scheduler:
+    image: daprio/daprd:1.15.8
+    container_name: scheduler-mndy
+    command: --etcd-data-dir=/var/lock/dapr/scheduler
+    ports:
+      - "50006:50006"
+      - "52379:52379"
+      - "58081:58081"
+      - "59091:59091"
+    restart: unless-stopped
+
+  ##############################################
+  #                   RabbitMQ                 #
+  ##############################################
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-mndy
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping && rabbitmq-diagnostics -q status
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  ##############################################
+  #                   MongoDB                  #
+  ##############################################
+  mongo:
+    image: mongo:7
+    container_name: mongo-mndy
+    command: [--replSet, rs0, --bind_ip_all, --port, "27017"]
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: test $$(mongosh --port 27017 --quiet --eval "try {rs.initiate({_id:'rs0',members:[{_id:0,host:\"mongo:27017\"}]})} catch(e) {rs.status().ok}") -eq 1
+      interval: 10s
+      start_period: 30s
+    volumes:
+      - mongodb-data:/data/keyfile
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express-mndy
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo-mndy
+      # ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      # ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  ##############################################
+  #                   Zipkin                   #
+  ##############################################
+  zipkin:
+    image: openzipkin/zipkin-slim
+    container_name: zipkin-mndy
+    ports:
+      - 9411:9411
+
+  ##############################################
+  #  Workflows Worker Service + Dapr sidecar   #
+  ##############################################
+  mndy-workflows-worker:
+    image: xo-feed/mndy/workflows-worker:dev
+    build:
+      context: workflows-worker/
+      dockerfile: Dockerfile
+      tags:
+        - xo-feed/mndy/workflows-worker:dev
+    ports:
+      - "6006:8001"
+    environment:
+      - DEBUGGING=False
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  mndy-workflows-worker-dapr:
+    <<: *daprdimage
+    command: [ "./daprd",
+      "--app-id", "mndy-workflows-worker",
+      "--app-port", "8001",
+      "--placement-host-address", "placement:50006",
+      "--resources-path", "/components",
+      "--config", "/configuration/config.yaml" ]
+    depends_on:
+      - mndy-workflows-worker
+    network_mode: service:mndy-workflows-worker
+
+  ########################################
+  #  AzDO Worker Service + Dapr sidecar  #
+  ########################################
+  mndy-azdo-worker:
+    image: xo-feed/mndy/azdo-worker:dev
+    build:
+      context: azdo-worker/
+      dockerfile: Dockerfile
+      tags:
+        - xo-feed/mndy/azdo-worker:dev
+    ports:
+      - "6003:8001"
+    environment:
+      - DEBUGGING=False
+      - API_KEY=${BASE64_AZDO_PAT}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  mndy-azdo-worker-dapr:
+    <<: *daprdimage
+    command: [ "./daprd",
+      "--app-id", "mndy-azdo-worker",
+      "--app-port", "8001",
+      "--placement-host-address", "placement:50006",
+      "--resources-path", "/components",
+      "--config", "/configuration/config.yaml" ]
+    depends_on:
+      - mndy-azdo-worker
+    network_mode: service:mndy-azdo-worker
+
+  ############################################
+  #  Insights Worker Service + Dapr sidecar  #
+  ############################################
+  mndy-insights-worker:
+    image: xo-feed/mndy/insights-worker:dev
+    build:
+      context: insights-worker/
+      dockerfile: Dockerfile
+      tags:
+        - xo-feed/mndy/insights-worker:dev
+    ports:
+      - "6004:8001"
+    environment:
+      - DEBUGGING=False
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  mndy-insights-worker-dapr:
+    <<: *daprdimage
+    command: [ "./daprd",
+      "--app-id", "mndy-insights-worker",
+      "--app-port", "8001",
+      "--placement-host-address", "placement:50006",
+      "--resources-path", "/components",
+      "--config", "/configuration/config.yaml" ]
+    depends_on:
+      - mndy-insights-worker
+    network_mode: service:mndy-insights-worker
+
+  ##############################################
+  #  AzDO Proxy Worker Service + Dapr sidecar  #
+  ##############################################
+  mndy-azdoproxy-worker:
+    image: xo-feed/mndy/azdoproxy-worker:dev
+    build:
+      context: azdoproxy-worker/
+      dockerfile: Dockerfile
+      tags:
+        - xo-feed/mndy/azdoproxy-worker:dev
+    ports:
+      - "6005:8001"
+    environment:
+      - DEBUGGING=False
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  mndy-azdoproxy-worker-dapr:
+    <<: *daprdimage
+    command: [ "./daprd",
+      "--app-id", "mndy-azdoproxy-worker",
+      "--app-port", "8001",
+      "--placement-host-address", "placement:50006",
+      "--resources-path", "/components",
+      "--config", "/configuration/config.yaml" ]
+    depends_on:
+      - mndy-azdoproxy-worker
+    network_mode: service:mndy-azdoproxy-worker
+
+  ###################################
+  #  AzDO Proxy API + Dapr sidecar  #
+  ###################################
+  mndy-azdoproxy-api:
+    image: xo-feed/mndy/azdoproxy-api:dev
+    build:
+      context: azdoproxy-api/
+      dockerfile: Dockerfile
+      tags:
+        - xo-feed/mndy/azdoproxy-api:dev
+    dns:
+      - "10.1.4.11"
+      - "10.1.4.12"
+    ports:
+      - 5079:5000
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+
+  #########################################
+  #           UI API + Dapr sidecar       #
+  #########################################
+  mndy-ui-api:
+    image: xo-feed/mndy/ui-api:dev
+    build:
+      context: ui-api/
+      dockerfile: Dockerfile
+      tags:
+        - xo-feed/mndy/ui-api:dev
+    ports:
+      - 3002:3002
+    environment:
+      - PORT=3001
+    depends_on:
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  mndy-ui-api-dapr:
+    <<: *daprdimage
+    command: [ "./daprd",
+      "--app-id", "mndy-ui-api",
+      "--dapr-http-port", "3500",
+      "--app-port", "3002",
+      "--placement-host-address", "placement:50006",
+      "--resources-path", "/components",
+      "--config", "/configuration/config.yaml" ]
+    depends_on:
+      - mndy-ui-api
+      - mndy-workflows-worker
+    network_mode: service:mndy-ui-api
+
+  ###################################################
+  #                       UI                        #
+  ###################################################
+  mndy-ui:
+    image: xo-feed/mndy/ui:dev
+    build:
+      context: ui/
+      dockerfile: Dockerfile
+      tags:
+        - xo-feed/mndy/ui:dev
+    ports:
+      - 8080:8081
+    environment:
+      - VUE_APP_UI_API_BASE_URL=http://localhost:3004/ui-api
+    depends_on:
+      - mndy-ui-api
+
+volumes:
+  mongodb-data:
+
+networks:
+  default:
+    driver: bridge

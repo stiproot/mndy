@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script type="text/javascript" src="d3.v7.min.js"></script>
+    <script type="module">
+      import { getTree } from "./data.service.js";
+      import { buildTidyTree } from "./tidy-tree.js";
+      import { buildNestedTreeMap } from "./nested-treemap.js";
+      import { buildClusterTree } from "./cluster-tree.js";
+      import { buildPackedCircles } from "./packed-circles.js";
+      import { buildForceDirectedTree } from "./force-directed-tree.js";
+
+      var summarizedData = [];
+      var weightedSummarizedData = [];
+
+      document.addEventListener("DOMContentLoaded", function () {
+        //   (async () => {
+        //     try {
+        //       const data = await getTree("simple_tree");
+        //       // summarizedData = data;
+        //       buildTidyTree(data, document.querySelector("#summarized-tree"));
+        //       buildClusterTree(data, document.querySelector("#cluster-tree"));
+        //       buildPackedCircles(data, document.querySelector("#packed-circles"));
+        //       buildForceDirectedTree(
+        //         data,
+        //         document.querySelector("#force-directed-tree")
+        //       );
+        //     } catch (error) {
+        //       console.error("GET request error:", error);
+        //     }
+        //   })();
+
+        (async () => {
+          try {
+            const data = await getTree("unit_tree");
+            // weightedSummarizedData = data;
+            buildNestedTreeMap(data, document.querySelector("#nested-treemap"));
+          } catch (error) {
+            console.error("GET request error:", error);
+          }
+        })();
+      });
+
+      function handleClick(id) {
+        const cont = document.querySelector("#container");
+        if (id === "nested-treemap") {
+          // const data = await getTree("unit_tree");
+          // buildNestedTreeMap(weightedSummarizedData, cont);
+        }
+
+        const element = document.getElementById(id);
+        element.style.display = element.style.display === "none" ? "" : "none";
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- <table> -->
+    <!--   <tr> -->
+    <!--     <td> -->
+    <!--       <button onclick="handleClick('summarized-tree')"> -->
+    <!--         summarized tree -->
+    <!--       </button> -->
+    <!--     </td> -->
+    <!--     <td> -->
+    <!--       <button onclick="handleClick('cluster-tree')">cluster-tree</button> -->
+    <!--     </td> -->
+    <!--     <td> -->
+    <!--       <button onclick="handleClick('packed-circles')"> -->
+    <!--         packed-circles -->
+    <!--       </button> -->
+    <!--     </td> -->
+    <!--     <td> -->
+    <!--       <button onclick="handleClick('force-directed-tree')"> -->
+    <!--         force-directed-tree -->
+    <!--       </button> -->
+    <!--     </td> -->
+    <!--     <td> -->
+    <!--       <button onclick="handleClick('nested-treemap')"> -->
+    <!--         nested-treemap -->
+    <!--       </button> -->
+    <!--     </td> -->
+    <!--   </tr> -->
+    <!-- </table> -->
+
+    <!-- <div id="container"></div> -->
+    <!-- <div id="summarized-tree"></div> -->
+    <!-- <div id="cluster-tree"></div> -->
+    <!-- <div id="packed-circles"></div> -->
+    <!-- <div id="force-directed-tree"></div> -->
+    <div id="nested-treemap"></div>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore-projs
+scopes:
+  - mndy-azdo-worker
+  - mndy-azdoproxy-worker
+  - mndy-insights-worker
+  - mndy-workflows-worker
+  - mndy-ui-api
+  - mndy-test-harness
+spec:
+  type: state.mongodb
+  version: v1
+  initTimeout: 5m
+  metadata:
+  - name: host
+    value: "mongo-mndy:27017"
+  - name: databaseName
+    value: "mndy"
+  - name: collectionName
+    value: "projs"
+  - name: keyPrefix
+    value: "none"
+  - name: params
+    value: "?authSource=admin&replicaSet=rs0&directConnection=true"
