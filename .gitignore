@@ -276,3 +276,5 @@ __pycache__/
 dist/
 build/
 *.egg-info/
+
+nscacert.pem
