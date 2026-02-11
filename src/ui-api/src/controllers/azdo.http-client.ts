@@ -1,8 +1,11 @@
 import { HttpClient } from "./http-client";
 
-const BASE_URL = "https://dev.azure.com/CompanyX/ProjectY";
-const WORK_ITEM_BASE_URL = "https://dev.azure.com/CompanyX/ProjectY/_apis/wit";
-const TEAMS_BASE_URL = "https://dev.azure.com/CompanyX/_apis/projects/Software";
+const AZDO_ORGANIZATION = process.env.AZDO_ORGANIZATION || "your-organization";
+const AZDO_PROJECT = process.env.AZDO_PROJECT || "your-project";
+
+const BASE_URL = `https://dev.azure.com/${AZDO_ORGANIZATION}/${AZDO_PROJECT}`;
+const WORK_ITEM_BASE_URL = `https://dev.azure.com/${AZDO_ORGANIZATION}/${AZDO_PROJECT}/_apis/wit`;
+const TEAMS_BASE_URL = `https://dev.azure.com/${AZDO_ORGANIZATION}/_apis/projects/${AZDO_PROJECT}`;
 
 const DEFAULT_API_VERSION = "api-version=7.1";
 const API_KEY = () => process.env.AZDO_API_KEY;

@@ -8,7 +8,7 @@
     <router-view></router-view>
   </q-page-container>
 
-  <img :src="CompanyXLogo" alt="CompanyX logo" class="bottom-right-icon" />
+  <img :src="MndyLogo" alt="mndy logo" class="bottom-right-icon" />
 
 </template>
 
@@ -17,7 +17,7 @@ import { storeToRefs } from 'pinia'
 import { useLayoutStore } from "@/stores/layout.store";
 import NavigationTopBar from "@/components/TopNavBarComponent.vue";
 import SidebarMenuComponent from "@/components/SidebarMenuComponent.vue";
-import CompanyXLogo from "@/assets/CompanyX_logo.svg";
+import MndyLogo from "@/assets/mndy_logo.svg";
 
 export default {
   name: "LandingView",
@@ -32,7 +32,7 @@ export default {
     return {
       maximized,
       fullscreen,
-      CompanyXLogo
+      MndyLogo
     };
   },
 };

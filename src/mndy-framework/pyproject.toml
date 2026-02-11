@@ -1,8 +1,9 @@
 [project]
 name = "mndy-framework"
 version = "0.1.0"
-description = "Add your description here"
+description = "Shared framework for mndy project metrics platform"
 readme = "README.md"
+authors = [{name = "Simon Stipcich", email = "code.stip.si@gmail.com"}]
 requires-python = ">=3.12"
 dependencies = [
   'environs',
