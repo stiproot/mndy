@@ -48,8 +48,10 @@ Use `make help` to see all available commands. The Makefile is the single entry 
 
 ### Docker
 
-- `make docker-compose` - Start all services with Docker
+- `make docker-compose` - Start all services (infrastructure + apps)
+- `make docker-compose-infra` - Start infrastructure only (Dapr, MongoDB, RabbitMQ, Zipkin)
 - `make docker-compose-arm` - Start all services (ARM/Apple Silicon)
+- `make docker-compose-arm-infra` - Start infrastructure only (ARM/Apple Silicon)
 
 ### Maintenance
 

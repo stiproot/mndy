@@ -1,29 +1,34 @@
 name: mndy
+
+# =============================================================================
+# Profiles:
+#   - (none)     : Infrastructure only (Dapr, MongoDB, RabbitMQ, Zipkin)
+#   - apps       : All application services (workers, UI, API)
+#
+# Usage:
+#   docker compose up                    # Infrastructure only
+#   docker compose --profile apps up     # Everything
+# =============================================================================
+
 x-daprdimage: &daprdimage
-  image: daprio/daprd:1.15.5
+  image: daprio/daprd:1.16.9
   volumes:
-    - ./dapr/components/:/components
-    - ./dapr/configuration/:/configuration
+    - ./src/dapr/components/:/components
+    - ./src/dapr/configuration/:/configuration
 
 services:
   ##############################################
   #           Dapr placement service           #
   ##############################################
-  # placement:
-  #   image: daprio/dapr:1.15.5-linux
-  #   container_name: placement-mndy
-  #   command: ["./placement", "-port", "50005"]
-  #   ports:
-  #     - 50000:50005
   placement:
-    image: daprio/placement:1.15.8
+    image: daprio/placement:1.16.9
     container_name: placement-mndy
     command: ["./placement", "-port", "50006"]
     ports:
       - 50000:50006
 
   scheduler:
-    image: daprio/daprd:1.15.8
+    image: daprio/daprd:1.16.9
     container_name: scheduler-mndy
     command: --etcd-data-dir=/var/lock/dapr/scheduler
     ports:
@@ -71,8 +76,6 @@ services:
       - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_SERVER: mongo-mndy
-      # ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      # ME_CONFIG_MONGODB_ADMINPASSWORD: example
     depends_on:
       mongo:
         condition: service_healthy
@@ -90,10 +93,11 @@ services:
   #  Workflows Worker Service + Dapr sidecar   #
   ##############################################
   mndy-workflows-worker:
+    profiles: [apps]
     image: xo-feed/mndy/workflows-worker:dev
     build:
-      context: workflows-worker/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: src/workflows-worker/Dockerfile
       tags:
         - xo-feed/mndy/workflows-worker:dev
     ports:
@@ -107,6 +111,7 @@ services:
         condition: service_healthy
 
   mndy-workflows-worker-dapr:
+    profiles: [apps]
     <<: *daprdimage
     command: [ "./daprd",
       "--app-id", "mndy-workflows-worker",
@@ -122,10 +127,11 @@ services:
   #  AzDO Worker Service + Dapr sidecar  #
   ########################################
   mndy-azdo-worker:
+    profiles: [apps]
     image: xo-feed/mndy/azdo-worker:dev
     build:
-      context: azdo-worker/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: src/azdo-worker/Dockerfile
       tags:
         - xo-feed/mndy/azdo-worker:dev
     ports:
@@ -140,6 +146,7 @@ services:
         condition: service_healthy
 
   mndy-azdo-worker-dapr:
+    profiles: [apps]
     <<: *daprdimage
     command: [ "./daprd",
       "--app-id", "mndy-azdo-worker",
@@ -155,10 +162,11 @@ services:
   #  Insights Worker Service + Dapr sidecar  #
   ############################################
   mndy-insights-worker:
+    profiles: [apps]
     image: xo-feed/mndy/insights-worker:dev
     build:
-      context: insights-worker/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: src/insights-worker/Dockerfile
       tags:
         - xo-feed/mndy/insights-worker:dev
     ports:
@@ -172,6 +180,7 @@ services:
         condition: service_healthy
 
   mndy-insights-worker-dapr:
+    profiles: [apps]
     <<: *daprdimage
     command: [ "./daprd",
       "--app-id", "mndy-insights-worker",
@@ -187,10 +196,11 @@ services:
   #  AzDO Proxy Worker Service + Dapr sidecar  #
   ##############################################
   mndy-azdoproxy-worker:
+    profiles: [apps]
     image: xo-feed/mndy/azdoproxy-worker:dev
     build:
-      context: azdoproxy-worker/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: src/azdoproxy-worker/Dockerfile
       tags:
         - xo-feed/mndy/azdoproxy-worker:dev
     ports:
@@ -204,6 +214,7 @@ services:
         condition: service_healthy
 
   mndy-azdoproxy-worker-dapr:
+    profiles: [apps]
     <<: *daprdimage
     command: [ "./daprd",
       "--app-id", "mndy-azdoproxy-worker",
@@ -219,9 +230,10 @@ services:
   #  AzDO Proxy API + Dapr sidecar  #
   ###################################
   mndy-azdoproxy-api:
+    profiles: [apps]
     image: xo-feed/mndy/azdoproxy-api:dev
     build:
-      context: azdoproxy-api/
+      context: ./src/azdoproxy-api/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/azdoproxy-api:dev
@@ -237,9 +249,10 @@ services:
   #           UI API + Dapr sidecar       #
   #########################################
   mndy-ui-api:
+    profiles: [apps]
     image: xo-feed/mndy/ui-api:dev
     build:
-      context: ui-api/
+      context: ./src/ui-api/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/ui-api:dev
@@ -254,6 +267,7 @@ services:
         condition: service_healthy
 
   mndy-ui-api-dapr:
+    profiles: [apps]
     <<: *daprdimage
     command: [ "./daprd",
       "--app-id", "mndy-ui-api",
@@ -271,9 +285,10 @@ services:
   #                       UI                        #
   ###################################################
   mndy-ui:
+    profiles: [apps]
     image: xo-feed/mndy/ui:dev
     build:
-      context: ui/
+      context: ./src/ui/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/ui:dev

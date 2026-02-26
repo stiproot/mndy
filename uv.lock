@@ -176,7 +176,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "dapr", specifier = ">=1.15.0" },
+    { name = "dapr", specifier = ">=1.16.0" },
     { name = "dapr-ext-fastapi-dev" },
     { name = "environs" },
     { name = "fastapi" },
@@ -204,7 +204,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "dapr", specifier = ">=1.15.0" },
+    { name = "dapr", specifier = ">=1.16.0" },
     { name = "dapr-ext-fastapi-dev" },
     { name = "environs" },
     { name = "fastapi" },
@@ -599,7 +599,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "dapr", specifier = ">=1.15.0" },
+    { name = "dapr", specifier = ">=1.16.0" },
     { name = "dapr-ext-fastapi-dev" },
     { name = "environs" },
     { name = "fastapi" },
@@ -636,7 +636,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "dapr", specifier = ">=1.15.0" },
+    { name = "dapr", specifier = ">=1.16.0" },
     { name = "environs" },
     { name = "pydantic" },
 ]
@@ -1057,7 +1057,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "dapr", specifier = ">=1.15.0" },
+    { name = "dapr", specifier = ">=1.16.0" },
     { name = "dapr-ext-fastapi-dev" },
     { name = "environs" },
     { name = "fastapi" },

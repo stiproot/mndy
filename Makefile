@@ -3,12 +3,15 @@
 # Single entry point for all repository commands
 # ==============================================================================
 
+# Container runtime (override with: make DOCKER=docker docker-compose)
+DOCKER ?= podman
+
 .PHONY: install install-node install-python \
         dev serve-ui run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
         build build-ui build-ui-api \
         lint lint-md lint-md-fix lint-python lint-node \
         lock lock-python lock-node \
-        docker-compose docker-compose-arm \
+        docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra \
         clean clean-node clean-python \
         help
 
@@ -41,36 +44,40 @@ run-ui-api: ## Run UI API gateway with Dapr (port 3001)
 		-- bun run --cwd src/ui-api start
 
 run-azdo-worker: ## Run Azure DevOps worker with Dapr (port 6006)
+	cd src/azdo-worker/src && \
 	dapr run --app-id mndy-azdo-worker \
 		--placement-host-address localhost:50000 \
-		--resources-path src/dapr/components.local/ \
-		--config src/dapr/configuration/config.yaml \
+		--resources-path ../../dapr/components.local/ \
+		--config ../../dapr/configuration/config.yaml \
 		--app-port 6006 \
-		-- uv run --package azdo-worker uvicorn main:app --host 0.0.0.0 --port 6006 --app-dir src/azdo-worker/src
+		-- uv run --package azdo-worker uvicorn main:app --host 0.0.0.0 --port 6006
 
 run-azdoproxy-worker: ## Run Azure DevOps proxy worker with Dapr (port 6006)
+	cd src/azdoproxy-worker/src && \
 	dapr run --app-id mndy-azdoproxy-worker \
 		--placement-host-address localhost:50000 \
-		--resources-path src/dapr/components.local/ \
-		--config src/dapr/configuration/config.yaml \
+		--resources-path ../../dapr/components.local/ \
+		--config ../../dapr/configuration/config.yaml \
 		--app-port 6006 \
-		-- uv run --package azdoproxy-worker uvicorn main:app --host 0.0.0.0 --port 6006 --app-dir src/azdoproxy-worker/src
+		-- uv run --package azdoproxy-worker uvicorn main:app --host 0.0.0.0 --port 6006
 
 run-insights-worker: ## Run insights worker with Dapr (port 6006)
+	cd src/insights-worker/src && \
 	dapr run --app-id mndy-insights-worker \
 		--placement-host-address localhost:50000 \
-		--resources-path src/dapr/components.local/ \
-		--config src/dapr/configuration/config.yaml \
+		--resources-path ../../dapr/components.local/ \
+		--config ../../dapr/configuration/config.yaml \
 		--app-port 6006 \
-		-- uv run --package insights-worker uvicorn main:app --host 0.0.0.0 --port 6006 --app-dir src/insights-worker/src
+		-- uv run --package insights-worker uvicorn main:app --host 0.0.0.0 --port 6006
 
 run-workflows-worker: ## Run workflows worker with Dapr (port 6006)
+	cd src/workflows-worker/src && \
 	dapr run --app-id mndy-workflows-worker \
 		--placement-host-address localhost:50000 \
-		--resources-path src/dapr/components.local/ \
-		--config src/dapr/configuration/config.yaml \
+		--resources-path ../../dapr/components.local/ \
+		--config ../../dapr/configuration/config.yaml \
 		--app-port 6006 \
-		-- uv run --package workflows-worker uvicorn main:app --host 0.0.0.0 --port 6006 --app-dir src/workflows-worker/src
+		-- uv run --package workflows-worker uvicorn main:app --host 0.0.0.0 --port 6006
 
 # ==============================================================================
 # Build
@@ -123,10 +130,16 @@ lock-node: ## Regenerate Node.js lock file
 # ==============================================================================
 
 docker-compose: ## Start all services with Docker Compose
-	docker compose -p mndy -f src/docker-compose.yml up --build
+	$(DOCKER) compose -p mndy --profile apps up --build
 
-docker-compose-arm: ## Start all services with Podman Compose (ARM)
-	podman-compose -p mndy -f src/docker-compose.yml -f src/docker-compose.arm.override.yml --env-file .core.env up --build
+docker-compose-infra: ## Start infrastructure only (Dapr, MongoDB, RabbitMQ, Zipkin)
+	$(DOCKER) compose -p mndy up --build
+
+docker-compose-arm: ## Start all services with Docker Compose (ARM)
+	$(DOCKER) compose -p mndy -f docker-compose.yml -f docker-compose.arm.yml --env-file .core.env --profile apps up --build
+
+docker-compose-arm-infra: ## Start infrastructure only (ARM)
+	$(DOCKER) compose -p mndy -f docker-compose.yml -f docker-compose.arm.yml --env-file .core.env up --build
 
 # ==============================================================================
 # Clean

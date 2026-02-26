@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
   "fastapi",
   "dapr-ext-fastapi-dev",
-  "dapr>=1.15.0",
+  "dapr>=1.16.0",
   "uvicorn",
   "pyxi_azdo_http_client",
   "requests",
