@@ -27,13 +27,11 @@ Overview
 
 Effective team behaviors are crucial for the success of any software development project. The Software Development Life Cycle (SDLC) encompasses various stages, from planning and design to implementation and maintenance. Each stage requires coordinated efforts, clear communication, and disciplined practices. However, teams often fall into negative behavioral patterns that can jeopardize project outcomes. This section outlines the importance of behavioral change in the SDLC and sets the foundation for understanding how the Project Metrics application can help steer teams towards better practices.
 
-
- Common Negative Behaviors
+Common Negative Behaviors
 Poor Time Management: Missed deadlines, inefficient meetings, and lack of prioritization can derail project timelines.
 Inadequate Work Item Tracking: Unclear task assignments, lack of updates, and poor tracking of progress can lead to confusion and delays.
 Unrealistic Estimates: Over-optimistic or vague estimates can result in scope creep, budget overruns, and missed deadlines.
 Weak Project Governance: Lack of accountability, unclear roles, and insufficient oversight can lead to project mismanagement and failure.
-
 
 Behavioral Change Strategies
 Awareness: Recognizing the negative behaviors and understanding their impact on the project.
@@ -71,4 +69,3 @@ Commands are used to process and structure the data extracted by queries. They c
 Data Visualization
 
 The Project Metrics application provides data visualization tools that help teams better understand their project data. These tools include charts, graphs, tables, and other visual representations that make it easier to identify trends, patterns, and relationships in the data.
-

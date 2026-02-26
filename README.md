@@ -83,6 +83,7 @@ For detailed architecture diagrams, see [docs/architecture.html](docs/architectu
 3. **Configure Okta (optional)**
 
    If using Okta authentication, update the Okta environment variables in `src/ui-api/.env`:
+
    ```bash
    OKTA_ISSUER=https://your-okta-domain.okta.com/oauth2/default
    OKTA_CLIENT_ID=your-client-id
@@ -102,6 +103,7 @@ make docker-compose-arm
 ```
 
 This starts all services including:
+
 - Dapr placement service
 - MongoDB (with replica set)
 - RabbitMQ
@@ -125,6 +127,7 @@ make run-workflows-worker
 ```
 
 **Access the application:**
+
 - UI: `http://localhost:8080` (or configured port)
 - MongoDB Express: `http://localhost:8081`
 - Zipkin: `http://localhost:9411`
@@ -138,6 +141,7 @@ make run-workflows-worker
    - Project and Team (Read)
 
 2. Configure environment variables in each service's `.env` file:
+
    ```bash
    AZDO_ORGANIZATION=your-organization
    AZDO_PROJECT=your-project
@@ -166,7 +170,7 @@ Copy each template to `.env` and configure with your credentials.
 
 ## Project Structure
 
-```
+```text
 mndy/
 ├── src/
 │   ├── ui/                      # Vue 3 frontend (Quasar + D3.js)
@@ -212,17 +216,20 @@ npm run dev
 **Python Workers:**
 
 1. Create virtual environment:
+
    ```bash
    python3.12 -m venv .venv
    source .venv/bin/activate
    ```
 
 2. Install dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 3. Run with Dapr:
+
    ```bash
    # Example for azdo-worker
    dapr run --app-id azdo-worker \
@@ -270,6 +277,7 @@ Built with D3.js, the visualization tools provide charts, graphs, and interactiv
 ### Behavioral Change
 
 mndy promotes positive team behaviors by:
+
 - **Transparency** - Making metrics visible to all team members
 - **Accountability** - Tracking time management and work item progress
 - **Data-Driven Decisions** - Replacing guesswork with factual insights
@@ -292,6 +300,7 @@ Contributions are welcome! To contribute:
 5. Open a Pull Request
 
 Please ensure:
+
 - Code follows existing style conventions
 - All tests pass
 - Documentation is updated
