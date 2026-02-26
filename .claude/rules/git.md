@@ -9,6 +9,7 @@ Example: `feat/add-oauth-support`, `fix/token-refresh-bug`
 ## Commit Messages
 
 Use conventional commits format:
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation only

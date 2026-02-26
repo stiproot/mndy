@@ -5,6 +5,7 @@ Project analytics platform for Azure DevOps integration.
 ## Architecture
 
 Microservices architecture using Dapr:
+
 - `src/ui/` - Vue 3 + TypeScript + Quasar frontend
 - `src/ui-api/` - Express.js API gateway (Node/TS)
 - `src/azdo-worker/` - Azure DevOps data collection (Python/FastAPI)
@@ -14,29 +15,64 @@ Microservices architecture using Dapr:
 
 ## Commands
 
+Use `make help` to see all available commands. The Makefile is the single entry point.
+
+### Install
+
+- `make install` - Install all dependencies (Node + Python)
+- `make install-node` - Install Node.js dependencies only
+- `make install-python` - Install Python dependencies only
+
 ### Development
+
 - `make serve-ui` - Frontend dev server (port 8080)
-- `make run-ui-api` - API gateway (port 3001)
+- `make run-ui-api` - API gateway with Dapr (port 3001)
 - `make run-azdo-worker` - Azure DevOps worker
-- `make docker-compose` - Start all services with Docker
+- `make run-azdoproxy-worker` - Azure DevOps proxy worker
+- `make run-insights-worker` - Insights worker
+- `make run-workflows-worker` - Workflows worker
 
 ### Build
+
+- `make build` - Build all services
 - `make build-ui` - Build frontend
 - `make build-ui-api` - Build API gateway
-- `make build-framework-pkg` - Build mndy-framework package
-- `make install-framework-pkg` - Install framework in workers
+
+### Lint
+
+- `make lint` - Run all linters
+- `make lint-md` - Lint markdown files
+- `make lint-md-fix` - Fix markdown lint issues
+- `make lint-node` - Lint Node.js/TypeScript code
+- `make lint-python` - Lint Python code
+
+### Docker
+
+- `make docker-compose` - Start all services with Docker
+- `make docker-compose-arm` - Start all services (ARM/Apple Silicon)
+
+### Maintenance
+
+- `make lock` - Regenerate all lock files
+- `make clean` - Clean all build artifacts
+
+## Workspaces
+
+This repo uses workspaces for dependency management:
+
+- **Python**: uv workspace (pyproject.toml at root)
+- **Node.js**: bun workspace (package.json at root)
 
 ## Linting
 
 Each service has its own linting configuration:
-- **Python workers**: uv (check pyproject.toml)
-- **Node/TypeScript**: prettier + eslint (check package.json)
-- **C# services**: SonarQube
 
-Run service-specific linters before committing. Do not manually format code.
+- **Python workers**: ruff (check pyproject.toml)
+- **Node/TypeScript**: prettier + eslint (check package.json)
+- **Markdown**: markdownlint (strict defaults)
 
 ## Workflow
 
-- Workers depend on mndy-framework - rebuild package after changes
+- Workers depend on mndy-framework (shared via workspace)
 - Environment variables: copy `.env.template` to `.env` for each service
 - Test individual services before full docker-compose

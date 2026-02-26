@@ -1,0 +1,14 @@
+[project]
+name = "mndy"
+version = "0.1.0"
+description = "Project analytics platform for Azure DevOps"
+requires-python = ">=3.12"
+
+[tool.uv.workspace]
+members = [
+    "src/mndy-framework",
+    "src/azdo-worker",
+    "src/insights-worker",
+    "src/azdoproxy-worker",
+    "src/workflows-worker",
+]

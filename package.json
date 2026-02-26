@@ -1,0 +1,18 @@
+{
+  "name": "mndy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Project analytics platform for Azure DevOps",
+  "workspaces": [
+    "src/ui",
+    "src/ui-api",
+    "src/d3-lab"
+  ],
+  "scripts": {
+    "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**'",
+    "lint:md:fix": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**' --fix"
+  },
+  "devDependencies": {
+    "markdownlint-cli": "^0.43.0"
+  }
+}
