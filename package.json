@@ -8,7 +8,8 @@
     "src/ui-api",
     "src/d3-lab",
     "src/mcp-core",
-    "src/github-issues-mcp"
+    "src/github-issues-mcp",
+    "src/cc-core"
   ],
   "scripts": {
     "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**'",

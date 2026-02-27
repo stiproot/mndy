@@ -8,7 +8,7 @@ DOCKER ?= podman
 
 .PHONY: install install-node install-python \
         dev serve-ui run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
-        run-github-issues-mcp build-mcp \
+        run-github-issues-mcp build-mcp build-cc \
         build build-ui build-ui-api \
         lint lint-md lint-md-fix lint-python lint-node \
         lock lock-python lock-node \
@@ -90,6 +90,13 @@ run-github-issues-mcp: ## Run GitHub Issues MCP server (port 3001)
 build-mcp: ## Build all MCP packages
 	bun run --cwd src/mcp-core build
 	bun run --cwd src/github-issues-mcp build
+
+# ==============================================================================
+# Claude Code / Agent
+# ==============================================================================
+
+build-cc: ## Build Claude Code core package
+	bun run --cwd src/cc-core build
 
 # ==============================================================================
 # Build
