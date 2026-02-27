@@ -8,6 +8,7 @@ DOCKER ?= podman
 
 .PHONY: install install-node install-python \
         dev serve-ui run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
+        run-github-issues-mcp build-mcp \
         build build-ui build-ui-api \
         lint lint-md lint-md-fix lint-python lint-node \
         lock lock-python lock-node \
@@ -78,6 +79,17 @@ run-workflows-worker: ## Run workflows worker with Dapr (port 6006)
 		--config ../../dapr/configuration/config.yaml \
 		--app-port 6006 \
 		-- uv run --package workflows-worker uvicorn main:app --host 0.0.0.0 --port 6006
+
+# ==============================================================================
+# MCP Servers
+# ==============================================================================
+
+run-github-issues-mcp: ## Run GitHub Issues MCP server (port 3001)
+	bun run --cwd src/github-issues-mcp start
+
+build-mcp: ## Build all MCP packages
+	bun run --cwd src/mcp-core build
+	bun run --cwd src/github-issues-mcp build
 
 # ==============================================================================
 # Build

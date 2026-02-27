@@ -13,6 +13,11 @@ Microservices architecture using Dapr:
 - `src/workflows-worker/` - Workflow orchestration (Python/FastAPI)
 - `src/mndy-framework/` - Shared Python package (used by all workers)
 
+MCP (Model Context Protocol) servers:
+
+- `src/mcp-core/` - Shared TypeScript library for building MCP servers
+- `src/github-issues-mcp/` - GitHub Issues MCP server
+
 ## Commands
 
 Use `make help` to see all available commands. The Makefile is the single entry point.
@@ -37,6 +42,11 @@ Use `make help` to see all available commands. The Makefile is the single entry 
 - `make build` - Build all services
 - `make build-ui` - Build frontend
 - `make build-ui-api` - Build API gateway
+- `make build-mcp` - Build all MCP packages
+
+### MCP Servers
+
+- `make run-github-issues-mcp` - GitHub Issues MCP server (port 3001)
 
 ### Lint
 

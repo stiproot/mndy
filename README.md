@@ -4,7 +4,7 @@
 [![Vue 3](https://img.shields.io/badge/Vue-3.x-brightgreen.svg)](https://vuejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
-[![Dapr](https://img.shields.io/badge/Dapr-1.15+-purple.svg)](https://dapr.io/)
+[![Dapr](https://img.shields.io/badge/Dapr-1.16+-purple.svg)](https://dapr.io/)
 
 ## Overview
 
@@ -35,6 +35,11 @@ mndy is built on a modern cloud-native microservices architecture using Dapr (Di
 - **AzDo Proxy Worker** (Python + FastAPI) - Proxy service for Azure DevOps API
 - **Insights Worker** (Python + FastAPI) - Analytics and data processing service
 - **Workflows Worker** (Python + FastAPI) - Workflow orchestration service
+
+### MCP Servers
+
+- **mcp-core** (TypeScript) - Shared library for building MCP servers
+- **github-issues-mcp** (TypeScript) - GitHub Issues MCP server for AI assistants
 
 ### Infrastructure
 
@@ -124,6 +129,9 @@ make run-azdo-worker
 make run-azdoproxy-worker
 make run-insights-worker
 make run-workflows-worker
+
+# MCP servers
+make run-github-issues-mcp
 ```
 
 **Access the application:**
@@ -180,6 +188,8 @@ mndy/
 │   ├── azdoproxy-worker/        # Azure DevOps proxy
 │   ├── insights-worker/         # Analytics processing
 │   ├── workflows-worker/        # Workflow orchestration
+│   ├── mcp-core/                # Shared MCP server library
+│   ├── github-issues-mcp/       # GitHub Issues MCP server
 │   └── dapr/                    # Dapr configuration
 │       ├── components/          # Pub/sub & state components
 │       └── configuration/       # Dapr runtime config
