@@ -10,6 +10,9 @@ const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1, "ANTHROPIC_API_KEY is required"),
   GITHUB_ISSUES_MCP_URL: z.string().url("GITHUB_ISSUES_MCP_URL must be a valid URL"),
 
+  // Anthropic API Base URL (optional - for internal proxies/LiteLLM)
+  ANTHROPIC_BASE_URL: z.string().url().optional(),
+
   // Optional with defaults
   CLAUDE_MODEL: z.string().default("claude-sonnet-4-5-20250929"),
   GITHUB_TOKEN: z.string().optional(),

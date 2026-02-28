@@ -90,3 +90,15 @@ services:
   ###################################################
   mndy-ui:
     platform: 'linux/arm64'
+
+  ###################################################
+  #  GitHub Issues MCP Server (AI profile)
+  ###################################################
+  github-issues-mcp:
+    platform: 'linux/arm64'
+
+  ###################################################
+  #  Claude Code Service (AI profile)
+  ###################################################
+  cc-svc:
+    platform: 'linux/arm64'

@@ -4,10 +4,12 @@ name: mndy
 # Profiles:
 #   - (none)     : Infrastructure only (Dapr, MongoDB, RabbitMQ, Zipkin)
 #   - apps       : All application services (workers, UI, API)
+#   - ai         : AI services only (cc-svc, github-issues-mcp)
 #
 # Usage:
 #   docker compose up                    # Infrastructure only
 #   docker compose --profile apps up     # Everything
+#   docker compose --profile ai up       # AI services only
 # =============================================================================
 
 x-daprdimage: &daprdimage
@@ -298,6 +300,57 @@ services:
       - VUE_APP_UI_API_BASE_URL=http://localhost:3004/ui-api
     depends_on:
       - mndy-ui-api
+
+  ##############################################
+  #  GitHub Issues MCP Server (AI profile)    #
+  ##############################################
+  github-issues-mcp:
+    profiles: [ai]
+    image: xo-feed/mndy/github-issues-mcp:dev
+    build:
+      context: .
+      dockerfile: src/github-issues-mcp/Dockerfile
+      tags:
+        - xo-feed/mndy/github-issues-mcp:dev
+    ports:
+      - "3001:3001"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PORT=3001
+    healthcheck:
+      test: ["CMD", "bun", "--eval", "fetch('http://localhost:3001/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  ##############################################
+  #  Claude Code Service (AI profile)         #
+  ##############################################
+  cc-svc:
+    profiles: [ai]
+    image: xo-feed/mndy/cc-svc:dev
+    build:
+      context: .
+      dockerfile: src/cc-svc/Dockerfile
+      tags:
+        - xo-feed/mndy/cc-svc:dev
+    ports:
+      - "3002:3002"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}
+      - GITHUB_ISSUES_MCP_URL=http://github-issues-mcp:3001/mcp
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PORT=3002
+      - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-sonnet-4-5-20250929}
+      - MAX_ORCHESTRATOR_TURNS=${MAX_ORCHESTRATOR_TURNS:-10}
+      - MAX_SUBAGENT_TURNS=${MAX_SUBAGENT_TURNS:-5}
+      - MAX_BUDGET_USD=${MAX_BUDGET_USD:-1.00}
+      - MAX_SUBAGENT_BUDGET_USD=${MAX_SUBAGENT_BUDGET_USD:-0.25}
+    depends_on:
+      github-issues-mcp:
+        condition: service_healthy
 
 volumes:
   mongodb-data:

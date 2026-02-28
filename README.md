@@ -41,6 +41,11 @@ mndy is built on a modern cloud-native microservices architecture using Dapr (Di
 - **mcp-core** (TypeScript) - Shared library for building MCP servers
 - **github-issues-mcp** (TypeScript) - GitHub Issues MCP server for AI assistants
 
+### AI Services
+
+- **cc-core** (TypeScript) - Claude Code SDK wrapper for building agentic services
+- **cc-svc** (TypeScript + Express) - Multi-agent contributor insights service
+
 ### Infrastructure
 
 - **Dapr** - Service mesh for inter-service communication
@@ -105,6 +110,10 @@ make docker-compose
 
 # ARM architecture (Apple Silicon)
 make docker-compose-arm
+
+# AI services only (cc-svc + github-issues-mcp)
+make docker-compose-ai
+make docker-compose-ai-arm  # ARM architecture
 ```
 
 This starts all services including:
@@ -132,6 +141,9 @@ make run-workflows-worker
 
 # MCP servers
 make run-github-issues-mcp
+
+# AI services
+make run-cc-svc
 ```
 
 **Access the application:**
@@ -173,6 +185,8 @@ Each service has its own `.env.template` file:
 - `src/azdoproxy-worker/.env.template` - AzDo proxy worker
 - `src/insights-worker/.env.template` - Insights worker
 - `src/workflows-worker/.env.template` - Workflows worker
+- `src/github-issues-mcp/.env.template` - GitHub Issues MCP server
+- `src/cc-svc/.env.template` - Claude Code service
 
 Copy each template to `.env` and configure with your credentials.
 
@@ -190,13 +204,17 @@ mndy/
 │   ├── workflows-worker/        # Workflow orchestration
 │   ├── mcp-core/                # Shared MCP server library
 │   ├── github-issues-mcp/       # GitHub Issues MCP server
+│   ├── cc-core/                 # Claude Code SDK wrapper
+│   ├── cc-svc/                  # Multi-agent insights service
 │   └── dapr/                    # Dapr configuration
 │       ├── components/          # Pub/sub & state components
 │       └── configuration/       # Dapr runtime config
+├── tests/                       # Integration & unit tests
+│   └── integration/             # Integration test suites
 ├── docs/                        # Documentation
 │   ├── architecture.html        # Architecture diagram
 │   └── raw.md                   # Project vision & concepts
-├── test/                        # Test harness
+├── test/                        # Test harness (legacy)
 ├── tools/                       # Utility scripts
 ├── Makefile                     # Build and run commands
 ├── docker-compose.yml           # Main compose file
@@ -259,8 +277,30 @@ make build-ui
 # Build UI API
 make build-ui-api
 
+# Build AI services
+make build-cc
+make build-cc-svc
+
 # Build Docker images
 docker-compose build
+```
+
+### Running Tests
+
+**Integration tests** require services to be running:
+
+```bash
+# Terminal 1: Start github-issues-mcp
+make run-github-issues-mcp
+
+# Terminal 2: Start cc-svc
+make run-cc-svc
+
+# Terminal 3: Run integration tests
+make test-integration
+
+# Or watch mode
+make test-integration-watch
 ```
 
 ### Adding New Features

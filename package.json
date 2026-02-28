@@ -14,9 +14,12 @@
   ],
   "scripts": {
     "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**'",
-    "lint:md:fix": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**' --fix"
+    "lint:md:fix": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**' --fix",
+    "test:integration": "vitest run tests/integration/",
+    "test:integration:watch": "vitest tests/integration/"
   },
   "devDependencies": {
-    "markdownlint-cli": "^0.43.0"
+    "markdownlint-cli": "^0.43.0",
+    "vitest": "^3.0.0"
   }
 }

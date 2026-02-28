@@ -12,7 +12,8 @@ DOCKER ?= podman
         build build-ui build-ui-api \
         lint lint-md lint-md-fix lint-python lint-node \
         lock lock-python lock-node \
-        docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra \
+        docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra docker-compose-ai docker-compose-ai-arm \
+        test-integration test-integration-watch \
         clean clean-node clean-python \
         help
 
@@ -165,6 +166,22 @@ docker-compose-arm: ## Start all services with Docker Compose (ARM)
 
 docker-compose-arm-infra: ## Start infrastructure only (ARM)
 	$(DOCKER) compose -p mndy -f docker-compose.yml -f docker-compose.arm.yml --env-file .core.env up --build
+
+docker-compose-ai: ## Start AI services (cc-svc, github-issues-mcp)
+	$(DOCKER) compose -p mndy --profile ai up --build
+
+docker-compose-ai-arm: ## Start AI services (ARM)
+	$(DOCKER) compose -p mndy -f docker-compose.yml -f docker-compose.arm.yml --profile ai up --build
+
+# ==============================================================================
+# Test
+# ==============================================================================
+
+test-integration: ## Run integration tests (requires services running)
+	bun run vitest run tests/integration/
+
+test-integration-watch: ## Run integration tests in watch mode
+	bun run vitest tests/integration/
 
 # ==============================================================================
 # Clean
