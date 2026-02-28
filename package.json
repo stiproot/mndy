@@ -9,7 +9,8 @@
     "src/d3-lab",
     "src/mcp-core",
     "src/github-issues-mcp",
-    "src/cc-core"
+    "src/cc-core",
+    "src/cc-svc"
   ],
   "scripts": {
     "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**'",
