@@ -105,6 +105,8 @@ export interface ExecuteOptions {
   hooks?: HookCallback[];
   /** Abort signal for cancellation */
   signal?: AbortSignal;
+  /** Callback for each message during execution (for logging/debugging) */
+  onMessage?: (message: AgentMessage) => void;
 }
 
 /**
@@ -163,6 +165,38 @@ export async function executeTask(
     const messages: unknown[] = [];
     for await (const message of queryResult) {
       messages.push(message);
+
+      // Call onMessage callback if provided
+      if (options?.onMessage) {
+        const msg = message as Record<string, unknown>;
+        if (msg.type === "assistant" && typeof msg.message === "object") {
+          const assistantMsg = msg.message as Record<string, unknown>;
+          if (Array.isArray(assistantMsg.content)) {
+            for (const content of assistantMsg.content) {
+              const c = content as Record<string, unknown>;
+              if (c.type === "text" && typeof c.text === "string") {
+                options.onMessage({
+                  type: "text",
+                  content: c.text,
+                });
+              } else if (c.type === "tool_use") {
+                options.onMessage({
+                  type: "tool_use",
+                  content: c.name as string,
+                  toolName: c.name as string,
+                  toolInput: c.input as Record<string, unknown>,
+                });
+              }
+            }
+          }
+        } else if (msg.type === "tool_result") {
+          options.onMessage({
+            type: "tool_result",
+            content: JSON.stringify(msg.content),
+            isError: msg.is_error as boolean | undefined,
+          });
+        }
+      }
     }
 
     // Extract result text from the last assistant message

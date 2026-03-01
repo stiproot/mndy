@@ -17,6 +17,8 @@ import {
   buildSynthesisPrompt,
 } from "../prompts/index.js";
 import { contributorInsightsResponseSchema } from "../schemas/index.js";
+import { createScopedLogger, logger } from "../utils/logger.js";
+import type { AgentMessage } from "cc-core";
 
 export class OrchestratorService {
   /**
@@ -28,8 +30,10 @@ export class OrchestratorService {
     const startTime = Date.now();
     const { owner, repo, username, options } = request;
 
-    console.log(
-      `[Orchestrator] Starting analysis for ${username} in ${owner}/${repo}`
+    logger.info(
+      `Starting analysis for ${username} in ${owner}/${repo}`,
+      undefined,
+      "Orchestrator"
     );
 
     // Phase 1: Run sub-agents in parallel to gather data
@@ -39,7 +43,7 @@ export class OrchestratorService {
       this.runQualityAssessor(owner, repo, username),
     ]);
 
-    console.log(`[Orchestrator] Sub-agents completed, synthesizing results...`);
+    logger.info("Sub-agents completed, synthesizing results...", undefined, "Orchestrator");
 
     // Phase 2: Orchestrator synthesizes results
     const result = await this.synthesizeResults(
@@ -52,8 +56,10 @@ export class OrchestratorService {
       startTime
     );
 
-    console.log(
-      `[Orchestrator] Analysis complete in ${Date.now() - startTime}ms`
+    logger.info(
+      `Analysis complete in ${Date.now() - startTime}ms`,
+      undefined,
+      "Orchestrator"
     );
 
     return result;
@@ -211,6 +217,22 @@ export class OrchestratorService {
   }
 
   /**
+   * Create an onMessage callback for debug logging
+   */
+  private createMessageLogger(agentName: string): (message: AgentMessage) => void {
+    const logger = createScopedLogger(agentName);
+    return (message: AgentMessage) => {
+      if (message.type === "text") {
+        logger.debug("Claude thinking", { content: message.content });
+      } else if (message.type === "tool_use") {
+        logger.debug("Tool call", { tool: message.toolName, input: message.toolInput });
+      } else if (message.type === "tool_result") {
+        logger.debug("Tool result", { content: message.content, isError: message.isError });
+      }
+    };
+  }
+
+  /**
    * Run the issue analyzer sub-agent
    */
   private async runIssueAnalyzer(
@@ -225,7 +247,9 @@ export class OrchestratorService {
       includeClosedIssues: options?.includeClosedIssues,
     });
 
-    const result = await agent.execute(prompt);
+    const result = await agent.execute(prompt, {
+      onMessage: this.createMessageLogger("issue-analyzer"),
+    });
 
     if (!result.success) {
       throw new AgentError(
@@ -251,7 +275,9 @@ export class OrchestratorService {
       lookbackDays: options?.lookbackDays,
     });
 
-    const result = await agent.execute(prompt);
+    const result = await agent.execute(prompt, {
+      onMessage: this.createMessageLogger("activity-tracker"),
+    });
 
     if (!result.success) {
       throw new AgentError(
@@ -274,7 +300,9 @@ export class OrchestratorService {
     const agent = createQualityAssessorAgent();
     const prompt = buildQualityAssessorPrompt(owner, repo, username);
 
-    const result = await agent.execute(prompt);
+    const result = await agent.execute(prompt, {
+      onMessage: this.createMessageLogger("quality-assessor"),
+    });
 
     if (!result.success) {
       throw new AgentError(
@@ -309,7 +337,9 @@ export class OrchestratorService {
       startTime
     );
 
-    const result = await orchestrator.execute(synthesisPrompt);
+    const result = await orchestrator.execute(synthesisPrompt, {
+      onMessage: this.createMessageLogger("orchestrator"),
+    });
 
     if (!result.success) {
       throw new AgentError(

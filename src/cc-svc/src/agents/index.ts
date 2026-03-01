@@ -1,9 +1,6 @@
 import {
   agentBuilder,
   createHttpMcpServer,
-  combineHooks,
-  createAuditHook,
-  createSafetyHook,
   type Agent,
 } from "cc-core";
 import { getConfig } from "../config/index.js";
@@ -20,23 +17,6 @@ import {
 function getGitHubMcpServer() {
   const config = getConfig();
   return createHttpMcpServer(config.GITHUB_ISSUES_MCP_URL);
-}
-
-/**
- * Create audit hook for logging agent tool usage
- */
-function createAgentAuditHook() {
-  return createAuditHook({
-    log: (entry) => {
-      const config = getConfig();
-      if (config.LOG_LEVEL === "debug") {
-        console.log(
-          `[AGENT:${entry.toolName}] ${new Date(entry.timestamp).toISOString()}`,
-          JSON.stringify(entry.toolInput, null, 2)
-        );
-      }
-    },
-  });
 }
 
 /**
@@ -106,9 +86,3 @@ export function createOrchestratorAgent(): Agent {
     .build();
 }
 
-/**
- * Get shared hooks for all agents
- */
-export function getAgentHooks() {
-  return [createAgentAuditHook(), createSafetyHook()];
-}
