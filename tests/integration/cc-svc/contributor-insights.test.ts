@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import { waitForHealth, config, getTestRepository } from "./setup.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { waitForHealth, config, getTestRepository, consumeSSEStream, sleep } from "./setup.js";
 
 describe("POST /cc-svc/contributor-insights", () => {
   beforeAll(async () => {
@@ -26,6 +26,7 @@ describe("POST /cc-svc/contributor-insights", () => {
   });
 
   it("returns contributor insights for valid request", async () => {
+    // This test calls Claude API multiple times - needs longer timeout
     const response = await fetch(
       `${config.ccSvcUrl}/cc-svc/contributor-insights`,
       {
@@ -55,7 +56,7 @@ describe("POST /cc-svc/contributor-insights", () => {
     // Verify contributor info
     expect(data.contributor.username).toBe(config.testUsername);
     expect(data.contributor.repository).toBe(getTestRepository());
-  });
+  }, 180000); // 3 minute timeout for full orchestrator flow
 
   it("supports SSE streaming via Accept header", async () => {
     const response = await fetch(
@@ -76,7 +77,28 @@ describe("POST /cc-svc/contributor-insights", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/event-stream");
-  });
+
+    // Consume and verify the SSE stream
+    const events = await consumeSSEStream(response);
+
+    // Verify event sequence
+    const eventTypes = events.map((e) => e.type);
+    expect(eventTypes).toContain("start");
+    expect(eventTypes).toContain("phase");
+    expect(eventTypes).toContain("complete");
+
+    // Verify start event structure
+    const startEvent = events.find((e) => e.type === "start");
+    expect(startEvent?.data).toHaveProperty("owner");
+    expect(startEvent?.data).toHaveProperty("repo");
+    expect(startEvent?.data).toHaveProperty("username");
+
+    // Verify complete event has full response structure
+    const completeEvent = events.find((e) => e.type === "complete");
+    expect(completeEvent?.data).toHaveProperty("contributor");
+    expect(completeEvent?.data).toHaveProperty("summary");
+    expect(completeEvent?.data).toHaveProperty("insights");
+  }, 180000); // 3 minute timeout for full orchestrator flow
 
   it("supports SSE streaming via query parameter", async () => {
     const response = await fetch(
@@ -94,5 +116,18 @@ describe("POST /cc-svc/contributor-insights", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/event-stream");
+
+    // Consume and verify the SSE stream
+    const events = await consumeSSEStream(response);
+
+    // Verify we received the complete event sequence
+    const eventTypes = events.map((e) => e.type);
+    expect(eventTypes).toContain("start");
+    expect(eventTypes).toContain("complete");
+  }, 180000); // 3 minute timeout for full orchestrator flow
+
+  afterAll(async () => {
+    // Allow connections to close gracefully
+    await sleep(100);
   });
 });

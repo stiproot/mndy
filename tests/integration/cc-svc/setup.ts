@@ -56,3 +56,77 @@ export const config = {
 export function getTestRepository(): string {
   return `${config.testOwner}/${config.testRepo}`;
 }
+
+/**
+ * Parsed SSE event
+ */
+export interface SSEEvent {
+  type: string;
+  data: unknown;
+}
+
+/**
+ * Parse a single SSE event chunk into type and data
+ */
+function parseSSEEvent(chunk: string): SSEEvent | null {
+  const lines = chunk.split("\n");
+  let type = "";
+  let data = "";
+
+  for (const line of lines) {
+    if (line.startsWith("event: ")) {
+      type = line.slice(7);
+    } else if (line.startsWith("data: ")) {
+      data = line.slice(6);
+    }
+  }
+
+  if (!type) return null;
+
+  try {
+    return { type, data: JSON.parse(data) };
+  } catch {
+    return { type, data };
+  }
+}
+
+/**
+ * Read and parse an SSE stream until the 'done' event or timeout
+ */
+export async function consumeSSEStream(
+  response: Response,
+  timeout = 180000 // 3 minutes to match test timeout
+): Promise<SSEEvent[]> {
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("No response body");
+
+  const decoder = new TextDecoder();
+  const events: SSEEvent[] = [];
+  const startTime = Date.now();
+  let buffer = "";
+
+  while (Date.now() - startTime < timeout) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+
+    // Parse complete SSE events from buffer (events are separated by double newlines)
+    const chunks = buffer.split("\n\n");
+    buffer = chunks.pop() ?? ""; // Keep incomplete event in buffer
+
+    for (const chunk of chunks) {
+      const event = parseSSEEvent(chunk);
+      if (event) {
+        events.push(event);
+        if (event.type === "done") {
+          reader.releaseLock();
+          return events;
+        }
+      }
+    }
+  }
+
+  reader.releaseLock();
+  return events;
+}
