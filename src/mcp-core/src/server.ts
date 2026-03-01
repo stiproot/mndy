@@ -43,7 +43,9 @@ export function createMcpApp(
   const sessions = new InMemorySessionStore(sessionTtlMs);
 
   // Middleware
-  app.use(express.json());
+  // Note: Do NOT use express.json() globally - the MCP SDK's StreamableHTTPServerTransport
+  // needs to parse the raw request body itself. express.json() would consume the body stream
+  // before the transport can read it, causing "Parse error: Invalid JSON".
   app.use(createCorsMiddleware(corsOrigin));
   app.use(hostHeaderValidation(allowedHosts));
   if (enableRequestLogging) {
@@ -58,11 +60,12 @@ export function createMcpApp(
   // MCP POST endpoint - client sends messages
   app.post(endpoint, async (req: Request, res: Response) => {
     try {
-      const sessionId = req.headers["mcp-session-id"] as string | undefined;
-      let session = sessionId ? sessions.get(sessionId) : undefined;
+      const clientSessionId = req.headers["mcp-session-id"] as string | undefined;
+      let session = clientSessionId ? sessions.get(clientSessionId) : undefined;
 
       if (!session) {
-        const id = crypto.randomUUID();
+        // Use client's session ID if provided, otherwise generate one
+        const id = clientSessionId || crypto.randomUUID();
         const server = serverFactory();
         const transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => id,
@@ -80,6 +83,8 @@ export function createMcpApp(
 
         sessions.set(id, session);
         logger.info(`New session created: ${id}`);
+      } else {
+        session.lastActivityAt = new Date();
       }
 
       await session.transport.handleRequest(req, res);

@@ -1,6 +1,8 @@
-import { z, type McpServer } from "mcp-core";
+import { z, type McpServer, createLogger } from "mcp-core";
 import { createGitHubClient } from "../services/github.js";
 import type { IssueFilters } from "../types.js";
+
+const logger = createLogger("github_list_issues");
 
 /**
  * Input schema for the github_list_issues tool
@@ -79,7 +81,20 @@ export function registerIssuesTool(server: McpServer): void {
           page: args.page,
         };
 
+        logger.debug("Fetching issues with filters", filters);
+
         const result = await client.listIssues(filters);
+
+        logger.debug("Issues response", {
+          total_count: result.total_count,
+          returned: result.issues.length,
+          issues: result.issues.map((i) => ({
+            number: i.number,
+            state: i.state,
+            title: i.title,
+            user: i.user?.login,
+          })),
+        });
 
         const summary = `Found ${result.total_count} issue(s) in ${args.owner}/${args.repo} (page ${result.page})`;
 

@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createMcpApp, McpServer, log } from "mcp-core";
+import { createMcpApp, McpServer, log, setLogLevel, type LogLevel } from "mcp-core";
 import { registerIssuesTool } from "./tools/issues.js";
 
 const SERVER_NAME = "github-issues-mcp";
@@ -18,6 +18,9 @@ function createServer(): McpServer {
 
 async function main(): Promise<void> {
   const port = parseInt(process.env.PORT ?? "3001", 10);
+  const logLevel = (process.env.LOG_LEVEL ?? "info") as LogLevel;
+
+  setLogLevel(logLevel);
 
   if (!process.env.GITHUB_TOKEN) {
     log("warning", "GITHUB_TOKEN not set - only public repos will be accessible");

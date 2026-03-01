@@ -13,7 +13,7 @@ DOCKER ?= podman
         lint lint-md lint-md-fix lint-python lint-node \
         lock lock-python lock-node \
         docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra docker-compose-ai docker-compose-ai-arm \
-        test-integration test-integration-watch \
+        test-integration test-integration-watch test-mcp test-cc-svc \
         clean clean-node clean-python \
         help
 
@@ -177,11 +177,17 @@ docker-compose-ai-arm: ## Start AI services (ARM)
 # Test
 # ==============================================================================
 
-test-integration: ## Run integration tests (requires services running)
+test-integration: ## Run all integration tests (requires services running)
 	bun run vitest run tests/integration/
 
 test-integration-watch: ## Run integration tests in watch mode
 	bun run vitest tests/integration/
+
+test-mcp: ## Run github-issues-mcp integration tests
+	bun run vitest run tests/integration/github-issues-mcp/
+
+test-cc-svc: ## Run cc-svc integration tests
+	bun run vitest run tests/integration/cc-svc/
 
 # ==============================================================================
 # Clean

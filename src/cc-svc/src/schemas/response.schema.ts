@@ -88,8 +88,8 @@ export const contributorInsightsResponseSchema = z.object({
   metadata: z.object({
     analysisVersion: z.string(),
     dataRange: z.object({
-      from: z.string(),
-      to: z.string(),
+      from: z.string().nullable(),
+      to: z.string().nullable(),
     }),
     issuesAnalyzed: z.number(),
     processingTimeMs: z.number(),
