@@ -88,16 +88,22 @@ describe("POST /cc-svc/contributor-insights", () => {
     expect(eventTypes).toContain("complete");
 
     // Verify start event structure
+    // Note: SSE data contains the full event object { type, data }
     const startEvent = events.find((e) => e.type === "start");
-    expect(startEvent?.data).toHaveProperty("owner");
-    expect(startEvent?.data).toHaveProperty("repo");
-    expect(startEvent?.data).toHaveProperty("username");
+    expect(startEvent).toBeDefined();
+    const startPayload = startEvent?.data as { type: string; data: { owner: string; repo: string; username: string } };
+    expect(startPayload.data.owner).toBe(config.testOwner);
+    expect(startPayload.data.repo).toBe(config.testRepo);
+    expect(startPayload.data.username).toBe(config.testUsername);
 
     // Verify complete event has full response structure
+    // Note: SSE data contains the full event object { type, data }
     const completeEvent = events.find((e) => e.type === "complete");
-    expect(completeEvent?.data).toHaveProperty("contributor");
-    expect(completeEvent?.data).toHaveProperty("summary");
-    expect(completeEvent?.data).toHaveProperty("insights");
+    expect(completeEvent).toBeDefined();
+    const completePayload = completeEvent?.data as { type: string; data: Record<string, unknown> };
+    expect(completePayload.data).toHaveProperty("contributor");
+    expect(completePayload.data).toHaveProperty("summary");
+    expect(completePayload.data).toHaveProperty("insights");
   }, 180000); // 3 minute timeout for full orchestrator flow
 
   it("supports SSE streaming via query parameter", async () => {
