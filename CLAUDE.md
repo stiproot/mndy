@@ -88,3 +88,23 @@ Each service has its own linting configuration:
 - Workers depend on mndy-framework (shared via workspace)
 - Environment variables: copy `.env.template` to `.env` for each service
 - Test individual services before full docker-compose
+
+## Effect-TS Migration
+
+**Status:** Active migration in progress
+
+**Services being migrated (in order):**
+
+1. `src/github-issues-mcp/` - In progress (smallest, uses Zod)
+2. `src/mcp-core/` - Pending
+3. `src/ui-api/` - Pending (highest complexity)
+
+**Standards:** See `docs/guides/effect-ts.standards.md` for comprehensive patterns
+
+**Key Principles:**
+
+- Use `Effect.gen` for business logic, `.pipe()` for transformations
+- Define tagged errors with `Data.TaggedError`
+- Model dependencies as Services (no module-level singletons)
+- Use `Schema` for runtime validation
+- Handle errors with `catchTag`/`catchTags`, not try-catch
