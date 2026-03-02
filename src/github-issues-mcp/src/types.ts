@@ -1,80 +1,148 @@
-/**
- * Filter options for listing GitHub issues
- */
-export interface IssueFilters {
-  /** Repository owner (required) */
-  owner: string;
-  /** Repository name (required) */
-  repo: string;
-  /** Filter by state */
-  state?: "open" | "closed" | "all";
-  /** Comma-separated list of label names */
-  labels?: string;
-  /** Filter by assignee username, "none", or "*" for any */
-  assignee?: string;
-  /** Filter by creator username */
-  creator?: string;
-  /** Filter by mentioned username */
-  mentioned?: string;
-  /** Filter by milestone number, "none", or "*" for any */
-  milestone?: string;
-  /** Only issues updated after this ISO 8601 timestamp */
-  since?: string;
-  /** Sort field */
-  sort?: "created" | "updated" | "comments";
-  /** Sort direction */
-  direction?: "asc" | "desc";
-  /** Results per page (max 100) */
-  per_page?: number;
-  /** Page number */
-  page?: number;
-}
+import { Config, Data, Schema } from "effect";
+
+// =============================================================================
+// Tagged Errors
+// =============================================================================
 
 /**
- * Label information
+ * Error when GitHub API request fails
  */
-export interface IssueLabel {
-  name: string;
-  color: string;
-}
+export class GitHubApiError extends Data.TaggedError("GitHubApiError")<{
+  readonly message: string;
+  readonly status?: number;
+  readonly cause?: unknown;
+}> {}
 
 /**
- * User information
+ * Error when configuration is invalid or missing
  */
-export interface IssueUser {
-  login: string;
-  avatar_url: string;
-}
+export class ConfigError extends Data.TaggedError("ConfigError")<{
+  readonly message: string;
+  readonly field?: string;
+}> {}
+
+// =============================================================================
+// Configuration
+// =============================================================================
 
 /**
- * Simplified issue response
+ * GitHub configuration from environment
  */
-export interface Issue {
-  number: number;
-  title: string;
-  state: "open" | "closed";
-  labels: IssueLabel[];
-  assignee: IssueUser | null;
-  assignees: IssueUser[];
-  user: IssueUser;
-  created_at: string;
-  updated_at: string;
-  closed_at: string | null;
-  body: string | null;
-  html_url: string;
-  comments: number;
-  milestone: {
-    number: number;
-    title: string;
-  } | null;
-}
+export const GitHubConfig = Config.all({
+  token: Config.string("GITHUB_TOKEN").pipe(Config.withDefault("")),
+});
 
 /**
- * Result from listing issues
+ * Server configuration from environment
  */
-export interface ListIssuesResult {
-  issues: Issue[];
-  total_count: number;
-  page: number;
-  per_page: number;
-}
+export const ServerConfig = Config.all({
+  port: Config.integer("PORT").pipe(Config.withDefault(3001)),
+  logLevel: Config.string("LOG_LEVEL").pipe(Config.withDefault("info")),
+});
+
+// =============================================================================
+// Schemas
+// =============================================================================
+
+/**
+ * Schema for issue state
+ */
+export const IssueStateSchema = Schema.Literal("open", "closed", "all");
+export type IssueState = Schema.Schema.Type<typeof IssueStateSchema>;
+
+/**
+ * Schema for sort options
+ */
+export const IssueSortSchema = Schema.Literal("created", "updated", "comments");
+export type IssueSort = Schema.Schema.Type<typeof IssueSortSchema>;
+
+/**
+ * Schema for sort direction
+ */
+export const SortDirectionSchema = Schema.Literal("asc", "desc");
+export type SortDirection = Schema.Schema.Type<typeof SortDirectionSchema>;
+
+/**
+ * Schema for issue filters input
+ */
+export const IssueFiltersSchema = Schema.Struct({
+  owner: Schema.String.annotations({ description: "Repository owner (username or organization)" }),
+  repo: Schema.String.annotations({ description: "Repository name" }),
+  state: Schema.optional(IssueStateSchema).annotations({ description: "Filter by issue state" }),
+  labels: Schema.optional(Schema.String).annotations({ description: "Comma-separated list of label names to filter by" }),
+  assignee: Schema.optional(Schema.String).annotations({ description: 'Filter by assignee username, "none" for unassigned, "*" for any' }),
+  creator: Schema.optional(Schema.String).annotations({ description: "Filter by issue creator username" }),
+  mentioned: Schema.optional(Schema.String).annotations({ description: "Filter by username mentioned in the issue" }),
+  milestone: Schema.optional(Schema.String).annotations({ description: 'Filter by milestone number, "none", or "*" for any' }),
+  since: Schema.optional(Schema.String).annotations({ description: "Only issues updated after this ISO 8601 timestamp" }),
+  sort: Schema.optional(IssueSortSchema).annotations({ description: "Sort field" }),
+  direction: Schema.optional(SortDirectionSchema).annotations({ description: "Sort direction" }),
+  per_page: Schema.optional(Schema.Number.pipe(Schema.greaterThanOrEqualTo(1), Schema.lessThanOrEqualTo(100))).annotations({ description: "Results per page (max 100)" }),
+  page: Schema.optional(Schema.Number.pipe(Schema.greaterThanOrEqualTo(1))).annotations({ description: "Page number" }),
+});
+
+export type IssueFilters = Schema.Schema.Type<typeof IssueFiltersSchema>;
+
+/**
+ * Schema for label information
+ */
+export const IssueLabelSchema = Schema.Struct({
+  name: Schema.String,
+  color: Schema.String,
+});
+
+export type IssueLabel = Schema.Schema.Type<typeof IssueLabelSchema>;
+
+/**
+ * Schema for user information
+ */
+export const IssueUserSchema = Schema.Struct({
+  login: Schema.String,
+  avatar_url: Schema.String,
+});
+
+export type IssueUser = Schema.Schema.Type<typeof IssueUserSchema>;
+
+/**
+ * Schema for milestone information
+ */
+export const MilestoneSchema = Schema.Struct({
+  number: Schema.Number,
+  title: Schema.String,
+});
+
+export type Milestone = Schema.Schema.Type<typeof MilestoneSchema>;
+
+/**
+ * Schema for a single issue
+ */
+export const IssueSchema = Schema.Struct({
+  number: Schema.Number,
+  title: Schema.String,
+  state: Schema.Literal("open", "closed"),
+  labels: Schema.Array(IssueLabelSchema),
+  assignee: Schema.NullOr(IssueUserSchema),
+  assignees: Schema.Array(IssueUserSchema),
+  user: IssueUserSchema,
+  created_at: Schema.String,
+  updated_at: Schema.String,
+  closed_at: Schema.NullOr(Schema.String),
+  body: Schema.NullOr(Schema.String),
+  html_url: Schema.String,
+  comments: Schema.Number,
+  milestone: Schema.NullOr(MilestoneSchema),
+});
+
+export type Issue = Schema.Schema.Type<typeof IssueSchema>;
+
+/**
+ * Schema for list issues result
+ */
+export const ListIssuesResultSchema = Schema.Struct({
+  issues: Schema.Array(IssueSchema),
+  total_count: Schema.Number,
+  page: Schema.Number,
+  per_page: Schema.Number,
+});
+
+export type ListIssuesResult = Schema.Schema.Type<typeof ListIssuesResultSchema>;

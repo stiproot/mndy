@@ -1,6 +1,9 @@
 import "dotenv/config";
+import { Effect } from "effect";
 import { createMcpApp, McpServer, log, setLogLevel, type LogLevel } from "mcp-core";
 import { registerIssuesTool } from "./tools/issues.js";
+import { ServerConfig } from "./types.js";
+import { GitHubClient } from "./services/github.js";
 
 const SERVER_NAME = "github-issues-mcp";
 const SERVER_VERSION = "0.1.0";
@@ -16,31 +19,37 @@ function createServer(): McpServer {
   return server;
 }
 
-async function main(): Promise<void> {
-  const port = parseInt(process.env.PORT ?? "3001", 10);
-  const logLevel = (process.env.LOG_LEVEL ?? "info") as LogLevel;
+/**
+ * Main application startup effect
+ */
+const main = Effect.gen(function* () {
+  const config = yield* ServerConfig;
+  const client = yield* GitHubClient;
 
-  setLogLevel(logLevel);
+  setLogLevel(config.logLevel as LogLevel);
 
-  if (!process.env.GITHUB_TOKEN) {
-    log("warning", "GITHUB_TOKEN not set - only public repos will be accessible");
+  if (!client.hasToken()) {
+    yield* Effect.log("GITHUB_TOKEN not set - only public repos will be accessible");
   }
 
   const { start } = createMcpApp(
     {
       name: SERVER_NAME,
       version: SERVER_VERSION,
-      port,
+      port: config.port,
       endpoint: "/mcp",
       allowedHosts: ["localhost", "127.0.0.1"],
     },
     createServer
   );
 
-  await start();
-}
+  yield* Effect.promise(() => start());
+}).pipe(
+  Effect.provide(GitHubClient.Default),
+  Effect.tapError((error) => Effect.sync(() => log("error", "Failed to start server", error)))
+);
 
-main().catch((error) => {
-  log("error", "Failed to start server", error);
+// Execute the main effect
+Effect.runPromise(main).catch(() => {
   process.exit(1);
 });

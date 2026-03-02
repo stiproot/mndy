@@ -1,11 +1,12 @@
-import { z, type McpServer, createLogger } from "mcp-core";
-import { createGitHubClient } from "../services/github.js";
+import { Effect } from "effect";
+import { type McpServer, createLogger, z } from "mcp-core";
+import { GitHubClient } from "../services/github.js";
 import type { IssueFilters } from "../types.js";
 
 const logger = createLogger("github_list_issues");
 
 /**
- * Input schema for the github_list_issues tool
+ * Input schema for the github_list_issues tool (Zod for MCP SDK compatibility)
  */
 export const listIssuesSchema = {
   owner: z.string().describe("Repository owner (username or organization)"),
@@ -50,11 +51,66 @@ export const listIssuesSchema = {
 };
 
 /**
+ * List issues effect - the core business logic
+ */
+const listIssuesEffect = (filters: IssueFilters) =>
+  Effect.gen(function* () {
+    const client = yield* GitHubClient;
+
+    logger.debug("Fetching issues with filters", filters);
+
+    const result = yield* client.listIssues(filters);
+
+    logger.debug("Issues response", {
+      total_count: result.total_count,
+      returned: result.issues.length,
+      issues: result.issues.map((i) => ({
+        number: i.number,
+        state: i.state,
+        title: i.title,
+        user: i.user?.login,
+      })),
+    });
+
+    const summary = `Found ${result.total_count} issue(s) in ${filters.owner}/${filters.repo} (page ${result.page})`;
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(
+            {
+              summary,
+              ...result,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+      structuredContent: {
+        summary,
+        ...result,
+      },
+    };
+  }).pipe(
+    Effect.catchTag("GitHubApiError", (error) =>
+      Effect.succeed({
+        content: [
+          {
+            type: "text" as const,
+            text: `Error fetching issues: ${error.message}`,
+          },
+        ],
+        isError: true as const,
+      })
+    )
+  );
+
+/**
  * Register the github_list_issues tool on the server
  */
 export function registerIssuesTool(server: McpServer): void {
-  const client = createGitHubClient();
-
   server.registerTool(
     "github_list_issues",
     {
@@ -63,73 +119,27 @@ export function registerIssuesTool(server: McpServer): void {
         "Fetch issues from a GitHub repository with optional filters for state, labels, assignee, creator, milestone, and more.",
       inputSchema: listIssuesSchema,
     },
-    async (args) => {
-      try {
-        const filters: IssueFilters = {
-          owner: args.owner,
-          repo: args.repo,
-          state: args.state,
-          labels: args.labels,
-          assignee: args.assignee,
-          creator: args.creator,
-          mentioned: args.mentioned,
-          milestone: args.milestone,
-          since: args.since,
-          sort: args.sort,
-          direction: args.direction,
-          per_page: args.per_page,
-          page: args.page,
-        };
+    (args) => {
+      const filters: IssueFilters = {
+        owner: args.owner,
+        repo: args.repo,
+        state: args.state,
+        labels: args.labels,
+        assignee: args.assignee,
+        creator: args.creator,
+        mentioned: args.mentioned,
+        milestone: args.milestone,
+        since: args.since,
+        sort: args.sort,
+        direction: args.direction,
+        per_page: args.per_page,
+        page: args.page,
+      };
 
-        logger.debug("Fetching issues with filters", filters);
-
-        const result = await client.listIssues(filters);
-
-        logger.debug("Issues response", {
-          total_count: result.total_count,
-          returned: result.issues.length,
-          issues: result.issues.map((i) => ({
-            number: i.number,
-            state: i.state,
-            title: i.title,
-            user: i.user?.login,
-          })),
-        });
-
-        const summary = `Found ${result.total_count} issue(s) in ${args.owner}/${args.repo} (page ${result.page})`;
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(
-                {
-                  summary,
-                  ...result,
-                },
-                null,
-                2
-              ),
-            },
-          ],
-          structuredContent: {
-            summary,
-            ...result,
-          },
-        };
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Unknown error";
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error fetching issues: ${message}`,
-            },
-          ],
-          isError: true,
-        };
-      }
+      // Execute Effect at the boundary (MCP SDK expects Promise)
+      return Effect.runPromise(
+        listIssuesEffect(filters).pipe(Effect.provide(GitHubClient.Default))
+      );
     }
   );
 }

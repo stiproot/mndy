@@ -95,11 +95,11 @@ Each service has its own linting configuration:
 
 **Services being migrated (in order):**
 
-1. `src/github-issues-mcp/` - In progress (smallest, uses Zod)
+1. `src/github-issues-mcp/` - **Completed** (Effect Services, Schema, Config)
 2. `src/mcp-core/` - Pending
 3. `src/ui-api/` - Pending (highest complexity)
 
-**Standards:** See `docs/guides/effect-ts.standards.md` for comprehensive patterns
+**Standards:** See `docs/guides/effect-ts-standards.md` for comprehensive patterns
 
 **Key Principles:**
 
@@ -107,4 +107,5 @@ Each service has its own linting configuration:
 - Define tagged errors with `Data.TaggedError`
 - Model dependencies as Services (no module-level singletons)
 - Use `Schema` for runtime validation
+- Use `Config` module for environment variables (not `process.env`)
 - Handle errors with `catchTag`/`catchTags`, not try-catch

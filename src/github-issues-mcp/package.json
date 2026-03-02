@@ -13,7 +13,8 @@
   "dependencies": {
     "mcp-core": "workspace:*",
     "@octokit/rest": "^21.0.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "effect": "^3.12.5"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",
