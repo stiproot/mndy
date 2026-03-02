@@ -59,4 +59,4 @@ const results = yield* Effect.all([task1, task2, task3]);
 
 ## Reference
 
-See `docs/guides/effect-ts.standards.md` for comprehensive patterns and examples.
+See `docs/guides/effect-ts-standards.md` for comprehensive patterns and examples.

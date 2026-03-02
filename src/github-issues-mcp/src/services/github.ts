@@ -1,9 +1,76 @@
 import { Octokit } from "@octokit/rest";
-import { Effect, Layer } from "effect";
+import { Duration, Effect, Layer, Schedule } from "effect";
 import type { Issue, IssueFilters, ListIssuesResult } from "../types.js";
-import { GitHubApiError, GitHubConfig } from "../types.js";
+import { GitHubApiError, GitHubRateLimitError, TimeoutError, GitHubConfig } from "../types.js";
 
 const MAX_BODY_LENGTH = 500;
+const REQUEST_TIMEOUT = Duration.seconds(30);
+const MAX_RETRIES = 3;
+
+/**
+ * Type guard for Octokit RequestError (duck typing)
+ */
+interface OctokitRequestError extends Error {
+  status: number;
+  response?: {
+    headers?: Record<string, string>;
+  };
+}
+
+const isOctokitRequestError = (error: unknown): error is OctokitRequestError =>
+  error instanceof Error &&
+  "status" in error &&
+  typeof (error as OctokitRequestError).status === "number";
+
+/**
+ * Retry schedule with exponential backoff and jitter
+ * Retries on transient errors (5xx, network issues)
+ */
+const retrySchedule = Schedule.exponential(Duration.millis(500)).pipe(
+  Schedule.jittered,
+  Schedule.compose(Schedule.recurs(MAX_RETRIES))
+);
+
+/**
+ * Check if an error is retryable (transient)
+ */
+const isRetryableError = (error: GitHubApiError): boolean => {
+  const status = error.status;
+  if (!status) return true; // Network errors are retryable
+  return status >= 500 || status === 408 || status === 429;
+};
+
+/**
+ * Extract error details from Octokit errors
+ */
+const extractOctokitError = (
+  error: unknown
+): GitHubApiError | GitHubRateLimitError => {
+  if (isOctokitRequestError(error)) {
+    // Handle rate limiting
+    if (error.status === 403 || error.status === 429) {
+      const resetHeader = error.response?.headers?.["x-ratelimit-reset"];
+      const retryAfterHeader = error.response?.headers?.["retry-after"];
+
+      return new GitHubRateLimitError({
+        message: error.message || "GitHub API rate limit exceeded",
+        resetAt: resetHeader ? new Date(parseInt(resetHeader) * 1000) : undefined,
+        retryAfter: retryAfterHeader ? parseInt(retryAfterHeader) : undefined,
+      });
+    }
+
+    return new GitHubApiError({
+      message: error.message,
+      status: error.status,
+      cause: error,
+    });
+  }
+
+  return new GitHubApiError({
+    message: error instanceof Error ? error.message : "Unknown GitHub API error",
+    cause: error,
+  });
+};
 
 /**
  * Call GitHub API to list issues for a repo
@@ -11,7 +78,10 @@ const MAX_BODY_LENGTH = 500;
 const callGitHubApi = (
   octokit: Octokit,
   filters: IssueFilters
-): Effect.Effect<Awaited<ReturnType<Octokit["issues"]["listForRepo"]>>, GitHubApiError> => {
+): Effect.Effect<
+  Awaited<ReturnType<Octokit["issues"]["listForRepo"]>>,
+  GitHubApiError | GitHubRateLimitError | TimeoutError
+> => {
   const { owner, repo, ...options } = filters;
 
   return Effect.promise(() =>
@@ -31,14 +101,30 @@ const callGitHubApi = (
       page: options.page ?? 1,
     })
   ).pipe(
-    Effect.catchAllDefect((defect) =>
-      Effect.fail(
-        new GitHubApiError({
-          message: defect instanceof Error ? defect.message : "Unknown GitHub API error",
-          cause: defect,
-        })
-      )
-    )
+    // Add timeout
+    Effect.timeoutFail({
+      duration: REQUEST_TIMEOUT,
+      onTimeout: () =>
+        new TimeoutError({
+          message: "GitHub API request timed out",
+          duration: Duration.format(REQUEST_TIMEOUT),
+        }),
+    }),
+    // Convert defects to typed errors
+    Effect.catchAllDefect((defect) => Effect.fail(extractOctokitError(defect))),
+    // Add tracing span
+    Effect.withSpan("github.listIssuesForRepo", {
+      attributes: {
+        "github.owner": filters.owner,
+        "github.repo": filters.repo,
+        "github.state": filters.state ?? "open",
+      },
+    }),
+    // Retry transient errors with backoff
+    Effect.retry({
+      schedule: retrySchedule,
+      while: (error) => error._tag === "GitHubApiError" && isRetryableError(error),
+    })
   );
 };
 
@@ -124,9 +210,12 @@ export class GitHubClient extends Effect.Service<GitHubClient>()("GitHubClient",
       /**
        * List issues from a repository with filters
        */
-      listIssues: (filters: IssueFilters): Effect.Effect<ListIssuesResult, GitHubApiError> =>
+      listIssues: (
+        filters: IssueFilters
+      ): Effect.Effect<ListIssuesResult, GitHubApiError | GitHubRateLimitError | TimeoutError> =>
         callGitHubApi(octokit, filters).pipe(
-          Effect.map((response) => transformResponse(response.data, filters))
+          Effect.map((response) => transformResponse(response.data, filters)),
+          Effect.withSpan("GitHubClient.listIssues")
         ),
     };
   }),

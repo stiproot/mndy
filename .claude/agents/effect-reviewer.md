@@ -132,4 +132,4 @@ Fix: {corrected code}
 
 ## Reference
 
-See `docs/guides/effect-ts.standards.md` for comprehensive patterns.
+See `docs/guides/effect-ts-standards.md` for comprehensive patterns.

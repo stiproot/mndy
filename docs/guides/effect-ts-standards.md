@@ -15,12 +15,13 @@
 5. [Resource Management](#resource-management)
 6. [Data Types & Modeling](#data-types--modeling)
 7. [HTTP & Networking](#http--networking)
-8. [Schema & Validation](#schema--validation)
-9. [Observability & Logging](#observability--logging)
-10. [Testing Patterns](#testing-patterns)
-11. [Stream Processing](#stream-processing)
-12. [React & Web Applications](#react--web-applications)
-13. [Performance & Optimization](#performance--optimization)
+8. [API Resilience](#api-resilience)
+9. [Schema & Validation](#schema--validation)
+10. [Observability & Logging](#observability--logging)
+11. [Testing Patterns](#testing-patterns)
+12. [Stream Processing](#stream-processing)
+13. [React & Web Applications](#react--web-applications)
+14. [Performance & Optimization](#performance--optimization)
 
 ---
 
@@ -1158,6 +1159,222 @@ app.get('/users/:id', async (req, res) => {
 - Missing structured concurrency benefits
 
 **Related Patterns:** build-a-basic-http-server, handle-get-request, provide-dependencies-to-routes
+
+---
+
+## API Resilience
+
+### 1. Add Timeouts to External Calls
+
+**Pattern:** Use `Effect.timeoutFail` to prevent hanging requests.
+
+**When to Use:**
+
+- Any external API call
+- Database queries
+- Network operations that could hang
+
+**Key Standards:**
+
+```typescript
+// ✅ GOOD: Timeout with custom error
+class TimeoutError extends Data.TaggedError('TimeoutError')<{
+  readonly message: string;
+  readonly duration: string;
+}> {}
+
+const fetchData = (url: string) =>
+  Effect.promise(() => fetch(url)).pipe(
+    Effect.timeoutFail({
+      duration: Duration.seconds(30),
+      onTimeout: () =>
+        new TimeoutError({
+          message: 'Request timed out',
+          duration: '30 seconds',
+        }),
+    })
+  );
+
+// ❌ BAD: No timeout (can hang indefinitely)
+const fetchData = (url: string) => Effect.promise(() => fetch(url));
+```
+
+**Common Pitfalls:**
+
+- Not setting timeouts on external calls
+- Using generic timeout errors without context
+- Setting timeouts too short for legitimate operations
+
+**Related Patterns:** handle-flaky-operations-with-retry-timeout
+
+---
+
+### 2. Retry with Exponential Backoff
+
+**Pattern:** Use `Schedule` for composable retry policies with backoff and jitter.
+
+**When to Use:**
+
+- Transient failures (network issues, 5xx errors)
+- Rate-limited APIs (429 responses)
+- Flaky external services
+
+**Key Standards:**
+
+```typescript
+// ✅ GOOD: Exponential backoff with jitter and max retries
+const retrySchedule = Schedule.exponential(Duration.millis(500)).pipe(
+  Schedule.jittered,
+  Schedule.compose(Schedule.recurs(3))
+);
+
+// Conditional retry based on error type
+const fetchWithRetry = (url: string) =>
+  fetchData(url).pipe(
+    Effect.retry({
+      schedule: retrySchedule,
+      while: (error) => error._tag === 'ApiError' && isRetryable(error),
+    })
+  );
+
+// Helper to determine retryable errors
+const isRetryable = (error: ApiError): boolean => {
+  const status = error.status;
+  if (!status) return true; // Network errors
+  return status >= 500 || status === 408 || status === 429;
+};
+
+// ❌ BAD: Manual retry loop
+const fetchWithRetry = (url: string, attempts = 3) =>
+  fetchData(url).pipe(
+    Effect.catchAll((error) => {
+      if (attempts > 0) {
+        return Effect.sleep(1000).pipe(
+          Effect.flatMap(() => fetchWithRetry(url, attempts - 1))
+        );
+      }
+      return Effect.fail(error);
+    })
+  );
+```
+
+**Common Pitfalls:**
+
+- Manual retry loops instead of Schedule
+- Missing jitter (causes thundering herd)
+- Retrying non-transient errors (4xx client errors)
+- No maximum retry limit
+
+**Related Patterns:** control-repetition-with-schedule, retry-based-on-specific-errors
+
+---
+
+### 3. Handle Rate Limits
+
+**Pattern:** Detect rate limit responses and provide actionable error information.
+
+**When to Use:**
+
+- External APIs with rate limits (GitHub, Twitter, etc.)
+- Any API returning 429 or 403 with rate limit headers
+
+**Key Standards:**
+
+```typescript
+// ✅ GOOD: Specific rate limit error with retry info
+class RateLimitError extends Data.TaggedError('RateLimitError')<{
+  readonly message: string;
+  readonly resetAt?: Date;
+  readonly retryAfter?: number;
+}> {}
+
+const extractApiError = (error: unknown): ApiError | RateLimitError => {
+  if (isHttpError(error)) {
+    if (error.status === 403 || error.status === 429) {
+      return new RateLimitError({
+        message: 'Rate limit exceeded',
+        resetAt: parseResetHeader(error.headers['x-ratelimit-reset']),
+        retryAfter: parseRetryAfter(error.headers['retry-after']),
+      });
+    }
+    return new ApiError({ message: error.message, status: error.status });
+  }
+  return new ApiError({ message: 'Unknown error', cause: error });
+};
+
+// Handle rate limits specifically
+const result = yield * fetchData(url).pipe(
+  Effect.catchTag('RateLimitError', (error) =>
+    Effect.fail(
+      new UserFacingError({
+        message: `Rate limited. ${error.retryAfter ? `Retry after ${error.retryAfter}s` : ''}`,
+      })
+    )
+  )
+);
+
+// ❌ BAD: Generic error handling loses rate limit info
+const result = yield * fetchData(url).pipe(
+  Effect.catchAll((error) => Effect.fail(new Error('API call failed')))
+);
+```
+
+**Common Pitfalls:**
+
+- Treating rate limits as generic errors
+- Not extracting retry-after information
+- Not logging rate limit events for monitoring
+
+**Related Patterns:** handle-api-errors, mapping-errors-to-fit-your-domain
+
+---
+
+### 4. Add Tracing Spans
+
+**Pattern:** Use `Effect.withSpan` for distributed tracing and observability.
+
+**When to Use:**
+
+- External API calls
+- Database operations
+- Any operation you want to monitor in production
+
+**Key Standards:**
+
+```typescript
+// ✅ GOOD: Spans with attributes for observability
+const fetchIssues = (owner: string, repo: string) =>
+  callGitHubApi(owner, repo).pipe(
+    Effect.withSpan('github.listIssues', {
+      attributes: {
+        'github.owner': owner,
+        'github.repo': repo,
+      },
+    })
+  );
+
+// ✅ GOOD: Nested spans for detailed tracing
+const processOrder = (orderId: string) =>
+  Effect.gen(function* () {
+    const order = yield* fetchOrder(orderId);
+    const payment = yield* processPayment(order);
+    return { order, payment };
+  }).pipe(
+    Effect.withSpan('order.process', { attributes: { orderId } })
+  );
+
+// ❌ BAD: No tracing (invisible in production)
+const fetchIssues = (owner: string, repo: string) =>
+  callGitHubApi(owner, repo);
+```
+
+**Common Pitfalls:**
+
+- Not adding spans to critical operations
+- Missing span attributes for debugging
+- Not understanding trace context propagation
+
+**Related Patterns:** trace-operations-with-spans, observability-tracing-spans
 
 ---
 

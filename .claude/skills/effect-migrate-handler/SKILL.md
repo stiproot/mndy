@@ -103,4 +103,4 @@ app.post("/query", async (req, res) => {
 
 ## Reference
 
-See `docs/guides/effect-ts.standards.md` for comprehensive patterns.
+See `docs/guides/effect-ts-standards.md` for comprehensive patterns.

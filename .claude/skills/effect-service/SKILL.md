@@ -126,4 +126,4 @@ const result = await Effect.runPromise(
 
 ## Reference
 
-See `docs/guides/effect-ts.standards.md` section "Dependency Injection & Services".
+See `docs/guides/effect-ts-standards.md` section "Dependency Injection & Services".

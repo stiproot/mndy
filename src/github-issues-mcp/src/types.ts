@@ -14,6 +14,23 @@ export class GitHubApiError extends Data.TaggedError("GitHubApiError")<{
 }> {}
 
 /**
+ * Error when GitHub rate limit is exceeded
+ */
+export class GitHubRateLimitError extends Data.TaggedError("GitHubRateLimitError")<{
+  readonly message: string;
+  readonly resetAt?: Date;
+  readonly retryAfter?: number;
+}> {}
+
+/**
+ * Error when request times out
+ */
+export class TimeoutError extends Data.TaggedError("TimeoutError")<{
+  readonly message: string;
+  readonly duration: string;
+}> {}
+
+/**
  * Error when configuration is invalid or missing
  */
 export class ConfigError extends Data.TaggedError("ConfigError")<{

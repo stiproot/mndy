@@ -94,17 +94,38 @@ const listIssuesEffect = (filters: IssueFilters) =>
       },
     };
   }).pipe(
-    Effect.catchTag("GitHubApiError", (error) =>
-      Effect.succeed({
-        content: [
-          {
-            type: "text" as const,
-            text: `Error fetching issues: ${error.message}`,
-          },
-        ],
-        isError: true as const,
-      })
-    )
+    Effect.catchTags({
+      GitHubApiError: (error) =>
+        Effect.succeed({
+          content: [
+            {
+              type: "text" as const,
+              text: `Error fetching issues: ${error.message}${error.status ? ` (HTTP ${error.status})` : ""}`,
+            },
+          ],
+          isError: true as const,
+        }),
+      GitHubRateLimitError: (error) =>
+        Effect.succeed({
+          content: [
+            {
+              type: "text" as const,
+              text: `GitHub rate limit exceeded: ${error.message}${error.retryAfter ? `. Retry after ${error.retryAfter} seconds.` : ""}`,
+            },
+          ],
+          isError: true as const,
+        }),
+      TimeoutError: (error) =>
+        Effect.succeed({
+          content: [
+            {
+              type: "text" as const,
+              text: `Request timed out after ${error.duration}: ${error.message}`,
+            },
+          ],
+          isError: true as const,
+        }),
+    })
   );
 
 /**

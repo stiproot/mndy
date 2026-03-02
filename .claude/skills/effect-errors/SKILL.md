@@ -144,4 +144,4 @@ const findUser = (id: string): Effect.Effect<
 
 ## Reference
 
-See `docs/guides/effect-ts.standards.md` section "Error Handling Patterns".
+See `docs/guides/effect-ts-standards.md` section "Error Handling Patterns".
