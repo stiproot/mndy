@@ -46,7 +46,7 @@ Use `make help` to see all available commands. The Makefile is the single entry 
 
 ### MCP Servers
 
-- `make run-github-issues-mcp` - GitHub Issues MCP server (port 3001)
+- `make run-github-issues-mcp` - GitHub Issues MCP server (port 3001). [Details](src/github-issues-mcp/README.md)
 
 ### Lint
 

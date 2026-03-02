@@ -10,13 +10,15 @@
     "src/mcp-core",
     "src/github-issues-mcp",
     "src/cc-core",
-    "src/cc-svc"
+    "src/cc-svc",
+    "scripts"
   ],
   "scripts": {
     "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**'",
     "lint:md:fix": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**' --fix",
     "test:integration": "vitest run tests/integration/",
-    "test:integration:watch": "vitest tests/integration/"
+    "test:integration:watch": "vitest tests/integration/",
+    "insights": "bun run --cwd scripts src/contributor-insights.ts"
   },
   "devDependencies": {
     "markdownlint-cli": "^0.43.0",

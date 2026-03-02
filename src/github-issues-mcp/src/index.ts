@@ -2,6 +2,8 @@ import "dotenv/config";
 import { Effect } from "effect";
 import { createMcpApp, McpServer, log, setLogLevel, type LogLevel } from "mcp-core";
 import { registerIssuesTool } from "./tools/issues.js";
+import { registerUpdateIssueTool } from "./tools/update-issue.js";
+import { registerAddLabelsTool, registerRemoveLabelTool } from "./tools/labels.js";
 import { ServerConfig } from "./types.js";
 import { GitHubClient } from "./services/github.js";
 
@@ -15,6 +17,9 @@ function createServer(): McpServer {
   });
 
   registerIssuesTool(server);
+  registerUpdateIssueTool(server);
+  registerAddLabelsTool(server);
+  registerRemoveLabelTool(server);
 
   return server;
 }

@@ -1,0 +1,18 @@
+{
+  "name": "scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "insights": "bun run src/contributor-insights.ts"
+  },
+  "dependencies": {
+    "cc-svc": "workspace:*",
+    "json2md": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/json2md": "^1.5.4",
+    "typescript": "^5.5.2"
+  }
+}

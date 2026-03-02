@@ -36,7 +36,7 @@ install-python: ## Install Python dependencies (uv workspace)
 serve-ui: ## Run frontend dev server (port 8080)
 	bun run --cwd src/ui serve
 
-run-ui-api: ## Run UI API gateway with Dapr (port 3001)
+run-ui-api: build-ui-api ## Run UI API gateway with Dapr (port 3001)
 	dapr run --app-id mndy-ui-api \
 		--placement-host-address localhost:50000 \
 		--config src/dapr/configuration/config.yaml \
@@ -85,7 +85,7 @@ run-workflows-worker: ## Run workflows worker with Dapr (port 6006)
 # MCP Servers
 # ==============================================================================
 
-run-github-issues-mcp: ## Run GitHub Issues MCP server (port 3001)
+run-github-issues-mcp: build-mcp ## Run GitHub Issues MCP server (port 3001)
 	bun run --cwd src/github-issues-mcp start
 
 build-mcp: ## Build all MCP packages
@@ -102,7 +102,7 @@ build-cc: ## Build Claude Code core package
 build-cc-svc: build-cc ## Build Claude Code service
 	bun run --cwd src/cc-svc build
 
-run-cc-svc: ## Run Claude Code service (port 3002)
+run-cc-svc: build-cc-svc ## Run Claude Code service (port 3002)
 	bun run --cwd src/cc-svc start
 
 # ==============================================================================

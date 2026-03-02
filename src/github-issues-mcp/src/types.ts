@@ -163,3 +163,68 @@ export const ListIssuesResultSchema = Schema.Struct({
 });
 
 export type ListIssuesResult = Schema.Schema.Type<typeof ListIssuesResultSchema>;
+
+// =============================================================================
+// Update Issue Types
+// =============================================================================
+
+/**
+ * Schema for update issue input
+ */
+export const UpdateIssueInputSchema = Schema.Struct({
+  owner: Schema.String.annotations({ description: "Repository owner (username or organization)" }),
+  repo: Schema.String.annotations({ description: "Repository name" }),
+  issue_number: Schema.Number.annotations({ description: "Issue number to update" }),
+  title: Schema.optional(Schema.String).annotations({ description: "New title for the issue" }),
+  body: Schema.optional(Schema.String).annotations({ description: "New body content for the issue" }),
+  state: Schema.optional(Schema.Literal("open", "closed")).annotations({ description: "Set issue state" }),
+  labels: Schema.optional(Schema.mutable(Schema.Array(Schema.String))).annotations({ description: "Replace all labels with these" }),
+  assignees: Schema.optional(Schema.mutable(Schema.Array(Schema.String))).annotations({ description: "Replace all assignees with these usernames" }),
+  milestone: Schema.optional(Schema.NullOr(Schema.Number)).annotations({ description: "Milestone number (null to clear)" }),
+});
+
+export type UpdateIssueInput = Schema.Schema.Type<typeof UpdateIssueInputSchema>;
+
+/**
+ * Schema for add labels input
+ */
+export const AddLabelsInputSchema = Schema.Struct({
+  owner: Schema.String.annotations({ description: "Repository owner (username or organization)" }),
+  repo: Schema.String.annotations({ description: "Repository name" }),
+  issue_number: Schema.Number.annotations({ description: "Issue number" }),
+  labels: Schema.mutable(Schema.Array(Schema.String)).annotations({ description: "Labels to add to the issue" }),
+});
+
+export type AddLabelsInput = Schema.Schema.Type<typeof AddLabelsInputSchema>;
+
+/**
+ * Schema for remove label input
+ */
+export const RemoveLabelInputSchema = Schema.Struct({
+  owner: Schema.String.annotations({ description: "Repository owner (username or organization)" }),
+  repo: Schema.String.annotations({ description: "Repository name" }),
+  issue_number: Schema.Number.annotations({ description: "Issue number" }),
+  label: Schema.String.annotations({ description: "Label name to remove from the issue" }),
+});
+
+export type RemoveLabelInput = Schema.Schema.Type<typeof RemoveLabelInputSchema>;
+
+/**
+ * Schema for update issue result
+ */
+export const UpdateIssueResultSchema = Schema.Struct({
+  issue: IssueSchema,
+  updated: Schema.Boolean,
+});
+
+export type UpdateIssueResult = Schema.Schema.Type<typeof UpdateIssueResultSchema>;
+
+/**
+ * Schema for labels result
+ */
+export const LabelsResultSchema = Schema.Struct({
+  labels: Schema.Array(IssueLabelSchema),
+  issue_number: Schema.Number,
+});
+
+export type LabelsResult = Schema.Schema.Type<typeof LabelsResultSchema>;
