@@ -283,3 +283,5 @@ build/
 *.egg-info/
 
 nscacert.pem
+
+/scripts/output/*.md
