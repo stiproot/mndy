@@ -10,6 +10,9 @@
     "src/d3-lab",
     "src/mcp-core",
     "src/github-issues-mcp",
+    "src/ga4-mcp",
+    "src/meta-ads-mcp",
+    "src/shopify-mcp",
     "src/cc-core",
     "src/cc-svc",
     "scripts"
@@ -19,6 +22,11 @@
     "lint:md:fix": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**' --fix",
     "test:integration": "vitest run tests/integration/",
     "test:integration:watch": "vitest tests/integration/",
+    "test:integration:github": "vitest run tests/integration/github-issues-mcp/",
+    "test:integration:ga4": "vitest run tests/integration/ga4-mcp/",
+    "test:integration:meta": "vitest run tests/integration/meta-ads-mcp/",
+    "test:integration:shopify": "vitest run tests/integration/shopify-mcp/",
+    "test:integration:marketing": "vitest run tests/integration/ga4-mcp/ tests/integration/meta-ads-mcp/ tests/integration/shopify-mcp/",
     "insights": "bun run --cwd scripts src/contributor-insights.ts"
   },
   "devDependencies": {

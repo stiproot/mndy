@@ -40,6 +40,9 @@ mndy is built on a modern cloud-native microservices architecture using Dapr (Di
 
 - `src/mcp-core/` - TypeScript shared library for building MCP servers
 - `src/github-issues-mcp/` - GitHub Issues MCP server for AI assistants. [Details](src/github-issues-mcp/README.md)
+- `src/ga4-mcp/` - Google Analytics 4 MCP server. [Details](src/ga4-mcp/README.md)
+- `src/meta-ads-mcp/` - Meta (Facebook/Instagram) Ads MCP server. [Details](src/meta-ads-mcp/README.md)
+- `src/shopify-mcp/` - Shopify Admin API MCP server. [Details](src/shopify-mcp/README.md)
 
 ### AI Services
 
@@ -190,6 +193,215 @@ Each service has its own `.env.template` file:
 
 Copy each template to `.env` and configure with your credentials.
 
+### Marketing Analytics MCP Servers
+
+The marketing analytics MCP servers connect to Google Analytics 4, Meta Ads, and Shopify. Each requires API credentials from the respective platform.
+
+#### Google Analytics 4 (GA4) Setup
+
+**What you need:**
+
+- A Google Cloud Platform (GCP) account
+- Access to a GA4 property (Viewer role or higher)
+
+**Step 1: Create a GCP Project**
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Click "Select a project" → "New Project"
+3. Enter a project name (e.g., "mndy-analytics") and click "Create"
+
+**Step 2: Enable the GA4 Data API**
+
+1. In GCP Console, go to "APIs & Services" → "Library"
+2. Search for "Google Analytics Data API"
+3. Click on it and press "Enable"
+
+**Step 3: Create a Service Account**
+
+1. Go to "APIs & Services" → "Credentials"
+2. Click "Create Credentials" → "Service Account"
+3. Enter a name (e.g., "ga4-reader") and click "Create and Continue"
+4. Skip the optional role assignment and click "Done"
+5. Click on your new service account
+6. Go to the "Keys" tab → "Add Key" → "Create new key"
+7. Select "JSON" and click "Create"
+8. Save the downloaded JSON file to `secrets/ga4-service-account.json`
+
+**Step 4: Grant GA4 Access**
+
+1. Copy the service account email (looks like `ga4-reader@project-id.iam.gserviceaccount.com`)
+2. Go to [Google Analytics](https://analytics.google.com/)
+3. Navigate to Admin → Property Access Management
+4. Click "+" → "Add users"
+5. Paste the service account email
+6. Select "Viewer" role and click "Add"
+
+**Step 5: Get Your Property ID**
+
+1. In GA4, go to Admin → Property Settings
+2. Copy the "Property ID" (a numeric value like `123456789`)
+
+**Environment Variables:**
+
+```bash
+# In src/ga4-mcp/.env
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/secrets/ga4-service-account.json
+GA4_PROPERTY_ID=123456789
+PORT=3003
+```
+
+#### Meta (Facebook/Instagram) Ads Setup
+
+**What you need:**
+
+- A Meta Business Manager account
+- Admin access to an Ad Account
+
+**Step 1: Create a Meta Developer App**
+
+1. Go to [Meta for Developers](https://developers.facebook.com/)
+2. Click "My Apps" → "Create App"
+3. Select "Other" → "Business" → "Next"
+4. Enter an app name and select your Business Manager
+5. Click "Create App"
+
+**Step 2: Add Marketing API**
+
+1. In your app dashboard, click "Add Product"
+2. Find "Marketing API" and click "Set Up"
+
+**Step 3: Create a System User (Recommended for Production)**
+
+System User tokens don't expire, unlike personal tokens which expire in 60 days.
+
+1. Go to [Business Settings](https://business.facebook.com/settings/)
+2. Navigate to "Users" → "System Users"
+3. Click "Add" and create a new system user
+4. Set role to "Admin"
+5. Click "Add Assets" and assign your Ad Account with full permissions
+6. Click "Generate New Token"
+7. Select your app and these permissions:
+   - `ads_management`
+   - `ads_read`
+   - `read_insights`
+8. Click "Generate Token" and copy it securely
+
+**Step 4: Get Your Ad Account ID**
+
+1. Go to [Ads Manager](https://adsmanager.facebook.com/)
+2. Click the dropdown showing your account name
+3. The Ad Account ID is shown (format: `act_123456789`)
+
+**Environment Variables:**
+
+```bash
+# In src/meta-ads-mcp/.env
+META_ACCESS_TOKEN=EAAxxxxxxxxxxxxxxx...
+META_AD_ACCOUNT_ID=act_123456789
+PORT=3004
+```
+
+**Troubleshooting:**
+
+- If you see "Invalid OAuth access token", your token may have expired (if using a personal token)
+- If you see permission errors, ensure the system user has the Ad Account assigned
+
+#### Shopify Setup
+
+**What you need:**
+
+- A Shopify store (can be a development store for testing)
+- Store owner or staff account with app development permissions
+
+**Step 1: Enable Custom App Development**
+
+1. Log into your Shopify Admin
+2. Go to "Settings" → "Apps and sales channels"
+3. Click "Develop apps" (you may need to enable this first)
+4. Click "Allow custom app development" if prompted
+
+**Step 2: Create a Custom App**
+
+1. Click "Create an app"
+2. Enter an app name (e.g., "mndy-analytics")
+3. Click "Create app"
+
+**Step 3: Configure API Scopes**
+
+1. In your app, click "Configure Admin API scopes"
+2. Enable these scopes:
+   - `read_orders` - View orders
+   - `read_products` - View products
+   - `read_customers` - View customer data
+   - `read_analytics` - View store analytics
+3. Click "Save"
+
+**Step 4: Install the App and Get Credentials**
+
+1. Click "Install app" and confirm
+2. After installation, you'll see the "Admin API access token"
+3. **Important:** Copy this token immediately - it's only shown once!
+4. If you miss it, you'll need to uninstall and reinstall the app
+
+**Step 5: Get Your Store URL**
+
+Your store URL is in the format: `your-store-name.myshopify.com`
+
+**Environment Variables:**
+
+```bash
+# In src/shopify-mcp/.env
+SHOPIFY_ACCESS_TOKEN=shpat_xxxxxxxxxxxxxxxx
+SHOPIFY_STORE_URL=your-store.myshopify.com
+PORT=3005
+```
+
+**Note:** For development/testing, you can create a free [Shopify Partner](https://www.shopify.com/partners) account and spin up development stores.
+
+#### Running Marketing MCP Tests
+
+**1. Configure test environment:**
+
+```bash
+cp tests/.env.template tests/.env
+# Edit tests/.env with your credentials
+```
+
+**2. Start the MCP servers:**
+
+```bash
+# Start all marketing MCP servers with Docker
+docker compose --profile ai up ga4-mcp meta-ads-mcp shopify-mcp -d
+
+# Or run individually for development
+cd src/ga4-mcp && bun run dev
+cd src/meta-ads-mcp && bun run dev
+cd src/shopify-mcp && bun run dev
+```
+
+**3. Run the tests:**
+
+```bash
+# All marketing tests
+bun run test:integration:marketing
+
+# Individual MCP tests
+bun run test:integration:ga4
+bun run test:integration:meta
+bun run test:integration:shopify
+```
+
+**Test Configuration Reference:**
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `GA4_MCP_URL` | GA4 MCP server URL | `http://localhost:3003` |
+| `GA4_TEST_PROPERTY_ID` | GA4 property to test against | `123456789` |
+| `META_MCP_URL` | Meta Ads MCP server URL | `http://localhost:3004` |
+| `META_TEST_AD_ACCOUNT_ID` | Meta ad account to test against | `act_123456789` |
+| `SHOPIFY_MCP_URL` | Shopify MCP server URL | `http://localhost:3005` |
+| `SHOPIFY_TEST_STORE_URL` | Shopify store to test against | `store.myshopify.com` |
+
 ## Project Structure
 
 ```text
@@ -204,6 +416,9 @@ mndy/
 │   ├── workflows-worker/        # Workflow orchestration
 │   ├── mcp-core/                # Shared MCP server library
 │   ├── github-issues-mcp/       # GitHub Issues MCP server
+│   ├── ga4-mcp/                 # Google Analytics 4 MCP server
+│   ├── meta-ads-mcp/            # Meta Ads MCP server
+│   ├── shopify-mcp/             # Shopify MCP server
 │   ├── cc-core/                 # Claude Code SDK wrapper
 │   ├── cc-svc/                  # Multi-agent insights service
 │   └── dapr/                    # Dapr configuration
@@ -211,6 +426,10 @@ mndy/
 │       └── configuration/       # Dapr runtime config
 ├── tests/                       # Integration & unit tests
 │   └── integration/             # Integration test suites
+│       ├── github-issues-mcp/   # GitHub MCP tests
+│       ├── ga4-mcp/             # GA4 MCP tests
+│       ├── meta-ads-mcp/        # Meta Ads MCP tests
+│       └── shopify-mcp/         # Shopify MCP tests
 ├── docs/                        # Documentation
 │   ├── architecture.html        # Architecture diagram
 │   └── raw.md                   # Project vision & concepts

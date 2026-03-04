@@ -4,7 +4,7 @@ name: mndy
 # Profiles:
 #   - (none)     : Infrastructure only (Dapr, MongoDB, RabbitMQ, Zipkin)
 #   - apps       : All application services (workers, UI, API)
-#   - ai         : AI services only (cc-svc, github-issues-mcp)
+#   - ai         : AI services (cc-svc, github-issues-mcp, ga4-mcp, meta-ads-mcp, shopify-mcp)
 #
 # Usage:
 #   docker compose up                    # Infrastructure only
@@ -322,6 +322,80 @@ services:
       start_period: 10s
 
   ##############################################
+  #  Google Analytics 4 MCP Server (AI profile)#
+  ##############################################
+  ga4-mcp:
+    profiles: [ai]
+    image: xo-feed/mndy/ga4-mcp:dev
+    build:
+      context: .
+      dockerfile: src/ga4-mcp/Dockerfile
+      tags:
+        - xo-feed/mndy/ga4-mcp:dev
+    ports:
+      - "3003:3003"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/ga4-service-account.json
+      - GA4_PROPERTY_ID=${GA4_PROPERTY_ID}
+      - PORT=3003
+    volumes:
+      - ./secrets/ga4-service-account.json:/secrets/ga4-service-account.json:ro
+    healthcheck:
+      test: ["CMD", "bun", "--eval", "fetch('http://localhost:3003/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  ##############################################
+  #  Meta Ads MCP Server (AI profile)          #
+  ##############################################
+  meta-ads-mcp:
+    profiles: [ai]
+    image: xo-feed/mndy/meta-ads-mcp:dev
+    build:
+      context: .
+      dockerfile: src/meta-ads-mcp/Dockerfile
+      tags:
+        - xo-feed/mndy/meta-ads-mcp:dev
+    ports:
+      - "3004:3004"
+    environment:
+      - META_ACCESS_TOKEN=${META_ACCESS_TOKEN}
+      - META_AD_ACCOUNT_ID=${META_AD_ACCOUNT_ID}
+      - PORT=3004
+    healthcheck:
+      test: ["CMD", "bun", "--eval", "fetch('http://localhost:3004/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  ##############################################
+  #  Shopify MCP Server (AI profile)           #
+  ##############################################
+  shopify-mcp:
+    profiles: [ai]
+    image: xo-feed/mndy/shopify-mcp:dev
+    build:
+      context: .
+      dockerfile: src/shopify-mcp/Dockerfile
+      tags:
+        - xo-feed/mndy/shopify-mcp:dev
+    ports:
+      - "3005:3005"
+    environment:
+      - SHOPIFY_ACCESS_TOKEN=${SHOPIFY_ACCESS_TOKEN}
+      - SHOPIFY_STORE_URL=${SHOPIFY_STORE_URL}
+      - PORT=3005
+    healthcheck:
+      test: ["CMD", "bun", "--eval", "fetch('http://localhost:3005/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  ##############################################
   #  Claude Code Service (AI profile)         #
   ##############################################
   cc-svc:
@@ -338,6 +412,9 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}
       - GITHUB_ISSUES_MCP_URL=http://github-issues-mcp:3001/mcp
+      - GA4_MCP_URL=http://ga4-mcp:3003/mcp
+      - META_MCP_URL=http://meta-ads-mcp:3004/mcp
+      - SHOPIFY_MCP_URL=http://shopify-mcp:3005/mcp
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - PORT=3002
       - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-sonnet-4-5-20250929}
@@ -347,6 +424,12 @@ services:
       - MAX_SUBAGENT_BUDGET_USD=${MAX_SUBAGENT_BUDGET_USD:-0.25}
     depends_on:
       github-issues-mcp:
+        condition: service_healthy
+      ga4-mcp:
+        condition: service_healthy
+      meta-ads-mcp:
+        condition: service_healthy
+      shopify-mcp:
         condition: service_healthy
 
 volumes:
