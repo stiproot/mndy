@@ -29,17 +29,17 @@ mndy is built on a modern cloud-native microservices architecture using Dapr (Di
 
 ### Services
 
-- **UI** (Vue 3 + TypeScript + Quasar) - Frontend application with D3.js visualizations
-- **UI API** (Node.js + Express) - API gateway handling queries, commands, and authentication
-- **AzDo Worker** (Python + FastAPI) - Azure DevOps data gathering service
-- **AzDo Proxy Worker** (Python + FastAPI) - Proxy service for Azure DevOps API
-- **Insights Worker** (Python + FastAPI) - Analytics and data processing service
-- **Workflows Worker** (Python + FastAPI) - Workflow orchestration service
+- `src/ui/` - Vue 3 + TypeScript + Quasar frontend with D3.js visualizations. [Details](src/ui/README.md)
+- `src/ui-api/` - Express.js API gateway for authentication and data operations. [Details](src/ui-api/README.md)
+- `src/azdo-worker/` - Python FastAPI service for Azure DevOps data collection
+- `src/azdoproxy-worker/` - Python FastAPI proxy for Azure DevOps API
+- `src/insights-worker/` - Python FastAPI analytics and data processing service
+- `src/workflows-worker/` - Python FastAPI workflow orchestration service
 
 ### MCP Servers
 
-- **mcp-core** (TypeScript) - Shared library for building MCP servers
-- **github-issues-mcp** (TypeScript) - GitHub Issues MCP server for AI assistants
+- `src/mcp-core/` - TypeScript shared library for building MCP servers
+- `src/github-issues-mcp/` - GitHub Issues MCP server for AI assistants. [Details](src/github-issues-mcp/README.md)
 
 ### AI Services
 

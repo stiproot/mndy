@@ -6,3 +6,4 @@ export const OKTA_ISSUER = (): string => process.env.OKTA_ISSUER!;
 export const OKTA_TOKEN_URI = (): string => process.env.OKTA_TOKEN_URI!;
 export const OKTA_CLIENT_ID = (): string => process.env.OKTA_CLIENT_ID!;
 export const OKTA_SECRET = (): string => process.env.OKTA_SECRET!;
+export const IGNORE_AUTH = (): boolean => process.env.IGNORE_AUTH === 'true';

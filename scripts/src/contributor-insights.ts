@@ -11,6 +11,7 @@
  * Examples:
  *   bun run insights anthropics claude-code octocat
  *   bun run insights anthropics claude-code octocat --lookback-days=30
+ *   bun run insights Derivco nebula si-stip-der --lookback-days=30
  *   bun run insights anthropics claude-code octocat --stream
  *   bun run insights anthropics claude-code octocat --output=./report.md
  */

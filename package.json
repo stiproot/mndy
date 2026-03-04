@@ -5,6 +5,7 @@
   "description": "Project analytics platform for Azure DevOps",
   "workspaces": [
     "src/ui",
+    "src/vis",
     "src/ui-api",
     "src/d3-lab",
     "src/mcp-core",

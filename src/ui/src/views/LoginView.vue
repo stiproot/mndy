@@ -5,9 +5,12 @@
         <div class="logo-container">
           <img :src="mndyNameLogo" alt="My Icon" class="mndy-icon" />
         </div>
-        <q-btn @click="handleSignInClick" class="sign-in-btn" label="Sign in with " no-caps>
-          <img :src="oktaLogo" alt="Okta Logo" class="okta-logo" />
+        <q-btn @click="handleSignInClick" class="sign-in-btn" :label="signInLabel" no-caps>
+          <img v-if="!isDevMode" :src="oktaLogo" alt="Okta Logo" class="okta-logo" />
         </q-btn>
+        <div v-if="isDevMode" class="dev-mode-badge">
+          🔓 Development Mode
+        </div>
       </div>
       <div class="right-section">
         <img :src="loginIllustration" alt="Login Illustration" class="illustration" />
@@ -17,12 +20,14 @@
 </template>
 
 <script>
-import { inject } from "vue";
+import { inject, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useLoadingStore } from "@/stores/loading.store";
 import mndyNameLogo from '@/assets/mndy_name_logo.svg';
 import loginIllustration from '@/assets/login_page_illustration.svg';
 import oktaLogo from '@/assets/okta_logo.svg';
+import { ENV_VAR } from '@/services/env.service';
+import { EnvKeys } from '@/types/env-keys';
 
 export default {
   name: "LoginView",
@@ -31,16 +36,23 @@ export default {
     const { loading } = storeToRefs(loadingStore);
     const authService = inject("authService");
 
+    const isDevMode = computed(() => ENV_VAR(EnvKeys.VUE_APP_IGNORE_AUTH) === 'true');
+    const signInLabel = computed(() =>
+      isDevMode.value ? 'Sign in (Dev Mode)' : 'Sign in with '
+    );
+
     async function handleSignInClick() {
       loading.value = true;
       await authService.signIn();
     }
 
-    return { 
-      handleSignInClick, 
+    return {
+      handleSignInClick,
       mndyNameLogo,
       loginIllustration,
       oktaLogo,
+      isDevMode,
+      signInLabel,
     };
   },
 };
@@ -118,6 +130,16 @@ export default {
   height: auto;
   margin-left: 8px;
   padding-bottom: 4px;
+}
+
+.dev-mode-badge {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: #ffa500;
+  color: white;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .illustration {

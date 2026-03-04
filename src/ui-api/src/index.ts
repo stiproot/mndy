@@ -3,7 +3,7 @@ import cors from "cors";
 import { processProcsQry, processProjsQry, processProjQry, processStructQry, processUnitsQry } from "./controllers/qrys";
 import { processAzdoProxyCmds, processWorkflowCmd } from "./controllers/cmds/cmds";
 import { processPersistProjCmd, processUpdateProjCmd } from "./controllers/cmds/projs.cmds";
-import { processExchangeCodeForTokenCmd, processRefreshTokenCmd } from "./controllers/cmds/auth.cmds";
+import { processExchangeCodeForTokenCmd, processRefreshTokenCmd, processDevAuthCmd } from "./controllers/cmds/auth.cmds";
 import { runWiql, getWiDetails, getAllTeams, getTeamIterations, getTeamSettings, getTeamFieldValues } from "./controllers/azdo.qrys";
 import { validateToken } from "./controllers/cmds/auth.token";
 import { Request, Response } from 'express';
@@ -18,6 +18,7 @@ app.use(cors());
 // AUTH...
 app.post(`${BASE_URL}/cmd/auth/token/exchange`, express.json(), processExchangeCodeForTokenCmd);
 app.post(`${BASE_URL}/cmd/auth/token/refresh`, express.json(), processRefreshTokenCmd);
+app.post(`${BASE_URL}/cmd/auth/dev`, express.json(), processDevAuthCmd);
 
 // CMDS...
 app.post(`${BASE_URL}/cmd/data/workflows`, express.json(), validateToken, processWorkflowCmd);

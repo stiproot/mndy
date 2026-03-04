@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "vue-cli-plugin-quasar": "^5.1.2"
+  }
+}

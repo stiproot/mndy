@@ -3,8 +3,9 @@ import { Configs } from "../consts";
 import OktaJwtVerifier from '@okta/jwt-verifier';
 import axios from 'axios';
 import qs from 'qs';
-import { OKTA_ISSUER, OKTA_TOKEN_URI, OKTA_CLIENT_ID, OKTA_SECRET, REDIRECT_URI } from "./auth.data";
+import { OKTA_ISSUER, OKTA_TOKEN_URI, OKTA_CLIENT_ID, OKTA_SECRET, REDIRECT_URI, IGNORE_AUTH } from "./auth.data";
 import { Request, Response } from 'express';
+import { DevAuthService } from "./dev-auth.service";
 
 const oktaJwtVerifier = new OktaJwtVerifier({
   issuer: OKTA_ISSUER(),
@@ -130,3 +131,42 @@ export const processRefreshTokenCmd = async (req: Request, res: Response) => {
     res.sendStatus(500);
   }
 }
+
+/**
+ * Development authentication endpoint
+ * WARNING: Only active when IGNORE_AUTH=true
+ */
+export const processDevAuthCmd = async (req: Request, res: Response) => {
+  if (!IGNORE_AUTH()) {
+    console.error("[DEV AUTH] Attempted to use dev auth endpoint when IGNORE_AUTH is false");
+    return res.sendStatus(403);
+  }
+
+  DevAuthService.validateDevAuthEnabled();
+  console.info("[DEV AUTH] Processing dev auth cmd.");
+
+  const { fingerprint } = req.body;
+
+  if (!fingerprint) {
+    console.error("[DEV AUTH] No fingerprint provided");
+    return res.status(400).json({ error: "fingerprint required" });
+  }
+
+  const response = DevAuthService.generateDevTokens(fingerprint);
+
+  // Persist usr information to Dapr state store
+  const usrData = {
+    id: response.usr.email,
+    name: response.usr.name,
+    title: response.usr.title,
+  };
+  const state = [{ key: response.usr.email, value: usrData }];
+  await saveState(Configs.DAPR_USRS_STATE_STORE_NAME, state);
+
+  console.info("[DEV AUTH] Processed dev auth cmd successfully");
+
+  res.json({
+    status: "ok",
+    ...response
+  });
+};

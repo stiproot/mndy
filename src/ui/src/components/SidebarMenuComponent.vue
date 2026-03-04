@@ -150,6 +150,8 @@ export default {
 
     // Watch for route changes and update the activeMenuItem
     watch(route, (newRoute) => {
+      if (!newRoute || !newRoute.path) return;
+
       const path = newRoute.path;
       if (path.startsWith('/projects')) {
         activeMenuItem.value = 'projects';
@@ -194,7 +196,7 @@ export default {
   background-color: $tertiary;
 }
 
-::v-deep .q-drawer {
+:deep(.q-drawer) {
   background-color: transparent;
   height: 97%;
   align-items: center;
@@ -203,7 +205,7 @@ export default {
   justify-content: center;
 }
 
-::v-deep .floating-drawer {
+:deep(.floating-drawer) {
   border-radius: 24px !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
   overflow: hidden !important;
@@ -227,7 +229,7 @@ export default {
   margin-bottom: 24px;
 }
 
-::v-deep #logo-button.q-hoverable:hover > .q-focus-helper {
+:deep(#logo-button.q-hoverable:hover > .q-focus-helper) {
   background-color: transparent !important;
 }
 

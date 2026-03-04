@@ -7,10 +7,10 @@
 DOCKER ?= podman
 
 .PHONY: install install-node install-python \
-        dev serve-ui run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
+        dev serve-ui serve-vis run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
         run-github-issues-mcp build-mcp build-cc build-cc-svc run-cc-svc \
-        build build-ui build-ui-api \
-        lint lint-md lint-md-fix lint-python lint-node \
+        build build-ui build-vis build-ui-api \
+        lint lint-md lint-md-fix lint-python lint-node lint-vis \
         lock lock-python lock-node \
         docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra docker-compose-ai docker-compose-ai-arm \
         test-integration test-integration-watch test-mcp test-cc-svc \
@@ -36,13 +36,17 @@ install-python: ## Install Python dependencies (uv workspace)
 serve-ui: ## Run frontend dev server (port 8080)
 	bun run --cwd src/ui serve
 
+serve-vis: ## Run vis dev server (port 8082)
+	bun run --cwd src/vis serve
+
 run-ui-api: build-ui-api ## Run UI API gateway with Dapr (port 3001)
 	dapr run --app-id mndy-ui-api \
 		--placement-host-address localhost:50000 \
-		--config src/dapr/configuration/config.yaml \
-		--resources-path src/dapr/components.local/ \
+		--enable-app-health-check=false \
+		--scheduler-host-address="" \
 		--dapr-http-port 3500 \
 		--app-port 3001 \
+		--components-path src/dapr/components.localhost \
 		-- bun run --cwd src/ui-api start
 
 run-azdo-worker: ## Run Azure DevOps worker with Dapr (port 6006)
@@ -109,10 +113,13 @@ run-cc-svc: build-cc-svc ## Run Claude Code service (port 3002)
 # Build
 # ==============================================================================
 
-build: build-ui build-ui-api ## Build all services
+build: build-ui build-vis build-ui-api ## Build all services
 
 build-ui: ## Build frontend for production
 	bun run --cwd src/ui build
+
+build-vis: ## Build vis module
+	bun run --cwd src/vis build
 
 build-ui-api: ## Build UI API
 	bun run --cwd src/ui-api build
@@ -131,7 +138,11 @@ lint-md-fix: ## Fix markdown lint issues
 
 lint-node: ## Lint Node.js/TypeScript code
 	bun run --cwd src/ui lint
+	bun run --cwd src/vis lint
 	bun run --cwd src/ui-api lint || true
+
+lint-vis: ## Lint vis code
+	bun run --cwd src/vis lint
 
 lint-python: ## Lint Python code
 	uv run --package azdo-worker ruff check src/azdo-worker/src || true

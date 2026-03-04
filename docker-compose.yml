@@ -30,14 +30,11 @@ services:
       - 50000:50006
 
   scheduler:
-    image: daprio/daprd:1.16.9
+    image: daprio/dapr:1.16.9
     container_name: scheduler-mndy
-    command: --etcd-data-dir=/var/lock/dapr/scheduler
+    command: ["./scheduler", "--port", "50006"]
     ports:
       - "50006:50006"
-      - "52379:52379"
-      - "58081:58081"
-      - "59091:59091"
     restart: unless-stopped
 
   ##############################################

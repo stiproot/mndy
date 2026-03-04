@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, RouteLocationNormalized, NavigationGuardNext, RouteRecordRaw } from "vue-router";
 import { AuthService } from "@/services/auth.service";
 
 // Import views and components
@@ -203,8 +203,8 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  if (to.matched.some((record: RouteRecordRaw) => record.meta?.requiresAuth)) {
     if (authService.isAuthenticated()) {
       const accessToken = authService.getAccessToken();
       if (!accessToken) {
@@ -236,7 +236,7 @@ router.beforeEach(async (to, from, next) => {
   }
 });
 
-router.afterEach((to) => {
+router.afterEach((to: RouteLocationNormalized) => {
   // Use the title from the meta field if it exists
   if (to.meta.title) {
     document.title = to.meta.title as string;

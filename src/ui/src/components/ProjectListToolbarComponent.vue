@@ -250,7 +250,7 @@ export default {
   color: white;
 }
 
-::v-deep .q-field__native > span {
+:deep(.q-field__native > span) {
   white-space: nowrap;
   overflow: hidden !important;
   text-overflow: ellipsis;
