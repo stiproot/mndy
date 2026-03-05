@@ -4,8 +4,9 @@
   "private": true,
   "description": "Project analytics platform for Azure DevOps",
   "workspaces": [
-    "src/ui",
-    "src/vis",
+    "src/apps/ui",
+    "src/apps/vis",
+    "src/apps/azdo",
     "src/ui-api",
     "src/d3-lab",
     "src/mcp-core",

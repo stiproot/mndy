@@ -15,14 +15,16 @@ import ExpandableTreeComponent from "../components/ExpandableTreeComponent.vue";
 import NestedTreeMapComponent from "../components/charts/NestedTreeMapComponent.vue";
 import AzdoManagerView from "../views/AzdoManagerView.vue";
 import AzdoWiManagerView from "../views/AzdoWiManagerView.vue";
-import CreateAzdoDashboardView from "../views/azdo/CreateAzdoDashboardView.vue";
-import CloneAzdoWiView from "../views/azdo/CloneAzdoWiView.vue";
-import BulkCreateAzdoWisView from "../views/azdo/BulkCreateAzdoWisView.vue";
-import UpdateAzdoWiView from "../views/azdo/UpdateAzdoWiView.vue";
 import SettingsView from "../views/SettingsView.vue";
 import ProcManagerComponent from "../components/ProcManagerComponent.vue";
 import LoginView from "../views/LoginView.vue";
 import AuthCallbackView from "../views/AuthCallbackView.vue";
+
+// Module Federation remote imports for AzDO views
+const CloneAzdoWiView = () => import('mndyAzdo/CloneAzdoWiView');
+const CreateAzdoDashboardView = () => import('mndyAzdo/CreateAzdoDashboardView');
+const BulkCreateAzdoWisView = () => import('mndyAzdo/BulkCreateAzdoWisView');
+const UpdateAzdoWiView = () => import('mndyAzdo/UpdateAzdoWiView');
 
 const authService = new AuthService();
 

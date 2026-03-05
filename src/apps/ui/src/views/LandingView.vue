@@ -2,8 +2,6 @@
 <template>
   <navigation-top-bar v-if="!fullscreen" />
 
-  <sidebar-menu-component v-if="!fullscreen" />
-
   <q-page-container>
     <router-view></router-view>
   </q-page-container>
@@ -16,14 +14,12 @@
 import { storeToRefs } from 'pinia'
 import { useLayoutStore } from "@/stores/layout.store";
 import NavigationTopBar from "@/components/TopNavBarComponent.vue";
-import SidebarMenuComponent from "@/components/SidebarMenuComponent.vue";
 import MndyLogo from "@/assets/mndy_logo.svg";
 
 export default {
   name: "LandingView",
   components: {
     NavigationTopBar,
-    SidebarMenuComponent,
   },
   setup() {
     const store = useLayoutStore();

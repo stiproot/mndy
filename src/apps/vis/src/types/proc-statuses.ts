@@ -1,0 +1,8 @@
+
+export enum ProcStatuses {
+  PENDING = "PENDING",
+  COMPLETE = "COMPLETE",
+  RUNNING = "RUNNING",
+  ERROR = "ERROR",
+  CANCELLED = "CANCELLED",
+}

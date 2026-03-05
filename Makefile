@@ -7,9 +7,9 @@
 DOCKER ?= podman
 
 .PHONY: install install-node install-python \
-        dev serve-ui serve-vis run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
+        dev serve-ui serve-vis serve-azdo run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
         run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp build-mcp build-cc build-cc-svc run-cc-svc \
-        build build-ui build-vis build-ui-api \
+        build build-ui build-vis build-azdo build-ui-api \
         lint lint-md lint-md-fix lint-python lint-node lint-vis \
         lock lock-python lock-node \
         docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra docker-compose-ai docker-compose-ai-arm \
@@ -34,10 +34,13 @@ install-python: ## Install Python dependencies (uv workspace)
 # ==============================================================================
 
 serve-ui: ## Run frontend dev server (port 8080)
-	bun run --cwd src/ui serve
+	bun run --cwd src/apps/ui serve
 
 serve-vis: ## Run vis dev server (port 8082)
-	bun run --cwd src/vis serve
+	bun run --cwd src/apps/vis serve
+
+serve-azdo: ## Run azdo module dev server (port 8083)
+	bun run --cwd src/apps/azdo serve
 
 run-ui-api: build-ui-api ## Run UI API gateway with Dapr (port 3001)
 	dapr run --app-id mndy-ui-api \
@@ -125,13 +128,16 @@ run-cc-svc: build-cc-svc ## Run Claude Code service (port 3002)
 # Build
 # ==============================================================================
 
-build: build-ui build-vis build-ui-api ## Build all services
+build: build-ui build-vis build-azdo build-ui-api ## Build all services
 
 build-ui: ## Build frontend for production
-	bun run --cwd src/ui build
+	bun run --cwd src/apps/ui build
 
 build-vis: ## Build vis module
-	bun run --cwd src/vis build
+	bun run --cwd src/apps/vis build
+
+build-azdo: ## Build azdo module
+	bun run --cwd src/apps/azdo build
 
 build-ui-api: ## Build UI API
 	bun run --cwd src/ui-api build
@@ -149,12 +155,12 @@ lint-md-fix: ## Fix markdown lint issues
 	bun run lint:md:fix
 
 lint-node: ## Lint Node.js/TypeScript code
-	bun run --cwd src/ui lint
-	bun run --cwd src/vis lint
+	bun run --cwd src/apps/ui lint
+	bun run --cwd src/apps/vis lint
 	bun run --cwd src/ui-api lint || true
 
 lint-vis: ## Lint vis code
-	bun run --cwd src/vis lint
+	bun run --cwd src/apps/vis lint
 
 lint-python: ## Lint Python code
 	uv run --package azdo-worker ruff check src/azdo-worker/src || true
@@ -229,7 +235,9 @@ clean: clean-node clean-python ## Clean all build artifacts
 
 clean-node: ## Clean Node.js artifacts
 	rm -rf node_modules
-	rm -rf src/ui/node_modules src/ui/dist
+	rm -rf src/apps/ui/node_modules src/apps/ui/dist
+	rm -rf src/apps/vis/node_modules src/apps/vis/dist
+	rm -rf src/apps/azdo/node_modules src/apps/azdo/dist
 	rm -rf src/ui-api/node_modules src/ui-api/dist
 	rm -rf src/d3-lab/node_modules
 
