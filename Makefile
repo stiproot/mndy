@@ -182,13 +182,13 @@ docker-compose: ## Start all services with Docker Compose
 	$(DOCKER) compose -p mndy --profile apps up --build
 
 docker-compose-infra: ## Start infrastructure only (Dapr, MongoDB, RabbitMQ, Zipkin)
-	$(DOCKER) compose -p mndy up --build
+	$(DOCKER) compose -p mndy up
 
 docker-compose-arm: ## Start all services with Docker Compose (ARM)
 	$(DOCKER) compose -p mndy -f docker-compose.yml -f docker-compose.arm.yml --env-file .core.env --profile apps up --build
 
 docker-compose-arm-infra: ## Start infrastructure only (ARM)
-	$(DOCKER) compose -p mndy -f docker-compose.yml -f docker-compose.arm.yml --env-file .core.env up --build
+	$(DOCKER) compose -p mndy -f docker-compose.yml -f docker-compose.arm.yml --env-file .core.env up
 
 docker-compose-ai: ## Start AI services (cc-svc, github-issues-mcp)
 	$(DOCKER) compose -p mndy --profile ai up --build
