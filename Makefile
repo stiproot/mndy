@@ -8,12 +8,12 @@ DOCKER ?= podman
 
 .PHONY: install install-node install-python \
         dev serve-ui serve-vis run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
-        run-github-issues-mcp build-mcp build-cc build-cc-svc run-cc-svc \
+        run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp build-mcp build-cc build-cc-svc run-cc-svc \
         build build-ui build-vis build-ui-api \
         lint lint-md lint-md-fix lint-python lint-node lint-vis \
         lock lock-python lock-node \
         docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra docker-compose-ai docker-compose-ai-arm \
-        test-integration test-integration-watch test-mcp test-cc-svc \
+        test-integration test-integration-watch test-mcp test-ga4-mcp test-meta-ads-mcp test-shopify-mcp test-cc-svc \
         clean clean-node clean-python \
         help
 
@@ -92,9 +92,21 @@ run-workflows-worker: ## Run workflows worker with Dapr (port 6006)
 run-github-issues-mcp: build-mcp ## Run GitHub Issues MCP server (port 3001)
 	bun run --cwd src/github-issues-mcp start
 
+run-ga4-mcp: build-mcp ## Run GA4 MCP server (port 3001)
+	bun run --cwd src/ga4-mcp start
+
+run-meta-ads-mcp: build-mcp ## Run Meta Ads MCP server (port 3001)
+	bun run --cwd src/meta-ads-mcp start
+
+run-shopify-mcp: build-mcp ## Run Shopify MCP server (port 3001)
+	bun run --cwd src/shopify-mcp start
+
 build-mcp: ## Build all MCP packages
 	bun run --cwd src/mcp-core build
 	bun run --cwd src/github-issues-mcp build
+	bun run --cwd src/ga4-mcp build
+	bun run --cwd src/meta-ads-mcp build
+	bun run --cwd src/shopify-mcp build
 
 # ==============================================================================
 # Claude Code / Agent
@@ -196,6 +208,15 @@ test-integration-watch: ## Run integration tests in watch mode
 
 test-mcp: ## Run github-issues-mcp integration tests
 	bun run vitest run tests/integration/github-issues-mcp/
+
+test-ga4-mcp: ## Run ga4-mcp integration tests
+	bun run vitest run tests/integration/ga4-mcp/
+
+test-meta-ads-mcp: ## Run meta-ads-mcp integration tests
+	bun run vitest run tests/integration/meta-ads-mcp/
+
+test-shopify-mcp: ## Run shopify-mcp integration tests
+	bun run vitest run tests/integration/shopify-mcp/
 
 test-cc-svc: ## Run cc-svc integration tests
 	bun run vitest run tests/integration/cc-svc/

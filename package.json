@@ -30,6 +30,8 @@
     "insights": "bun run --cwd scripts src/contributor-insights.ts"
   },
   "devDependencies": {
+    "dotenv": "^16.4.5",
+    "effect": "^3.12.5",
     "markdownlint-cli": "^0.43.0",
     "vitest": "^3.0.0"
   }

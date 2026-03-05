@@ -13,12 +13,11 @@ import {
 } from "./setup.js";
 
 interface ReportResult {
-  dimensionHeaders?: Array<{ name: string }>;
-  metricHeaders?: Array<{ name: string; type: string }>;
-  rows?: Array<{
-    dimensionValues?: Array<{ value: string }>;
-    metricValues?: Array<{ value: string }>;
-  }>;
+  summary?: string;
+  propertyId?: string;
+  dimensions?: string[];
+  metrics?: string[];
+  rows?: Array<Record<string, string>>;
   rowCount?: number;
   metadata?: {
     currencyCode?: string;
@@ -58,9 +57,8 @@ describe("ga4-mcp", () => {
 
       const { response, data } = await Effect.runPromise(
         callMcpTool(config.mcpUrl, "ga4_run_report", {
-          property_id: config.propertyId,
-          start_date: "7daysAgo",
-          end_date: "today",
+          propertyId: config.propertyId,
+          dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
           metrics: [{ name: "sessions" }],
           dimensions: [{ name: "date" }],
         })
@@ -72,8 +70,8 @@ describe("ga4-mcp", () => {
       const reportData = extractToolResultJson<ReportResult>(data);
       expect(reportData).toHaveProperty("rows");
       expect(reportData).toHaveProperty("rowCount");
-      expect(reportData.metricHeaders).toBeDefined();
-      expect(reportData.metricHeaders?.some((h) => h.name === "sessions")).toBe(true);
+      expect(reportData.metrics).toBeDefined();
+      expect(reportData.metrics?.includes("sessions")).toBe(true);
     });
 
     it("supports multiple metrics", async () => {
@@ -84,9 +82,8 @@ describe("ga4-mcp", () => {
 
       const { response, data } = await Effect.runPromise(
         callMcpTool(config.mcpUrl, "ga4_run_report", {
-          property_id: config.propertyId,
-          start_date: "7daysAgo",
-          end_date: "today",
+          propertyId: config.propertyId,
+          dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
           metrics: [{ name: "sessions" }, { name: "activeUsers" }, { name: "screenPageViews" }],
         })
       );
@@ -94,7 +91,7 @@ describe("ga4-mcp", () => {
       expect(response.status).toBe(200);
 
       const reportData = extractToolResultJson<ReportResult>(data);
-      expect(reportData.metricHeaders?.length).toBe(3);
+      expect(reportData.metrics?.length).toBe(3);
     });
 
     it("supports dimension filtering", async () => {
@@ -105,9 +102,8 @@ describe("ga4-mcp", () => {
 
       const { response, data } = await Effect.runPromise(
         callMcpTool(config.mcpUrl, "ga4_run_report", {
-          property_id: config.propertyId,
-          start_date: "30daysAgo",
-          end_date: "today",
+          propertyId: config.propertyId,
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
           metrics: [{ name: "sessions" }],
           dimensions: [{ name: "country" }],
           limit: 10,
@@ -124,9 +120,8 @@ describe("ga4-mcp", () => {
     it("returns error for invalid property ID", async () => {
       const { response, data } = await Effect.runPromise(
         callMcpTool(config.mcpUrl, "ga4_run_report", {
-          property_id: "invalid-property-12345",
-          start_date: "7daysAgo",
-          end_date: "today",
+          propertyId: "invalid-property-12345",
+          dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
           metrics: [{ name: "sessions" }],
         })
       );
@@ -185,9 +180,8 @@ describe("ga4-mcp", () => {
           config.mcpUrl,
           "ga4_run_report",
           {
-            property_id: config.propertyId,
-            start_date: "7daysAgo",
-            end_date: "today",
+            propertyId: config.propertyId,
+            dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
             metrics: [{ name: "sessions" }],
           },
           sessionId
@@ -201,9 +195,8 @@ describe("ga4-mcp", () => {
           config.mcpUrl,
           "ga4_run_report",
           {
-            property_id: config.propertyId,
-            start_date: "14daysAgo",
-            end_date: "7daysAgo",
+            propertyId: config.propertyId,
+            dateRanges: [{ startDate: "14daysAgo", endDate: "7daysAgo" }],
             metrics: [{ name: "sessions" }],
           },
           sessionId
