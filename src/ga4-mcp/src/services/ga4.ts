@@ -1,7 +1,10 @@
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 import { Duration, Effect, Schedule } from "effect";
+import { createLogger } from "mcp-core";
 import type { RunReportInput, ReportResult, ReportRow } from "../types.js";
 import { GA4ApiError, GA4QuotaError, TimeoutError, GA4Config } from "../types.js";
+
+const logger = createLogger("GA4Client");
 
 const REQUEST_TIMEOUT = Duration.seconds(60);
 const MAX_RETRIES = 3;
@@ -219,6 +222,16 @@ export class GA4Client extends Effect.Service<GA4Client>()("GA4Client", {
           }
         ).pipe(
           Effect.map(transformReportResponse),
+          Effect.tap((result) =>
+            Effect.sync(() => {
+              logger.debug("GA4 API response", {
+                rowCount: result.rowCount,
+                dimensionHeaders: result.dimensionHeaders?.map((h) => h.name),
+                metricHeaders: result.metricHeaders.map((h) => h.name),
+                rows: result.rows,
+              });
+            })
+          ),
           Effect.withSpan("GA4Client.runReport")
         );
       },
