@@ -30,10 +30,10 @@ const main = Effect.gen(function* () {
 
   setLogLevel(config.logLevel as LogLevel);
 
-  if (!client.hasAccessToken()) {
-    yield* Effect.log("SHOPIFY_ACCESS_TOKEN not set - API requests will fail");
+  if (!client.hasCredentials()) {
+    yield* Effect.log("SHOPIFY_CLIENT_ID or SHOPIFY_CLIENT_SECRET not set - API requests will fail");
   } else {
-    yield* Effect.log(`Connected to Shopify store: ${client.getStoreUrl()}`);
+    yield* Effect.log(`Shopify MCP configured for store: ${client.getStoreUrl()}`);
   }
 
   const { start } = createMcpApp(

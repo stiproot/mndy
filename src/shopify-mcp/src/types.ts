@@ -37,15 +37,25 @@ export class ConfigError extends Data.TaggedError("ConfigError")<{
   readonly field?: string;
 }> {}
 
+/**
+ * Error when OAuth token exchange fails
+ */
+export class TokenExchangeError extends Data.TaggedError("TokenExchangeError")<{
+  readonly message: string;
+  readonly cause?: unknown;
+}> {}
+
 // =============================================================================
 // Configuration
 // =============================================================================
 
 /**
  * Shopify configuration from environment
+ * Uses client credentials grant (OAuth 2.0) for token exchange
  */
 export const ShopifyConfig = Config.all({
-  accessToken: Config.string("SHOPIFY_ACCESS_TOKEN"),
+  clientId: Config.string("SHOPIFY_CLIENT_ID"),
+  clientSecret: Config.string("SHOPIFY_CLIENT_SECRET"),
   storeUrl: Config.string("SHOPIFY_STORE_URL"),
   apiVersion: Config.string("SHOPIFY_API_VERSION").pipe(Config.withDefault("2024-10")),
 });

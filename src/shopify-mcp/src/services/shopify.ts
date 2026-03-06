@@ -1,9 +1,18 @@
-import { Duration, Effect, Schedule } from "effect";
+import { Duration, Effect, Schedule, Ref } from "effect";
 import type { GetOrdersInput, Order, OrdersResult, GetAnalyticsInput, AnalyticsSummary, LineItem, Customer } from "../types.js";
-import { ShopifyApiError, ShopifyRateLimitError, TimeoutError, ShopifyConfig } from "../types.js";
+import { ShopifyApiError, ShopifyRateLimitError, TimeoutError, TokenExchangeError, ShopifyConfig } from "../types.js";
 
 const REQUEST_TIMEOUT = Duration.seconds(60);
 const MAX_RETRIES = 3;
+const TOKEN_REFRESH_BUFFER_SECONDS = 300; // Refresh 5 minutes before expiry
+
+/**
+ * Cached access token with expiry tracking
+ */
+interface CachedToken {
+  accessToken: string;
+  expiresAt: number; // Unix timestamp in seconds
+}
 
 /**
  * Retry schedule with exponential backoff and jitter
@@ -25,11 +34,11 @@ const isRetryableError = (error: ShopifyApiError): boolean => {
 /**
  * Wrap Shopify API call with timeout, error handling, and retry
  */
-const withApiResilience = <T>(
-  effect: Effect.Effect<T, ShopifyApiError | ShopifyRateLimitError, never>,
+const withApiResilience = <T, E extends ShopifyApiError | ShopifyRateLimitError | TokenExchangeError>(
+  effect: Effect.Effect<T, E, never>,
   spanName: string,
   attributes: Record<string, string | number>
-): Effect.Effect<T, ShopifyApiError | ShopifyRateLimitError | TimeoutError> =>
+): Effect.Effect<T, E | TimeoutError> =>
   effect.pipe(
     Effect.timeoutFail({
       duration: REQUEST_TIMEOUT,
@@ -42,7 +51,18 @@ const withApiResilience = <T>(
     Effect.withSpan(spanName, { attributes }),
     Effect.retry({
       schedule: retrySchedule,
-      while: (error) => error._tag === "ShopifyApiError" && isRetryableError(error),
+      while: (error) => {
+        // Retry transient API errors
+        if (error._tag === "ShopifyApiError" && isRetryableError(error)) {
+          return true;
+        }
+        // Retry token exchange failures (could be transient network issues)
+        if (error._tag === "TokenExchangeError") {
+          return true;
+        }
+        // DO NOT retry rate limit errors (need proper backoff handled separately)
+        return false;
+      },
     })
   );
 
@@ -53,6 +73,62 @@ const buildApiUrl = (storeUrl: string, apiVersion: string, resource: string): st
   const cleanStoreUrl = storeUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
   return `https://${cleanStoreUrl}/admin/api/${apiVersion}/${resource}.json`;
 };
+
+/**
+ * Build OAuth token endpoint URL
+ */
+const buildTokenUrl = (storeUrl: string): string => {
+  const cleanStoreUrl = storeUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  return `https://${cleanStoreUrl}/admin/oauth/access_token`;
+};
+
+/**
+ * Token exchange response from Shopify OAuth
+ */
+interface TokenResponse {
+  access_token: string;
+  scope: string;
+  expires_in: number;
+}
+
+/**
+ * Exchange client credentials for an access token
+ */
+const exchangeToken = (
+  storeUrl: string,
+  clientId: string,
+  clientSecret: string
+): Effect.Effect<TokenResponse, TokenExchangeError> =>
+  Effect.tryPromise({
+    try: async () => {
+      const url = buildTokenUrl(storeUrl);
+      const body = new URLSearchParams({
+        grant_type: "client_credentials",
+        client_id: clientId,
+        client_secret: clientSecret,
+      });
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: body.toString(),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Token exchange failed (${response.status}): ${errorText}`);
+      }
+
+      return response.json() as Promise<TokenResponse>;
+    },
+    catch: (error) =>
+      new TokenExchangeError({
+        message: error instanceof Error ? error.message : "Token exchange failed",
+        cause: error,
+      }),
+  }).pipe(Effect.withSpan("shopify.exchangeToken"));
 
 /**
  * Make authenticated request to Shopify Admin API (internal helper)
@@ -144,15 +220,44 @@ export class ShopifyClient extends Effect.Service<ShopifyClient>()("ShopifyClien
   effect: Effect.gen(function* () {
     const config = yield* ShopifyConfig;
 
-    const accessToken = config.accessToken;
+    const clientId = config.clientId;
+    const clientSecret = config.clientSecret;
     const storeUrl = config.storeUrl;
     const apiVersion = config.apiVersion;
 
+    // Initialize token cache
+    const tokenRef = yield* Ref.make<CachedToken | null>(null);
+
+    /**
+     * Get a valid access token, refreshing if necessary
+     */
+    const getValidToken = (): Effect.Effect<string, TokenExchangeError> =>
+      Effect.gen(function* () {
+        const cached = yield* Ref.get(tokenRef);
+        const now = Math.floor(Date.now() / 1000);
+
+        // Check if we have a valid cached token (with buffer before expiry)
+        if (cached && cached.expiresAt - TOKEN_REFRESH_BUFFER_SECONDS > now) {
+          return cached.accessToken;
+        }
+
+        // Exchange credentials for a new token
+        const tokenResponse = yield* exchangeToken(storeUrl, clientId, clientSecret);
+
+        const newToken: CachedToken = {
+          accessToken: tokenResponse.access_token,
+          expiresAt: now + tokenResponse.expires_in,
+        };
+
+        yield* Ref.set(tokenRef, newToken);
+        return newToken.accessToken;
+      }).pipe(Effect.withSpan("ShopifyClient.getValidToken"));
+
     return {
       /**
-       * Check if access token is configured
+       * Check if credentials are configured
        */
-      hasAccessToken: (): boolean => accessToken !== "",
+      hasCredentials: (): boolean => clientId !== "" && clientSecret !== "",
 
       /**
        * Get the store URL
@@ -164,8 +269,10 @@ export class ShopifyClient extends Effect.Service<ShopifyClient>()("ShopifyClien
        */
       getOrders: (
         input: GetOrdersInput
-      ): Effect.Effect<OrdersResult, ShopifyApiError | ShopifyRateLimitError | TimeoutError> => {
+      ): Effect.Effect<OrdersResult, ShopifyApiError | ShopifyRateLimitError | TimeoutError | TokenExchangeError> => {
         const fetchOrders = Effect.gen(function* () {
+          const accessToken = yield* getValidToken();
+
           // Build query parameters
           const params = new URLSearchParams();
           if (input.limit) params.set("limit", input.limit.toString());
@@ -250,8 +357,10 @@ export class ShopifyClient extends Effect.Service<ShopifyClient>()("ShopifyClien
        */
       getAnalytics: (
         input: GetAnalyticsInput
-      ): Effect.Effect<AnalyticsSummary, ShopifyApiError | ShopifyRateLimitError | TimeoutError> => {
+      ): Effect.Effect<AnalyticsSummary, ShopifyApiError | ShopifyRateLimitError | TimeoutError | TokenExchangeError> => {
         const fetchAnalytics = Effect.gen(function* () {
+          const accessToken = yield* getValidToken();
+
           // Fetch all orders in the date range
           const params = new URLSearchParams({
             status: "any",

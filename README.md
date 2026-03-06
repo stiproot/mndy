@@ -290,13 +290,16 @@ System User tokens don't expire, unlike personal tokens which expire in 60 days.
 
 1. Go to [Ads Manager](https://adsmanager.facebook.com/)
 2. Click the dropdown showing your account name
-3. The Ad Account ID is shown (format: `act_123456789`)
+3. Copy the Ad Account ID (displayed as a number like `123456789`)
+
+**Important:** The Ad Account ID in Ads Manager is displayed as just a number, but the Meta API requires the `act_` prefix. Add the prefix yourself when configuring:
 
 **Environment Variables:**
 
 ```bash
 # In src/meta-ads-mcp/.env
 META_ACCESS_TOKEN=EAAxxxxxxxxxxxxxxx...
+# Add the "act_" prefix to your numeric Ad Account ID
 META_AD_ACCOUNT_ID=act_123456789
 PORT=3004
 ```
@@ -313,37 +316,32 @@ PORT=3004
 - A Shopify store (can be a development store for testing)
 - Store owner or staff account with app development permissions
 
-**Step 1: Enable Custom App Development**
+**Step 1: Create an App in the Dev Dashboard**
 
-1. Log into your Shopify Admin
-2. Go to "Settings" → "Apps and sales channels"
-3. Click "Develop apps" (you may need to enable this first)
-4. Click "Allow custom app development" if prompted
+1. Go to your Shopify Admin (admin.shopify.com/store/your-store)
+2. Navigate to "Settings" → "Apps and sales channels"
+3. Click "Develop apps" → "Build app in Dev Dashboard"
+4. This opens the Shopify Dev Dashboard (dev.shopify.com)
+5. Click "Create app"
+6. Enter an app name (e.g., "mndy-analytics") and click "Create"
 
-**Step 2: Create a Custom App**
+**Step 2: Configure API Scopes**
 
-1. Click "Create an app"
-2. Enter an app name (e.g., "mndy-analytics")
-3. Click "Create app"
-
-**Step 3: Configure API Scopes**
-
-1. In your app, click "Configure Admin API scopes"
-2. Enable these scopes:
+1. In your app on dev.shopify.com, find the API configuration section
+2. Enable these Admin API scopes:
    - `read_orders` - View orders
    - `read_products` - View products
    - `read_customers` - View customer data
    - `read_analytics` - View store analytics
-3. Click "Save"
+3. Save your changes
 
-**Step 4: Install the App and Get Credentials**
+**Step 3: Release and Install the App**
 
-1. Click "Install app" and confirm
-2. After installation, you'll see the "Admin API access token"
-3. **Important:** Copy this token immediately - it's only shown once!
-4. If you miss it, you'll need to uninstall and reinstall the app
+1. Click "Release" to make the app available for installation
+2. Click "Install" to install the app on your store
+3. Copy the **Client ID** and **Client Secret** from the app credentials
 
-**Step 5: Get Your Store URL**
+**Step 4: Get Your Store URL**
 
 Your store URL is in the format: `your-store-name.myshopify.com`
 
@@ -351,10 +349,15 @@ Your store URL is in the format: `your-store-name.myshopify.com`
 
 ```bash
 # In src/shopify-mcp/.env
-SHOPIFY_ACCESS_TOKEN=shpat_xxxxxxxxxxxxxxxx
+SHOPIFY_CLIENT_ID=your-client-id
+SHOPIFY_CLIENT_SECRET=your-client-secret
 SHOPIFY_STORE_URL=your-store.myshopify.com
 PORT=3005
 ```
+
+**How Authentication Works:**
+
+The MCP server uses the OAuth 2.0 client credentials grant to exchange your Client ID and Client Secret for an access token. Tokens are automatically refreshed every 24 hours.
 
 **Note:** For development/testing, you can create a free [Shopify Partner](https://www.shopify.com/partners) account and spin up development stores.
 

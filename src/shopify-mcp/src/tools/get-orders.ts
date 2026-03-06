@@ -80,12 +80,12 @@ const getOrdersEffect = (input: GetOrdersInput) =>
 
     logger.debug("Fetching orders with filters", input);
 
-    if (!client.hasAccessToken()) {
+    if (!client.hasCredentials()) {
       return {
         content: [
           {
             type: "text" as const,
-            text: "Error: Shopify access token not configured. Please set SHOPIFY_ACCESS_TOKEN environment variable.",
+            text: "Error: Shopify credentials not configured. Please set SHOPIFY_CLIENT_ID and SHOPIFY_CLIENT_SECRET environment variables.",
           },
         ],
         isError: true as const,
@@ -145,6 +145,16 @@ const getOrdersEffect = (input: GetOrdersInput) =>
             {
               type: "text" as const,
               text: `Request timed out after ${error.duration}: ${error.message}`,
+            },
+          ],
+          isError: true as const,
+        }),
+      TokenExchangeError: (error) =>
+        Effect.succeed({
+          content: [
+            {
+              type: "text" as const,
+              text: `Shopify OAuth token exchange failed: ${error.message}`,
             },
           ],
           isError: true as const,
