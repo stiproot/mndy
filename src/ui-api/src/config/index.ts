@@ -57,6 +57,19 @@ export const WebSocketConfig = Config.all({
   ),
 });
 
+// CC-SVC configuration (agentic service)
+export const CcSvcConfig = Config.all({
+  baseUrl: Config.string("CC_SVC_BASE_URL").pipe(
+    Config.withDefault("http://localhost:3002")
+  ),
+  chatEndpoint: Config.string("CC_SVC_CHAT_ENDPOINT").pipe(
+    Config.withDefault("/cc-svc/chat")
+  ),
+  timeoutMs: Config.integer("CC_SVC_TIMEOUT_MS").pipe(
+    Config.withDefault(120000)
+  ),
+});
+
 // Constants (moved from consts.ts)
 export const Configs = {
   DAPR_PROJS_STATE_STORE_NAME: "statestore-projs",
@@ -64,6 +77,8 @@ export const Configs = {
   DAPR_USRS_STATE_STORE_NAME: "statestore-usrs",
   DAPR_PROCS_STATE_STORE_NAME: "statestore-procs",
   DAPR_STRUCTS_STATE_STORE_NAME: "statestore-structs",
+  DAPR_CHAT_STATE_STORE_NAME: "statestore-chat",
+  DAPR_LABELS_STATE_STORE_NAME: "statestore-labels",
   DAPR_PUBSUB_NAME: "pubsub",
   DAPR_CMD_WORKFLOW_PUBSUB_NAME: "pubsub-cmd-workflow",
   DAPR_CMD_RECEIPT_PUBSUB_NAME: "pubsub-cmd-receipt",

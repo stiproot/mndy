@@ -10,6 +10,18 @@ import {
 import { WebSocketClient, OutboundMessage } from "../types";
 import { OktaAuthSvc } from "./okta-auth.svc";
 
+// Message handler type - set during bootstrap to avoid circular deps
+type MessageHandler = (userId: string, message: string) => void;
+let messageHandler: MessageHandler | null = null;
+
+/**
+ * Set the message handler for incoming WebSocket messages.
+ * Called during bootstrap after all services are initialized.
+ */
+export const setWebSocketMessageHandler = (handler: MessageHandler): void => {
+  messageHandler = handler;
+};
+
 // Wrap ws.send in a promise
 const sendMessageAsync = (
   ws: WebSocket,
@@ -121,10 +133,15 @@ const handleConnection = (
     });
 
     ws.on("message", (data) => {
-      const message = data.toString();
+      const messageStr = data.toString();
       Effect.runSync(
-        Effect.logInfo("WebSocket message received", { userId, message })
+        Effect.logInfo("WebSocket message received", { userId, messageLength: messageStr.length })
       );
+      // Message handling is done via the exported onMessageHandler
+      // which is set during bootstrap to avoid circular dependencies
+      if (messageHandler) {
+        messageHandler(userId, messageStr);
+      }
     });
 
     ws.on("error", (error) => {

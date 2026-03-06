@@ -13,3 +13,14 @@ export {
   type ActivityTrackerOutput,
   type QualityAssessorOutput,
 } from "./response.schema.js";
+
+export {
+  chatRequestSchema,
+  chatResponseSchema,
+  chatContextMessageSchema,
+  chatMessageRoleSchema,
+  type ChatRequest,
+  type ChatResponse,
+  type ChatContextMessage,
+  type ChatMessageRole,
+} from "./chat.schema.js";

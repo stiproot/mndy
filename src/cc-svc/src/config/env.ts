@@ -10,6 +10,11 @@ const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1, "ANTHROPIC_API_KEY is required"),
   GITHUB_ISSUES_MCP_URL: z.string().url("GITHUB_ISSUES_MCP_URL must be a valid URL"),
 
+  // Optional MCP server URLs
+  GA4_MCP_URL: z.string().url().optional(),
+  META_MCP_URL: z.string().url().optional(),
+  SHOPIFY_MCP_URL: z.string().url().optional(),
+
   // Anthropic API Base URL (optional - for internal proxies/LiteLLM)
   ANTHROPIC_BASE_URL: z.string().url().optional(),
 
@@ -22,6 +27,10 @@ const envSchema = z.object({
   MAX_SUBAGENT_TURNS: z.coerce.number().default(5),
   MAX_BUDGET_USD: z.coerce.number().default(1.0),
   MAX_SUBAGENT_BUDGET_USD: z.coerce.number().default(0.25),
+
+  // Chat agent limits
+  MAX_CHAT_TURNS: z.coerce.number().default(15),
+  MAX_CHAT_BUDGET_USD: z.coerce.number().default(0.50),
 
   // Logging
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),

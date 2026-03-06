@@ -4,6 +4,10 @@ export type {
   IssueAnalyzerOutput,
   ActivityTrackerOutput,
   QualityAssessorOutput,
+  ChatRequest,
+  ChatResponse,
+  ChatContextMessage,
+  ChatMessageRole,
 } from "../schemas/index.js";
 
 /**

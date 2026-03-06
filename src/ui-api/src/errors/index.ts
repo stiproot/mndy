@@ -109,3 +109,23 @@ export class DaprSubscriptionError extends Data.TaggedError(
   readonly topic?: string;
   readonly cause?: unknown;
 }> {}
+
+// Chat Errors
+export class ChatError extends Data.TaggedError("ChatError")<{
+  readonly message: string;
+  readonly conversationId?: string;
+  readonly cause?: unknown;
+}> {}
+
+export class CcSvcError extends Data.TaggedError("CcSvcError")<{
+  readonly message: string;
+  readonly endpoint?: string;
+  readonly cause?: unknown;
+}> {}
+
+// Label Errors
+export class LabelError extends Data.TaggedError("LabelError")<{
+  readonly message: string;
+  readonly labelId?: string;
+  readonly cause?: unknown;
+}> {}

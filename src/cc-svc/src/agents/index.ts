@@ -9,6 +9,7 @@ import {
   ACTIVITY_TRACKER_PROMPT,
   QUALITY_ASSESSOR_PROMPT,
   ORCHESTRATOR_PROMPT,
+  CHAT_AGENT_PROMPT,
 } from "../prompts/index.js";
 
 /**
@@ -17,6 +18,33 @@ import {
 function getGitHubMcpServer() {
   const config = getConfig();
   return createHttpMcpServer(config.GITHUB_ISSUES_MCP_URL);
+}
+
+/**
+ * Get the GA4 MCP server configuration (if available)
+ */
+function getGA4McpServer() {
+  const config = getConfig();
+  if (!config.GA4_MCP_URL) return null;
+  return createHttpMcpServer(config.GA4_MCP_URL);
+}
+
+/**
+ * Get the Meta Ads MCP server configuration (if available)
+ */
+function getMetaMcpServer() {
+  const config = getConfig();
+  if (!config.META_MCP_URL) return null;
+  return createHttpMcpServer(config.META_MCP_URL);
+}
+
+/**
+ * Get the Shopify MCP server configuration (if available)
+ */
+function getShopifyMcpServer() {
+  const config = getConfig();
+  if (!config.SHOPIFY_MCP_URL) return null;
+  return createHttpMcpServer(config.SHOPIFY_MCP_URL);
 }
 
 /**
@@ -84,5 +112,40 @@ export function createOrchestratorAgent(): Agent {
     .maxBudget(config.MAX_BUDGET_USD)
     .persistSession(false)
     .build();
+}
+
+/**
+ * Create the chat agent with access to all available MCP servers
+ */
+export function createChatAgent(): Agent {
+  const config = getConfig();
+
+  const builder = agentBuilder("chat-agent")
+    .model(config.CLAUDE_MODEL)
+    .systemPrompt(CHAT_AGENT_PROMPT)
+    .permissionMode("bypassPermissions")
+    .maxTurns(config.MAX_CHAT_TURNS)
+    .maxBudget(config.MAX_CHAT_BUDGET_USD)
+    .persistSession(false);
+
+  // Add available MCP servers
+  builder.mcpServer("github-issues", getGitHubMcpServer());
+
+  const ga4Server = getGA4McpServer();
+  if (ga4Server) {
+    builder.mcpServer("ga4", ga4Server);
+  }
+
+  const metaServer = getMetaMcpServer();
+  if (metaServer) {
+    builder.mcpServer("meta-ads", metaServer);
+  }
+
+  const shopifyServer = getShopifyMcpServer();
+  if (shopifyServer) {
+    builder.mcpServer("shopify", shopifyServer);
+  }
+
+  return builder.build();
 }
 

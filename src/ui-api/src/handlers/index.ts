@@ -37,3 +37,16 @@ export {
   handleClientUpdateSubscription,
   getDaprSubscriptions,
 } from "./subscription.handlers";
+
+// Chat handlers
+export {
+  listConversations,
+  getConversation,
+  createConversation,
+  listLabels,
+  createLabel,
+  updateLabel,
+  deleteLabel,
+  assignLabelsToMessage,
+  removeLabelFromMessage,
+} from "./chat.handlers";

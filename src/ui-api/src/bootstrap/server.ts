@@ -33,6 +33,17 @@ import {
   handleClientUpdateSubscription,
   getDaprSubscriptions,
 } from "../handlers/subscription.handlers";
+import {
+  listConversations,
+  getConversation,
+  createConversation,
+  listLabels,
+  createLabel,
+  updateLabel,
+  deleteLabel,
+  assignLabelsToMessage,
+  removeLabelFromMessage,
+} from "../handlers/chat.handlers";
 
 // Middleware
 import { validateToken } from "../middleware/auth.middleware";
@@ -173,6 +184,61 @@ export const createServer = (): Express => {
     Configs.DAPR_SUBSCRIPTION_ROUTE,
     express.json(),
     handleClientUpdateSubscription
+  );
+
+  // CHAT - Conversations
+  app.get(
+    `${BASE_URL}/chat/conversations`,
+    validateToken,
+    listConversations
+  );
+  app.get(
+    `${BASE_URL}/chat/conversations/:id`,
+    validateToken,
+    getConversation
+  );
+  app.post(
+    `${BASE_URL}/chat/conversations`,
+    express.json(),
+    validateToken,
+    createConversation
+  );
+
+  // CHAT - Labels
+  app.get(
+    `${BASE_URL}/chat/labels`,
+    validateToken,
+    listLabels
+  );
+  app.post(
+    `${BASE_URL}/chat/labels`,
+    express.json(),
+    validateToken,
+    createLabel
+  );
+  app.put(
+    `${BASE_URL}/chat/labels/:id`,
+    express.json(),
+    validateToken,
+    updateLabel
+  );
+  app.delete(
+    `${BASE_URL}/chat/labels/:id`,
+    validateToken,
+    deleteLabel
+  );
+
+  // CHAT - Message Labels
+  app.post(
+    `${BASE_URL}/chat/messages/:messageId/labels`,
+    express.json(),
+    validateToken,
+    assignLabelsToMessage
+  );
+  app.delete(
+    `${BASE_URL}/chat/messages/:messageId/labels/:labelId`,
+    validateToken,
+    removeLabelFromMessage
   );
 
   // HEALTH

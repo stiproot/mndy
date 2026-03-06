@@ -26,10 +26,15 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`cc-svc running on port ${PORT}`);
   console.log(`  Health: http://localhost:${PORT}${BASE_PATH}/health`);
+  console.log(`  Chat: POST http://localhost:${PORT}${BASE_PATH}/chat`);
   console.log(
     `  Insights: POST http://localhost:${PORT}${BASE_PATH}/contributor-insights`
   );
-  console.log(`  MCP Server: ${config.GITHUB_ISSUES_MCP_URL}`);
+  console.log(`  MCP Servers:`);
+  console.log(`    - GitHub Issues: ${config.GITHUB_ISSUES_MCP_URL}`);
+  if (config.GA4_MCP_URL) console.log(`    - GA4: ${config.GA4_MCP_URL}`);
+  if (config.META_MCP_URL) console.log(`    - Meta Ads: ${config.META_MCP_URL}`);
+  if (config.SHOPIFY_MCP_URL) console.log(`    - Shopify: ${config.SHOPIFY_MCP_URL}`);
 });
 
 export { app };
