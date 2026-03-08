@@ -8,12 +8,12 @@ DOCKER ?= podman
 
 .PHONY: install install-node install-python \
         dev serve-ui serve-vis serve-azdo run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
-        run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp build-mcp build-cc build-cc-svc run-cc-svc \
+        run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp run-dapr-mcp run-dapr-actor-svc build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
         build build-ui build-vis build-azdo build-ui-api \
         lint lint-md lint-md-fix lint-python lint-node lint-vis \
         lock lock-python lock-node \
         docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra docker-compose-ai docker-compose-ai-arm \
-        test-integration test-integration-watch test-mcp test-ga4-mcp test-meta-ads-mcp test-shopify-mcp test-cc-svc \
+        test-integration test-integration-watch test-mcp test-ga4-mcp test-meta-ads-mcp test-shopify-mcp test-dapr-mcp test-cc-svc test-cc-svc-dapr-mcp test-cc-svc-brand-insights test-cc-svc-data-collection test-cc-svc-brand-analysis test-cc-svc-brand-e2e \
         clean clean-node clean-python \
         help
 
@@ -104,12 +104,40 @@ run-meta-ads-mcp: build-mcp ## Run Meta Ads MCP server (port 3001)
 run-shopify-mcp: build-mcp ## Run Shopify MCP server (port 3001)
 	bun run --cwd src/shopify-mcp start
 
+run-dapr-mcp: build-dapr ## Run Dapr MCP server with Dapr sidecar (port 3006)
+	dapr run --app-id mndy-dapr-mcp \
+		--placement-host-address localhost:50000 \
+		--enable-app-health-check=false \
+		--scheduler-host-address="" \
+		--dapr-http-port 3500 \
+		--app-port 3006 \
+		--components-path src/dapr/components.localhost \
+		-- bun run --cwd src/dapr-mcp start
+
 build-mcp: ## Build all MCP packages
 	bun run --cwd src/mcp-core build
 	bun run --cwd src/github-issues-mcp build
 	bun run --cwd src/ga4-mcp build
 	bun run --cwd src/meta-ads-mcp build
 	bun run --cwd src/shopify-mcp build
+
+build-dapr: ## Build Dapr core and MCP packages
+	bun run --cwd src/dapr-core build
+	bun run --cwd src/dapr-mcp build
+
+build-dapr-actor-svc: ## Build Dapr actor service
+	bun run --cwd src/dapr-core build
+	bun run --cwd src/dapr-actor-svc build
+
+run-dapr-actor-svc: build-dapr-actor-svc ## Run Dapr actor service with sidecar (port 3007)
+	dapr run --app-id mndy-dapr-actor-svc \
+		--placement-host-address localhost:50000 \
+		--enable-app-health-check=false \
+		--scheduler-host-address="" \
+		--dapr-http-port 3501 \
+		--app-port 3007 \
+		--components-path src/dapr/components.localhost \
+		-- bun run --cwd src/dapr-actor-svc start
 
 # ==============================================================================
 # Claude Code / Agent
@@ -224,8 +252,26 @@ test-meta-ads-mcp: ## Run meta-ads-mcp integration tests
 test-shopify-mcp: ## Run shopify-mcp integration tests
 	bun run vitest run tests/integration/shopify-mcp/
 
+test-dapr-mcp: ## Run dapr-mcp integration tests
+	bun run vitest run tests/integration/dapr-mcp/
+
 test-cc-svc: ## Run cc-svc integration tests
 	bun run vitest run tests/integration/cc-svc/
+
+test-cc-svc-dapr-mcp: ## Run cc-svc dapr-mcp integration tests
+	bun run vitest run tests/integration/cc-svc/dapr-mcp.test.ts
+
+test-cc-svc-brand-insights: ## Run cc-svc brand-insights integration tests (legacy endpoint)
+	bun run vitest run tests/integration/cc-svc/brand-insights.test.ts
+
+test-cc-svc-data-collection: ## Run cc-svc data-collection integration tests
+	bun run vitest run tests/integration/cc-svc/data-collection.test.ts
+
+test-cc-svc-brand-analysis: ## Run cc-svc brand-analysis integration tests
+	bun run vitest run tests/integration/cc-svc/brand-analysis.test.ts
+
+test-cc-svc-brand-e2e: ## Run cc-svc brand insights E2E tests (collect -> analyze)
+	bun run vitest run tests/integration/cc-svc/brand-insights-e2e.test.ts
 
 # ==============================================================================
 # Clean

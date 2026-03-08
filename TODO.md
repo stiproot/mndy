@@ -315,3 +315,16 @@ Budget moves (R amounts or % shifts)
 ---
 
 Because you run multiple brands and campaigns, I would strongly recommend adding a Campaign Classification Agent (it automatically identifies whether a campaign is awareness, traffic, or conversion).
+
+---
+
+time="2026-03-08T14:33:18.571457836Z" level=info msg="Data dir contents removed: data/default-dapr-scheduler-server-0/dapr-0.1" instance=181e78d123f7 scope=dapr.scheduler.server.etcd type=log ver=1.16.9
+�time="2026-03-08T14:33:18.571483378Z" level=error msg="Error running scheduler cron: context canceled" instance=181e78d123f7 scope=dapr.scheduler.server type=log ver=1.16.9
+�time="2026-03-08T14:33:18.571519295Z" level=info msg="Healthz server is listening on [::]:8080" instance=181e78d123f7 scope=dapr.scheduler type=log ver=1.16.9
+�time="2026-03-08T14:33:18.57155342Z" level=info msg="metrics server started on :9090/" instance=181e78d123f7 scope=dapr.scheduler type=log ver=1.16.9
+�time="2026-03-08T14:33:18.571644921Z" level=info msg="Dapr Scheduler listening on: :50006" instance=181e78d123f7 scope=dapr.scheduler.server type=log ver=1.16.9
+�time="2026-03-08T14:33:18.571705422Z" level=info msg="Scheduler GRPC server stopped" instance=181e78d123f7 scope=dapr.scheduler.server type=log ver=1.16.9
+�time="2026-03-08T14:33:18.57171913Z" level=info msg="Running gRPC server on port 50006" instance=181e78d123f7 scope=dapr.scheduler.server type=log ver=1.16.9
+�time="2026-03-08T14:33:18.571748714Z" level=info msg="Etcd shut down" instance=181e78d123f7 scope=dapr.scheduler.server.etcd type=log ver=1.16.9
+�time="2026-03-08T14:33:18.571781381Z" level=info msg="Healthz server is shutting down" instance=181e78d123f7 scope=dapr.scheduler type=log ver=1.16.9
+time="2026-03-08T14:33:18.571906049Z" level=fatal msg="Fatal error running scheduler: failed to create data dir: mkdir data: permission denied\nfailed to serve: grpc: the server has been stopped" instance=181e78d123f7 scope=dapr.scheduler type=log ver=1.16.9

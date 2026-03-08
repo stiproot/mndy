@@ -44,11 +44,52 @@ export const config = {
   ccSvcUrl: process.env.CC_SVC_URL || "http://localhost:3002",
   githubIssuesMcpUrl: process.env.GITHUB_ISSUES_MCP_URL || "http://localhost:3001",
 
+  // Analytics MCP URLs
+  ga4McpUrl: process.env.GA4_MCP_URL || "",
+  shopifyMcpUrl: process.env.SHOPIFY_MCP_URL || "",
+  metaMcpUrl: process.env.META_MCP_URL || "",
+
+  // Dapr MCP URL (for actor state persistence)
+  daprMcpUrl: process.env.DAPR_MCP_URL || "http://localhost:3006",
+
   // Test target repository and user
   testOwner: process.env.TEST_OWNER || "Derivco",
   testRepo: process.env.TEST_REPO || "nebula",
   testUsername: process.env.TEST_USERNAME || "si-stip-der",
 };
+
+/**
+ * Check if analytics MCPs are available for brand-insights tests
+ */
+export function hasAnalyticsMcps(): boolean {
+  return !!(config.ga4McpUrl || config.shopifyMcpUrl);
+}
+
+/**
+ * Check if dapr-mcp is available
+ */
+export async function isDaprMcpAvailable(): Promise<boolean> {
+  try {
+    const response = await fetch(`${config.daprMcpUrl}/health`);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Get a date range for the last 7 days
+ */
+export function getLast7DaysRange(): { startDate: string; endDate: string } {
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 7);
+
+  return {
+    startDate: startDate.toISOString().split("T")[0],
+    endDate: endDate.toISOString().split("T")[0],
+  };
+}
 
 /**
  * Get the full repository string (owner/repo)

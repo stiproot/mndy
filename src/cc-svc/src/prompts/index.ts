@@ -22,3 +22,12 @@ export {
   CHAT_AGENT_PROMPT,
   buildChatPrompt,
 } from "./chat.prompt.js";
+
+export {
+  GA4_ANALYST_PROMPT,
+  SHOPIFY_ANALYST_PROMPT,
+  BRAND_ORCHESTRATOR_PROMPT,
+  buildGA4AnalystPrompt,
+  buildShopifyAnalystPrompt,
+  buildBrandSynthesisPrompt,
+} from "./brand-insights.prompt.js";

@@ -8,6 +8,11 @@ export type {
   ChatResponse,
   ChatContextMessage,
   ChatMessageRole,
+  BrandInsightsRequest,
+  BrandInsightsResponse,
+  GA4AnalystOutput,
+  ShopifyAnalystOutput,
+  MetaAnalystOutput,
 } from "../schemas/index.js";
 
 /**

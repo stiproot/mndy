@@ -10,6 +10,9 @@ import {
   QUALITY_ASSESSOR_PROMPT,
   ORCHESTRATOR_PROMPT,
   CHAT_AGENT_PROMPT,
+  GA4_ANALYST_PROMPT,
+  SHOPIFY_ANALYST_PROMPT,
+  BRAND_ORCHESTRATOR_PROMPT,
 } from "../prompts/index.js";
 
 /**
@@ -45,6 +48,16 @@ function getShopifyMcpServer() {
   const config = getConfig();
   if (!config.SHOPIFY_MCP_URL) return null;
   return createHttpMcpServer(config.SHOPIFY_MCP_URL);
+}
+
+/**
+ * Get the Dapr MCP server configuration (if available)
+ * Used for persisting state via Dapr actors
+ */
+function getDaprMcpServer() {
+  const config = getConfig();
+  if (!config.DAPR_MCP_URL) return null;
+  return createHttpMcpServer(config.DAPR_MCP_URL);
 }
 
 /**
@@ -146,6 +159,105 @@ export function createChatAgent(): Agent {
     builder.mcpServer("shopify", shopifyServer);
   }
 
+  const daprServer = getDaprMcpServer();
+  if (daprServer) {
+    builder.mcpServer("dapr", daprServer);
+  }
+
   return builder.build();
+}
+
+/**
+ * Create the GA4 analyst agent for brand insights
+ */
+export function createGA4AnalystAgent(): Agent | null {
+  const config = getConfig();
+  const ga4Server = getGA4McpServer();
+  const daprServer = getDaprMcpServer();
+
+  if (!ga4Server) {
+    return null;
+  }
+
+  const builder = agentBuilder("ga4-analyst")
+    .model(config.CLAUDE_MODEL)
+    .mcpServer("ga4", ga4Server)
+    .systemPrompt(GA4_ANALYST_PROMPT)
+    .permissionMode("bypassPermissions")
+    .maxTurns(config.MAX_SUBAGENT_TURNS)
+    .maxBudget(config.MAX_SUBAGENT_BUDGET_USD)
+    .persistSession(false);
+
+  if (daprServer) {
+    builder.mcpServer("dapr", daprServer);
+  }
+
+  return builder.build();
+}
+
+/**
+ * Create the Shopify analyst agent for brand insights
+ */
+export function createShopifyAnalystAgent(): Agent | null {
+  const config = getConfig();
+  const shopifyServer = getShopifyMcpServer();
+  const daprServer = getDaprMcpServer();
+
+  if (!shopifyServer) {
+    return null;
+  }
+
+  const builder = agentBuilder("shopify-analyst")
+    .model(config.CLAUDE_MODEL)
+    .mcpServer("shopify", shopifyServer)
+    .systemPrompt(SHOPIFY_ANALYST_PROMPT)
+    .permissionMode("bypassPermissions")
+    .maxTurns(config.MAX_SUBAGENT_TURNS)
+    .maxBudget(config.MAX_SUBAGENT_BUDGET_USD)
+    .persistSession(false);
+
+  if (daprServer) {
+    builder.mcpServer("dapr", daprServer);
+  }
+
+  return builder.build();
+}
+
+/**
+ * Create the brand orchestrator agent for synthesizing analytics
+ */
+export function createBrandOrchestratorAgent(): Agent {
+  const config = getConfig();
+  const daprServer = getDaprMcpServer();
+
+  const builder = agentBuilder("brand-orchestrator")
+    .model(config.CLAUDE_MODEL)
+    .systemPrompt(BRAND_ORCHESTRATOR_PROMPT)
+    .permissionMode("bypassPermissions")
+    .maxTurns(config.MAX_ORCHESTRATOR_TURNS)
+    .maxBudget(config.MAX_BUDGET_USD)
+    .persistSession(false);
+
+  if (daprServer) {
+    builder.mcpServer("dapr", daprServer);
+  }
+
+  return builder.build();
+}
+
+/**
+ * Check which analytics MCPs are available
+ */
+export function getAvailableAnalyticsSources(): {
+  ga4: boolean;
+  shopify: boolean;
+  meta: boolean;
+} {
+  const config = getConfig();
+  return {
+    ga4: !!config.GA4_MCP_URL,
+    shopify: !!config.SHOPIFY_MCP_URL,
+    meta: !!config.META_MCP_URL,
+  };
 }
 

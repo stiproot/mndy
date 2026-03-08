@@ -1,0 +1,24 @@
+{
+  "name": "dapr-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Dapr actor operations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "mcp-core": "workspace:*",
+    "dapr-core": "workspace:*",
+    "dotenv": "^16.4.5",
+    "effect": "^3.12.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.2"
+  }
+}

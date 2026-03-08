@@ -1,0 +1,20 @@
+{
+  "name": "dapr-core",
+  "version": "0.1.0",
+  "description": "Shared Dapr utilities with Effect-TS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "effect": "^3.12.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.2"
+  }
+}

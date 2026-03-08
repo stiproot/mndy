@@ -24,3 +24,28 @@ export {
   type ChatContextMessage,
   type ChatMessageRole,
 } from "./chat.schema.js";
+
+export {
+  brandInsightsRequestSchema,
+  brandInsightsResponseSchema,
+  ga4AnalystOutputSchema,
+  shopifyAnalystOutputSchema,
+  metaAnalystOutputSchema,
+  type BrandInsightsRequest,
+  type BrandInsightsResponse,
+  type GA4AnalystOutput,
+  type ShopifyAnalystOutput,
+  type MetaAnalystOutput,
+} from "./brand-insights.schema.js";
+
+export {
+  collectRequestSchema,
+  collectResponseSchema,
+  analyzeRequestSchema,
+  dataSourceSchema,
+  type CollectRequest,
+  type CollectResponse,
+  type AnalyzeRequest,
+  type DataSource,
+  type SourceCacheStatus,
+} from "./data-collection.schema.js";

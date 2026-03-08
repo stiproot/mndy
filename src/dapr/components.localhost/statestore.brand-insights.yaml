@@ -1,0 +1,25 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore-brand-insights
+scopes:
+  - mndy-dapr-mcp
+  - mndy-dapr-actor-svc
+spec:
+  type: state.mongodb
+  version: v1
+  initTimeout: 5m
+  metadata:
+  - name: host
+    value: "localhost:27017"
+  - name: databaseName
+    value: "mndy"
+  - name: collectionName
+    value: "brand-insights"
+  - name: keyPrefix
+    value: "none"
+  - name: params
+    value: "?authSource=admin&replicaSet=rs0&directConnection=true"
+  # Actor state now uses statestore-actorstate component
+  # - name: actorStateStore
+  #   value: "true"
