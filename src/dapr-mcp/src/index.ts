@@ -10,6 +10,7 @@ import {
   registerSubmitShopifyDataTool,
   registerSubmitBrandReportTool,
   registerGetCachedDataTool,
+  registerGetBrandReportTool,
 } from "./tools/index.js";
 import { ServerConfig } from "./types.js";
 
@@ -34,6 +35,7 @@ function createServer(): McpServer {
   registerSubmitShopifyDataTool(server);
   registerSubmitBrandReportTool(server);
   registerGetCachedDataTool(server);
+  registerGetBrandReportTool(server);
 
   return server;
 }

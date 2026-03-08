@@ -4,8 +4,8 @@ import type { StreamEvent } from "../types/index.js";
 import { AgentError } from "../types/index.js";
 import { createBrandOrchestratorAgent } from "../agents/index.js";
 import { buildBrandSynthesisPrompt } from "../prompts/index.js";
-import { brandInsightsResponseSchema } from "../schemas/index.js";
 import { createScopedLogger, logger } from "../utils/logger.js";
+import { getBrandInsightsReport } from "../utils/dapr-persistence.js";
 import type { AgentMessage } from "cc-core";
 
 /**
@@ -120,6 +120,7 @@ export class BrandAnalysisService {
     };
 
     const orchestrator = createBrandOrchestratorAgent();
+    const actorId = `brand-${brandId}`;
     const synthesisPrompt = buildBrandSynthesisPrompt(
       startDate,
       endDate,
@@ -130,12 +131,9 @@ export class BrandAnalysisService {
       brandId
     );
 
-    let fullResponse = "";
-
     try {
       for await (const message of orchestrator.stream(synthesisPrompt)) {
         if (message.type === "text") {
-          fullResponse += message.content;
           yield {
             type: "text",
             data: { content: message.content },
@@ -167,12 +165,24 @@ export class BrandAnalysisService {
       throw error;
     }
 
-    // Parse and validate the final result
-    const parsed = this.parseAndValidateResponse(fullResponse, startTime);
+    // Retrieve the report from the actor (persisted by submit_brand_report)
+    const report = await getBrandInsightsReport(actorId);
+
+    if (!report) {
+      throw new AgentError(
+        `Brand report not found in actor ${actorId}. The orchestrator may have failed to call submit_brand_report.`,
+        "brand-orchestrator"
+      );
+    }
+
+    // Update processing time with actual value
+    if (report.metadata) {
+      report.metadata.processingTimeMs = Date.now() - startTime;
+    }
 
     yield {
       type: "complete",
-      data: parsed,
+      data: report,
     };
   }
 
@@ -239,6 +249,7 @@ export class BrandAnalysisService {
     brandId: string
   ): Promise<BrandInsightsResponse> {
     const orchestrator = createBrandOrchestratorAgent();
+    const actorId = `brand-${brandId}`;
     const synthesisPrompt = buildBrandSynthesisPrompt(
       startDate,
       endDate,
@@ -260,55 +271,22 @@ export class BrandAnalysisService {
       );
     }
 
-    return this.parseAndValidateResponse(result.result, startTime);
-  }
+    // The orchestrator calls submit_brand_report to persist the report.
+    // Now retrieve it from the actor to return to the caller.
+    const report = await getBrandInsightsReport(actorId);
 
-  /**
-   * Parse and validate the JSON response from the orchestrator
-   */
-  private parseAndValidateResponse(
-    result: string,
-    startTime: number
-  ): BrandInsightsResponse {
-    // Extract JSON from the response (handle markdown code blocks)
-    let jsonStr = result;
-
-    // Remove markdown code block if present
-    const codeBlockMatch = result.match(/```(?:json)?\s*([\s\S]*?)```/);
-    if (codeBlockMatch) {
-      jsonStr = codeBlockMatch[1].trim();
-    }
-
-    // Try to find JSON object
-    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
+    if (!report) {
       throw new AgentError(
-        "No valid JSON found in orchestrator response",
-        "brand-orchestrator",
-        { rawResponse: result.substring(0, 500) }
+        `Brand report not found in actor ${actorId}. The orchestrator may have failed to call submit_brand_report.`,
+        "brand-orchestrator"
       );
     }
 
-    try {
-      const parsed = JSON.parse(jsonMatch[0]);
-
-      // Update processing time
-      if (parsed.metadata) {
-        parsed.metadata.processingTimeMs = Date.now() - startTime;
-      }
-
-      // Validate with Zod schema
-      const validated = brandInsightsResponseSchema.parse(parsed);
-      return validated;
-    } catch (error) {
-      if (error instanceof SyntaxError) {
-        throw new AgentError(
-          `Invalid JSON in orchestrator response: ${error.message}`,
-          "brand-orchestrator",
-          { rawResponse: result.substring(0, 500) }
-        );
-      }
-      throw error;
+    // Update processing time with actual value
+    if (report.metadata) {
+      report.metadata.processingTimeMs = Date.now() - startTime;
     }
+
+    return report;
   }
 }

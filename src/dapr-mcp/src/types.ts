@@ -329,3 +329,19 @@ export interface GetCachedDataInput {
   source: "ga4" | "shopify";
   actorId: string;
 }
+
+/**
+ * Schema for get_brand_report tool.
+ * Retrieves a persisted brand insights report from BrandInsightsActor.
+ */
+export const getBrandReportSchema = {
+  actorId: z
+    .string()
+    .describe(
+      "The actor ID for the brand report. Use format: 'brand-{brandId}' (e.g., 'brand-default', 'brand-test')"
+    ),
+};
+
+export interface GetBrandReportInput {
+  actorId: string;
+}

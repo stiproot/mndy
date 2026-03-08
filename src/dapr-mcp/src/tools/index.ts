@@ -4,3 +4,4 @@ export { registerSubmitGA4DataTool } from "./submit-ga4-data.js";
 export { registerSubmitShopifyDataTool } from "./submit-shopify-data.js";
 export { registerSubmitBrandReportTool } from "./submit-brand-report.js";
 export { registerGetCachedDataTool } from "./get-cached-data.js";
+export { registerGetBrandReportTool } from "./get-brand-report.js";
