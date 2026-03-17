@@ -62,10 +62,11 @@ const getInsightsEffect = (input: GetInsightsInput) =>
     const client = yield* MetaAdsClient;
 
     const adAccountId = input.adAccountId || client.getDefaultAdAccountId();
+    const level = input.level || "campaign";
 
     logger.debug("Fetching Meta insights", {
       adAccountId,
-      level: input.level || "campaign",
+      level,
       datePreset: input.datePreset,
       timeRange: input.timeRange,
     });
@@ -97,7 +98,7 @@ const getInsightsEffect = (input: GetInsightsInput) =>
             {
               summary,
               adAccountId,
-              level: input.level || "campaign",
+              level,
               dateRange: input.datePreset || input.timeRange || "last_7d",
               totals: {
                 spend: totalSpend.toFixed(2),

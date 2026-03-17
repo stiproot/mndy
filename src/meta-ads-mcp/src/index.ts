@@ -2,6 +2,7 @@ import "dotenv/config";
 import { Effect } from "effect";
 import { createMcpApp, McpServer, log, setLogLevel, type LogLevel } from "mcp-core";
 import { registerGetInsightsTool } from "./tools/get-insights.js";
+import { registerGetCampaignsTool } from "./tools/get-campaigns.js";
 import { ServerConfig } from "./types.js";
 import { MetaAdsClient } from "./services/meta.js";
 
@@ -15,6 +16,7 @@ function createServer(): McpServer {
   });
 
   registerGetInsightsTool(server);
+  registerGetCampaignsTool(server);
 
   return server;
 }

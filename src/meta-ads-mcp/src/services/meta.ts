@@ -1,9 +1,7 @@
-import bizSdk from "facebook-nodejs-business-sdk";
+import { AdAccount, Campaign, FacebookAdsApi } from "facebook-nodejs-business-sdk";
 import { Duration, Effect, Schedule } from "effect";
 import type { GetInsightsInput, InsightsResult, InsightsData, CampaignInfo } from "../types.js";
 import { MetaApiError, MetaRateLimitError, TimeoutError, MetaConfig, DEFAULT_INSIGHTS_FIELDS } from "../types.js";
-
-const { AdAccount, Campaign } = bizSdk;
 
 const REQUEST_TIMEOUT = Duration.seconds(60);
 const MAX_RETRIES = 3;
@@ -75,7 +73,7 @@ const extractMetaError = (error: unknown): MetaApiError | MetaRateLimitError => 
  * Wrap Meta API call with timeout, error handling, and retry
  */
 const withApiResilience = <T>(
-  effect: Effect.Effect<T, never, never>,
+  effect: Effect.Effect<T, MetaApiError | MetaRateLimitError, never>,
   spanName: string,
   attributes: Record<string, string | number>
 ): Effect.Effect<T, MetaApiError | MetaRateLimitError | TimeoutError> =>
@@ -88,7 +86,6 @@ const withApiResilience = <T>(
           duration: Duration.format(REQUEST_TIMEOUT),
         }),
     }),
-    Effect.catchAllDefect((defect) => Effect.fail(extractMetaError(defect))),
     Effect.withSpan(spanName, { attributes }),
     Effect.retry({
       schedule: retrySchedule,
@@ -104,7 +101,7 @@ export class MetaAdsClient extends Effect.Service<MetaAdsClient>()("MetaAdsClien
     const config = yield* MetaConfig;
 
     // Initialize the SDK
-    bizSdk.FacebookAdsApi.init(config.accessToken);
+    FacebookAdsApi.init(config.accessToken);
 
     const defaultAdAccountId = config.adAccountId;
 
@@ -126,14 +123,36 @@ export class MetaAdsClient extends Effect.Service<MetaAdsClient>()("MetaAdsClien
         input: GetInsightsInput
       ): Effect.Effect<InsightsResult, MetaApiError | MetaRateLimitError | TimeoutError> => {
         const adAccountId = input.adAccountId || defaultAdAccountId;
-        const fields = input.fields || [...DEFAULT_INSIGHTS_FIELDS];
+        const level = input.level || "campaign";
+
+        // Start with requested fields or defaults
+        let fields = input.fields ? [...input.fields] : [...DEFAULT_INSIGHTS_FIELDS];
+
+        // Ensure dimension fields are included based on level
+        const dimensionFields: string[] = [];
+        if (level === "campaign" || level === "adset" || level === "ad") {
+          if (!fields.includes("campaign_id")) dimensionFields.push("campaign_id");
+          if (!fields.includes("campaign_name")) dimensionFields.push("campaign_name");
+        }
+        if (level === "adset" || level === "ad") {
+          if (!fields.includes("adset_id")) dimensionFields.push("adset_id");
+          if (!fields.includes("adset_name")) dimensionFields.push("adset_name");
+        }
+        if (level === "ad") {
+          if (!fields.includes("ad_id")) dimensionFields.push("ad_id");
+          if (!fields.includes("ad_name")) dimensionFields.push("ad_name");
+        }
+
+        // Prepend dimension fields so they appear first in results
+        fields = [...dimensionFields, ...fields];
 
         return withApiResilience(
-          Effect.promise(async () => {
-            const account = new AdAccount(adAccountId);
+          Effect.tryPromise({
+            try: async () => {
+              const account = new AdAccount(adAccountId);
 
             const params: Record<string, unknown> = {
-              level: input.level || "campaign",
+              level,
               limit: input.limit || 50,
             };
 
@@ -191,11 +210,13 @@ export class MetaAdsClient extends Effect.Service<MetaAdsClient>()("MetaAdsClien
               data,
               paging: insights._paging,
             } as InsightsResult;
+            },
+            catch: (error) => extractMetaError(error),
           }),
           "meta.getInsights",
           {
             "meta.adAccountId": adAccountId,
-            "meta.level": input.level || "campaign",
+            "meta.level": level,
             "meta.fields": fields.length,
           }
         ).pipe(Effect.withSpan("MetaAdsClient.getInsights"));
@@ -211,20 +232,23 @@ export class MetaAdsClient extends Effect.Service<MetaAdsClient>()("MetaAdsClien
         const accountId = adAccountId || defaultAdAccountId;
 
         return withApiResilience(
-          Effect.promise(async () => {
-            const account = new AdAccount(accountId);
-            const campaigns = await account.getCampaigns(
-              ["id", "name", "status", "objective", "buying_type"],
-              { limit: limit || 100 }
-            );
+          Effect.tryPromise({
+            try: async () => {
+              const account = new AdAccount(accountId);
+              const campaigns = await account.getCampaigns(
+                ["id", "name", "status", "objective", "buying_type"],
+                { limit: limit || 100 }
+              );
 
-            return campaigns.map((c) => ({
-              id: c.id,
-              name: c.name,
-              status: c.status,
-              objective: c.objective,
-              buying_type: c.buying_type,
-            }));
+              return campaigns.map((c) => ({
+                id: c.id,
+                name: c.name,
+                status: c.status,
+                objective: c.objective,
+                buying_type: c.buying_type,
+              }));
+            },
+            catch: (error) => extractMetaError(error),
           }),
           "meta.getCampaigns",
           {
