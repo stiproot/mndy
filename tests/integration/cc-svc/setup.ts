@@ -62,7 +62,7 @@ export const config = {
  * Check if analytics MCPs are available for brand-insights tests
  */
 export function hasAnalyticsMcps(): boolean {
-  return !!(config.ga4McpUrl || config.shopifyMcpUrl);
+  return !!(config.ga4McpUrl || config.shopifyMcpUrl || config.metaMcpUrl);
 }
 
 /**

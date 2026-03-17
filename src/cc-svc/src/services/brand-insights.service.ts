@@ -4,12 +4,14 @@ import { AgentError } from "../types/index.js";
 import {
   createGA4AnalystAgent,
   createShopifyAnalystAgent,
+  createMetaAnalystAgent,
   createBrandOrchestratorAgent,
   getAvailableAnalyticsSources,
 } from "../agents/index.js";
 import {
   buildGA4AnalystPrompt,
   buildShopifyAnalystPrompt,
+  buildMetaAnalystPrompt,
   buildBrandSynthesisPrompt,
 } from "../prompts/index.js";
 import { brandInsightsResponseSchema } from "../schemas/index.js";
@@ -77,11 +79,14 @@ export class BrandInsightsService {
       );
     }
 
-    // Meta analyst would go here when implemented
     if (useMeta) {
-      // Placeholder for future Meta analyst
       analysisPromises.push(
-        Promise.resolve({ source: "meta", result: null })
+        this.runMetaAnalyst(startDate, endDate)
+          .then((result) => ({ source: "meta", result }))
+          .catch((error) => {
+            logger.warn(`Meta analysis failed: ${error.message}`, undefined, "BrandInsights");
+            return { source: "meta", result: null };
+          })
       );
     }
 
@@ -375,6 +380,32 @@ export class BrandInsightsService {
       throw new AgentError(
         result.error ?? "Shopify analyst failed",
         "shopify-analyst"
+      );
+    }
+
+    return result.result;
+  }
+
+  /**
+   * Run the Meta Ads analyst agent
+   */
+  private async runMetaAnalyst(startDate: string, endDate: string): Promise<string> {
+    const agent = createMetaAnalystAgent();
+
+    if (!agent) {
+      throw new AgentError("Meta MCP not configured", "meta-analyst");
+    }
+
+    const prompt = buildMetaAnalystPrompt(startDate, endDate);
+
+    const result = await agent.execute(prompt, {
+      onMessage: this.createMessageLogger("meta-analyst"),
+    });
+
+    if (!result.success) {
+      throw new AgentError(
+        result.error ?? "Meta analyst failed",
+        "meta-analyst"
       );
     }
 

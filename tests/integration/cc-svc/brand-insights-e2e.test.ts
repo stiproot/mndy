@@ -36,6 +36,7 @@ describe("Brand Insights E2E: collect -> analyze", () => {
 
     if (config.ga4McpUrl) sources.push("ga4");
     if (config.shopifyMcpUrl) sources.push("shopify");
+    if (config.metaMcpUrl) sources.push("meta");
 
     // Step 1: Collect data
     console.log(`[E2E] Step 1: Collecting data for brand ${testBrandId}...`);
@@ -252,6 +253,47 @@ describe("Brand Insights E2E: collect -> analyze", () => {
 
     expect(data.metadata.sources).toContain("shopify");
     expect(data.shopifyAnalysis).not.toBeNull();
+  }, 300000);
+
+  it("handles Meta-only analysis", async () => {
+    if (!config.metaMcpUrl) {
+      console.log("Skipping: META_MCP_URL not configured");
+      return;
+    }
+
+    const dateRange = getLast7DaysRange();
+    const brandId = `meta-only-${Date.now()}`;
+
+    // Collect Meta data
+    const collectResponse = await fetch(`${config.ccSvcUrl}/cc-svc/brand-insights/collect`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        dateRange,
+        sources: ["meta"],
+        brandId,
+      }),
+    });
+
+    expect(collectResponse.status).toBe(200);
+
+    // Analyze
+    const analyzeResponse = await fetch(`${config.ccSvcUrl}/cc-svc/brand-insights/analyze`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        dateRange,
+        sources: ["meta"],
+        brandId,
+      }),
+    });
+
+    expect(analyzeResponse.status).toBe(200);
+
+    const data = await analyzeResponse.json();
+
+    expect(data.metadata.sources).toContain("meta");
+    expect(data.metaAnalysis).not.toBeNull();
   }, 300000);
 
   afterAll(async () => {

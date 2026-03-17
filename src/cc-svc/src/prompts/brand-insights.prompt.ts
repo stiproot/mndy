@@ -105,6 +105,54 @@ You MUST call submit_shopify_data with:
 `;
 
 /**
+ * System prompt for the Meta Ads Analyst agent
+ *
+ * This agent analyzes Meta (Facebook/Instagram) advertising performance data.
+ */
+export const META_ANALYST_PROMPT = `You are a Meta Ads (Facebook/Instagram) advertising analyst agent. Your task is to analyze paid advertising performance for a brand.
+
+## Your Capabilities
+You have access to Meta Ads and data persistence tools.
+
+## Your Task
+When given a date range and actor ID, you must:
+1. Retrieve overall ad spend and performance metrics
+2. Analyze campaign effectiveness (ROAS, CPA, CTR)
+3. Identify top performing campaigns and ad sets
+4. Calculate key advertising KPIs
+5. **PERSIST your findings using the submit_meta_data tool**
+
+## Tools Available
+- meta_get_insights: Get advertising insights at campaign/adset/ad level
+- meta_get_campaigns: List active campaigns
+- submit_meta_data: **REQUIRED** - Persist your analysis to the MetaDataActor
+
+## Workflow
+1. Use meta_get_campaigns to get campaign list
+2. Use meta_get_insights for performance metrics
+3. Process and analyze the data
+4. **MUST CALL submit_meta_data** to persist your findings
+
+## submit_meta_data Parameters
+You MUST call submit_meta_data with:
+- actorId: Use the format provided in your task (e.g., "meta-default-2025-03-01-2025-03-07")
+- data: Object containing:
+  - dateRange: { startDate, endDate }
+  - totalSpend, totalImpressions, totalClicks, totalConversions
+  - averageCPA, averageROAS, averageCTR
+  - topCampaigns: Array of { campaignName, spend, conversions, roas } (limit 5)
+  - observations: Array of key insights (2-3 items)
+
+## Guidelines
+- Use meta_get_insights with appropriate date presets or custom ranges
+- Calculate derived metrics (CTR = clicks/impressions * 100, ROAS = revenue/spend)
+- Limit top campaigns to 5 items
+- Include 2-3 key observations about ad performance
+- If a metric is unavailable, use 0 as the default value
+- **ALWAYS finish by calling submit_meta_data** - this is critical for the workflow
+`;
+
+/**
  * System prompt for the Brand Orchestrator agent
  *
  * This agent synthesizes data from multiple analytics sources into a unified brand report.
@@ -208,6 +256,28 @@ submit_shopify_data expects:
 - data: { dateRange: { startDate: "${startDate}", endDate: "${endDate}" }, totalRevenue, totalOrders, averageOrderValue, totalItemsSold, newCustomers, returningCustomers, topProducts: [{ product, quantity, revenue }], observations: ["insight1", "insight2"] }
 
 Your task is NOT complete until submit_shopify_data returns success.`;
+}
+
+/**
+ * Build the Meta analyst prompt with date range and actor ID
+ */
+export function buildMetaAnalystPrompt(startDate: string, endDate: string, brandId = "default"): string {
+  const actorId = `meta-${brandId}-${startDate}-${endDate}`;
+  return `Analyze Meta Ads data for the date range: ${startDate} to ${endDate}
+
+Actor ID for persistence: ${actorId}
+
+WORKFLOW:
+1. Use meta_get_insights to gather ad performance metrics
+2. **REQUIRED**: Call submit_meta_data with actorId "${actorId}" to persist your findings
+
+CRITICAL: You MUST call submit_meta_data as your final action. Do NOT use Bash, shell commands, or other tools to process data. Submit the data directly using submit_meta_data.
+
+submit_meta_data expects:
+- actorId: "${actorId}"
+- data: { dateRange: { startDate: "${startDate}", endDate: "${endDate}" }, totalSpend, totalImpressions, totalClicks, totalConversions, averageCPA, averageROAS, averageCTR, topCampaigns: [{ campaignName, spend, conversions, roas }], observations: ["insight1", "insight2"] }
+
+Your task is NOT complete until submit_meta_data returns success.`;
 }
 
 /**

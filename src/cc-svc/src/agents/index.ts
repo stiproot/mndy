@@ -12,6 +12,7 @@ import {
   CHAT_AGENT_PROMPT,
   GA4_ANALYST_PROMPT,
   SHOPIFY_ANALYST_PROMPT,
+  META_ANALYST_PROMPT,
   BRAND_ORCHESTRATOR_PROMPT,
 } from "../prompts/index.js";
 
@@ -211,6 +212,34 @@ export function createShopifyAnalystAgent(): Agent | null {
     .model(config.CLAUDE_MODEL)
     .mcpServer("shopify", shopifyServer)
     .systemPrompt(SHOPIFY_ANALYST_PROMPT)
+    .permissionMode("bypassPermissions")
+    .maxTurns(config.MAX_SUBAGENT_TURNS)
+    .maxBudget(config.MAX_SUBAGENT_BUDGET_USD)
+    .persistSession(false);
+
+  if (daprServer) {
+    builder.mcpServer("dapr", daprServer);
+  }
+
+  return builder.build();
+}
+
+/**
+ * Create the Meta Ads analyst agent for brand insights
+ */
+export function createMetaAnalystAgent(): Agent | null {
+  const config = getConfig();
+  const metaServer = getMetaMcpServer();
+  const daprServer = getDaprMcpServer();
+
+  if (!metaServer) {
+    return null;
+  }
+
+  const builder = agentBuilder("meta-analyst")
+    .model(config.CLAUDE_MODEL)
+    .mcpServer("meta-ads", metaServer)
+    .systemPrompt(META_ANALYST_PROMPT)
     .permissionMode("bypassPermissions")
     .maxTurns(config.MAX_SUBAGENT_TURNS)
     .maxBudget(config.MAX_SUBAGENT_BUDGET_USD)
