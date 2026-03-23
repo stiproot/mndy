@@ -17,18 +17,16 @@ Build a marketing analytics platform that pulls data from Google Analytics 4, Me
 | 2 | Create Shopify MCP server | ✅ Done |
 | 2 | Update docker-compose.yml | ✅ Done |
 | 2.5 | **Integration tests for MCP servers** | ✅ Done |
+| 3 | Implement GA4 Analyst Agent | ✅ Done |
+| 3 | Implement Shopify Analyst Agent | ✅ Done |
+| 3 | Implement Meta Analyst Agent | ✅ Done |
+| 4 | Implement Brand Orchestrator Agent | ✅ Done |
+| 5 | Create brand-insights API endpoints | ✅ Done |
+| 5 | Implement data persistence (Dapr actors) | ✅ Done |
+| 5.5 | **Brand insights E2E integration test** | ✅ Done |
 | 6 | Create marketing-analytics rules | ✅ Done |
 | 6 | Create marketing-agent skill | ✅ Done |
 | 6 | Create marketing-insights agent | ✅ Done |
-| 3 | Implement Data Ingestion Agent | ⏳ Pending |
-| 3 | Implement KPI Normalizer Agent | ⏳ Pending |
-| 3 | Implement Performance Detective Agent | ⏳ Pending |
-| 4 | Implement Marketing Director Agent | ⏳ Pending |
-| 4 | Implement Reporting Agent (Markdown output) | ⏳ Pending |
-| 4 | Build orchestrator service | ⏳ Pending |
-| 5 | Create API endpoints | ⏳ Pending |
-| 5 | Create reports directory | ⏳ Pending |
-| 5 | Set up scheduled jobs | ⏳ Pending |
 
 ## Completed Files
 
@@ -102,12 +100,30 @@ tests/integration/
 ├── meta-ads-mcp/
 │   ├── setup.ts
 │   └── meta-get-insights.test.ts
-└── shopify-mcp/
+├── shopify-mcp/
+│   ├── setup.ts
+│   └── shopify-get-orders.test.ts
+└── cc-svc/
     ├── setup.ts
-    └── shopify-get-orders.test.ts
+    └── brand-insights-e2e.test.ts  ← E2E test with all 3 MCPs
 
 tests/.env.template (updated with marketing MCP URLs)
 package.json (added test scripts)
+```
+
+### Phase 3-5: Brand Insights Service
+
+```
+src/cc-svc/src/
+├── agents/
+│   └── index.ts  (GA4, Shopify, Meta, Brand Orchestrator agents)
+├── prompts/
+│   └── brand-insights.prompt.ts  (GA4, Shopify, Meta analyst prompts)
+├── services/
+│   ├── brand-insights.service.ts  (Main service logic)
+│   └── data-collection.service.ts  (Data persistence)
+└── schemas/
+    └── brand-insights.schema.ts  (API types)
 ```
 
 ### Docker Configuration
@@ -122,37 +138,110 @@ package.json (added test scripts)
 | Meta Ads MCP | 3004 | `meta_get_insights`, `meta_get_campaigns` |
 | Shopify MCP | 3005 | `shopify_get_orders`, `shopify_get_analytics` |
 
-## Agent Pipeline Architecture
+## Brand Insights Architecture (Current Implementation)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         cc-svc (Orchestrator)                       │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌────────────┐ │
-│  │    Data     │  │     KPI     │  │ Performance │  │  Marketing │ │
-│  │  Ingestion  │→ │  Normalizer │→ │  Detective  │→ │  Director  │ │
-│  │   Agent     │  │   Agent     │  │   Agent     │  │   Agent    │ │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └────────────┘ │
-│         ↓               ↓               ↓               ↓          │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │                    Reporting Agent                          │   │
-│  └─────────────────────────────────────────────────────────────┘   │
+│                      cc-svc (Brand Insights)                        │
+│                                                                     │
+│  API: POST /cc-svc/brand-insights/collect                          │
+│  API: POST /cc-svc/brand-insights/analyze                          │
+│                                                                     │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                │
+│  │     GA4     │  │  Shopify    │  │    Meta     │                │
+│  │   Analyst   │  │  Analyst    │  │   Analyst   │  (Parallel)    │
+│  │    Agent    │  │   Agent     │  │    Agent    │                │
+│  └─────────────┘  └─────────────┘  └─────────────┘                │
+│         │               │               │                          │
+│         └───────────────┴───────────────┘                          │
+│                         │                                          │
+│                         ▼                                          │
+│            ┌─────────────────────────┐                             │
+│            │  Brand Orchestrator     │                             │
+│            │      Agent              │  (Synthesis)                │
+│            │  • Calculate score      │                             │
+│            │  • Generate insights    │                             │
+│            │  • Create report        │                             │
+│            └─────────────────────────┘                             │
+│                         │                                          │
+│                         ▼                                          │
+│                 ┌───────────────┐                                  │
+│                 │  Dapr Actors  │ (Persistence)                    │
+│                 └───────────────┘                                  │
 └─────────────────────────────────────────────────────────────────────┘
          │                    │                    │
          ▼                    ▼                    ▼
 ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
 │  GA4 MCP    │      │  Meta MCP   │      │ Shopify MCP │
+│  :3003      │      │  :3004      │      │  :3005      │
 └─────────────┘      └─────────────┘      └─────────────┘
+```
+
+## Current Features
+
+### Brand Insights Service (Completed)
+
+The brand insights service provides unified analytics across GA4, Meta Ads, and Shopify:
+
+**Endpoints:**
+- `POST /cc-svc/brand-insights/collect` - Collect data from analytics sources
+- `POST /cc-svc/brand-insights/analyze` - Generate brand health report
+
+**Features:**
+- Multi-source data collection (GA4, Meta, Shopify) running in parallel
+- Automatic data normalization and KPI calculation
+- Brand health scoring (0-100)
+- Cross-platform insights and correlations
+- Wins, concerns, and actionable recommendations
+- Persistent storage via Dapr actors
+
+**Agents:**
+- **GA4 Analyst**: Analyzes website traffic, conversions, user behavior
+- **Shopify Analyst**: Analyzes e-commerce sales, orders, products
+- **Meta Analyst**: Analyzes ad spend, ROAS, campaigns, CTR, CPA
+- **Brand Orchestrator**: Synthesizes all data into unified health report
+
+### Example Usage
+
+```bash
+# Collect data from all sources
+curl -X POST http://localhost:3002/cc-svc/brand-insights/collect \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dateRange": {
+      "startDate": "2026-03-10",
+      "endDate": "2026-03-17"
+    },
+    "sources": ["ga4", "shopify", "meta"],
+    "brandId": "my-brand"
+  }'
+
+# Analyze and generate report
+curl -X POST http://localhost:3002/cc-svc/brand-insights/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dateRange": {
+      "startDate": "2026-03-10",
+      "endDate": "2026-03-17"
+    },
+    "sources": ["ga4", "shopify", "meta"],
+    "brandId": "my-brand"
+  }'
 ```
 
 ## Next Steps
 
-1. Implement core agents (Data Ingestion, KPI Normalizer, Performance Detective)
-2. Implement intelligence layer (Marketing Director, Reporting Agent)
-3. Build orchestrator service in cc-svc
-4. Create API endpoints and scheduled jobs
-5. Create reports directory for markdown output
+1. ✅ ~~Brand insights core implementation~~ (Complete)
+2. ⏳ Scheduled jobs for automated daily/weekly reports
+3. ⏳ Notification system (Slack/email) for alerts
+4. ⏳ Historical trend analysis and comparison
+5. ⏳ Custom alerting rules and thresholds
 
 ## Running Tests
+
+### MCP Server Tests
+
+Test individual MCP servers:
 
 ```bash
 # Run all marketing MCP integration tests
@@ -164,7 +253,32 @@ bun run test:integration:meta
 bun run test:integration:shopify
 ```
 
-**Note:** Before running tests, copy `tests/.env.template` to `tests/.env` and configure the required credentials.
+### Brand Insights E2E Test
+
+Test the full brand insights pipeline (requires all services running):
+
+```bash
+# Prerequisites:
+# 1. Start MCP servers (ga4-mcp, meta-ads-mcp, shopify-mcp)
+# 2. Start dapr-mcp (optional, for persistence)
+# 3. Start cc-svc
+
+# Run E2E test
+bun run vitest run tests/integration/cc-svc/brand-insights-e2e.test.ts
+```
+
+The E2E test validates:
+- Data collection from GA4, Shopify, and Meta
+- Parallel analyst execution
+- Brand orchestrator synthesis
+- Health score calculation
+- Report generation with insights
+
+**Note:** Before running tests, copy `tests/.env.template` to `tests/.env` and configure the required credentials:
+- `GA4_MCP_URL`, `GA4_TEST_PROPERTY_ID`
+- `META_MCP_URL`, `META_TEST_AD_ACCOUNT_ID`
+- `SHOPIFY_MCP_URL`, `SHOPIFY_TEST_STORE_URL`
+- `CC_SVC_URL` (default: http://localhost:3002)
 
 ## Related Documents
 

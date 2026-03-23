@@ -1,53 +1,28 @@
 import { Effect } from "effect";
 import { type McpServer, createLogger } from "mcp-core";
-import { DaprActorSvc } from "dapr-core";
 import type { GetCachedDataInput } from "../types.js";
 import { getCachedDataSchema } from "../types.js";
+import { DataCacheSvc, CacheError } from "../services/data-cache.service.js";
 
 const logger = createLogger("get_cached_data");
 
 /**
- * Map source to actor type
- */
-const SOURCE_TO_ACTOR: Record<string, string> = {
-  ga4: "GA4DataActor",
-  shopify: "ShopifyDataActor",
-};
-
-/**
- * Effect for retrieving cached data from a data actor.
+ * Effect for retrieving cached data from the state store.
+ * Validates TTL and returns metadata about cache status.
  */
 const getCachedDataEffect = (input: GetCachedDataInput) =>
   Effect.gen(function* () {
-    const actorSvc = yield* DaprActorSvc;
-    const actorType = SOURCE_TO_ACTOR[input.source];
-
-    if (!actorType) {
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: `Unknown data source: ${input.source}. Valid sources are: ga4, shopify`,
-          },
-        ],
-        isError: true as const,
-      };
-    }
+    const cacheSvc = yield* DataCacheSvc;
 
     logger.debug("Retrieving cached data", {
       source: input.source,
-      actorType,
       actorId: input.actorId,
     });
 
-    const data = yield* actorSvc.invokeMethod(
-      actorType,
-      input.actorId,
-      "getData",
-      undefined
-    );
+    // Get data from state store with TTL validation
+    const result = yield* cacheSvc.getData(input.actorId);
 
-    if (!data) {
+    if (!result.found) {
       logger.info("No cached data found", {
         source: input.source,
         actorId: input.actorId,
@@ -61,9 +36,10 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
               {
                 success: true,
                 found: false,
+                valid: false,
                 source: input.source,
                 actorId: input.actorId,
-                message: "No cached data found for this actor ID",
+                message: "No cached data found for this cache key",
               },
               null,
               2
@@ -73,6 +49,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
         structuredContent: {
           success: true,
           found: false,
+          valid: false,
           source: input.source,
           actorId: input.actorId,
           data: null,
@@ -80,9 +57,49 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
       };
     }
 
+    // Check if data is still valid (not expired)
+    if (!result.valid) {
+      logger.info("Cached data found but expired", {
+        source: input.source,
+        actorId: input.actorId,
+        expiresAt: result.metadata?.expiresAt,
+      });
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                success: true,
+                found: true,
+                valid: false,
+                source: input.source,
+                actorId: input.actorId,
+                message: "Cached data found but has expired",
+                metadata: result.metadata,
+              },
+              null,
+              2
+            ),
+          },
+        ],
+        structuredContent: {
+          success: true,
+          found: true,
+          valid: false,
+          source: input.source,
+          actorId: input.actorId,
+          data: null,
+          metadata: result.metadata,
+        },
+      };
+    }
+
     logger.info("Cached data retrieved successfully", {
       source: input.source,
       actorId: input.actorId,
+      cachedAt: result.metadata?.cachedAt,
     });
 
     return {
@@ -93,9 +110,11 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
             {
               success: true,
               found: true,
+              valid: true,
               source: input.source,
               actorId: input.actorId,
-              data,
+              data: result.data,
+              metadata: result.metadata,
             },
             null,
             2
@@ -105,49 +124,18 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
       structuredContent: {
         success: true,
         found: true,
+        valid: true,
         source: input.source,
         actorId: input.actorId,
-        data,
+        data: result.data,
+        metadata: result.metadata,
       },
     };
-  }).pipe(
-    Effect.catchTags({
-      DaprActorError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Failed to retrieve cached data: ${error.message}`,
-            },
-          ],
-          isError: true as const,
-        }),
-      DaprTimeoutError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Data retrieval timed out after ${error.duration}: ${error.message}`,
-            },
-          ],
-          isError: true as const,
-        }),
-      DaprConnectionError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Dapr connection error: ${error.message} (${error.host}:${error.port})`,
-            },
-          ],
-          isError: true as const,
-        }),
-    })
-  );
+  });
 
 /**
  * Register the get_cached_data tool on the MCP server.
- * This tool retrieves cached raw data from GA4DataActor or ShopifyDataActor.
+ * This tool retrieves cached raw data from the state store with TTL validation.
  */
 export function registerGetCachedDataTool(server: McpServer): void {
   server.registerTool(
@@ -155,17 +143,17 @@ export function registerGetCachedDataTool(server: McpServer): void {
     {
       title: "Get Cached Analytics Data",
       description:
-        "Retrieve cached raw analytics data from GA4DataActor or ShopifyDataActor. Use this to check if data exists for a date range before deciding to collect fresh data. Returns null if no data is cached.",
+        "Retrieve cached raw analytics data from the state store. Use this to check if data exists for a date range before deciding to collect fresh data. Returns the data with cache metadata (cachedAt, expiresAt) and validation status. If data is expired (valid=false), you should collect fresh data.",
       inputSchema: getCachedDataSchema,
     },
     (args) => {
       const input: GetCachedDataInput = {
-        source: args.source as "ga4" | "shopify",
+        source: args.source as "ga4" | "shopify" | "meta",
         actorId: args.actorId as string,
       };
 
       return Effect.runPromise(
-        getCachedDataEffect(input).pipe(Effect.provide(DaprActorSvc.Default))
+        getCachedDataEffect(input).pipe(Effect.provide(DataCacheSvc.Default))
       );
     }
   );

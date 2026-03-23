@@ -1,13 +1,14 @@
 import "dotenv/config";
 import { Effect } from "effect";
 import { createMcpApp, McpServer, log, setLogLevel, type LogLevel } from "mcp-core";
-import { DaprActorSvc } from "dapr-core";
+import { DataCacheSvc } from "./services/data-cache.service.js";
 import {
   // Generic actor tools disabled - use structured submit tools instead
   // registerActorGetStateTool,
   // registerActorSaveStateTool,
   registerSubmitGA4DataTool,
   registerSubmitShopifyDataTool,
+  registerSubmitMetaDataTool,
   registerSubmitBrandReportTool,
   registerGetCachedDataTool,
   registerGetBrandReportTool,
@@ -18,7 +19,7 @@ const SERVER_NAME = "dapr-mcp";
 const SERVER_VERSION = "0.1.0";
 
 /**
- * Create and configure the MCP server with Dapr actor tools.
+ * Create and configure the MCP server with state store caching tools.
  */
 function createServer(): McpServer {
   const server = new McpServer({
@@ -30,9 +31,10 @@ function createServer(): McpServer {
   // registerActorGetStateTool(server);
   // registerActorSaveStateTool(server);
 
-  // Register structured submit tools (type-safe, validated)
+  // Register structured caching tools (type-safe, validated, with TTL)
   registerSubmitGA4DataTool(server);
   registerSubmitShopifyDataTool(server);
+  registerSubmitMetaDataTool(server);
   registerSubmitBrandReportTool(server);
   registerGetCachedDataTool(server);
   registerGetBrandReportTool(server);
@@ -72,7 +74,7 @@ const main = Effect.gen(function* () {
     health: `http://localhost:${config.port}/health`,
   });
 }).pipe(
-  Effect.provide(DaprActorSvc.Default),
+  Effect.provide(DataCacheSvc.Default),
   Effect.tapError((error) =>
     Effect.sync(() => log("error", "Failed to start server", error))
   )

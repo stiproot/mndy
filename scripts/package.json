@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "insights": "bun run src/contributor-insights.ts"
+    "insights": "bun run src/contributor-insights.ts",
+    "refresh-meta-token": "bun run src/refresh-meta-token.ts"
   },
   "dependencies": {
     "cc-svc": "workspace:*",

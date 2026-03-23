@@ -1,41 +1,41 @@
 import { Effect } from "effect";
 import { type McpServer, createLogger } from "mcp-core";
-import { DaprActorSvc } from "dapr-core";
 import type { SubmitGA4DataInput } from "../types.js";
 import { submitGA4DataSchema } from "../types.js";
+import { DataCacheSvc } from "../services/data-cache.service.js";
+import { calculateCacheTTL } from "../utils/cache-ttl.js";
 
 const logger = createLogger("submit_ga4_data");
 
 /**
- * Effect for submitting GA4 data to the GA4DataActor.
- * Validates and persists the data, adding collection timestamp.
+ * Effect for submitting GA4 data to the state store cache.
+ * Validates and persists the data with automatic TTL based on date range.
  */
 const submitGA4DataEffect = (input: SubmitGA4DataInput) =>
   Effect.gen(function* () {
-    const actorSvc = yield* DaprActorSvc;
+    const cacheSvc = yield* DataCacheSvc;
 
-    // Add collection timestamp
-    const dataWithTimestamp = {
-      ...input.data,
-      collectedAt: new Date().toISOString(),
-    };
+    // Calculate TTL based on date range
+    const ttl = calculateCacheTTL(input.actorId);
 
-    logger.debug("Submitting GA4 data", {
+    logger.debug("Submitting GA4 data to cache", {
       actorId: input.actorId,
       dateRange: input.data.dateRange,
+      ttl: ttl ? `${ttl}s` : "no expiration",
     });
 
-    yield* actorSvc.invokeMethod(
-      "GA4DataActor",
+    // Save to state store with TTL
+    const result = yield* cacheSvc.saveData(
       input.actorId,
-      "saveData",
-      dataWithTimestamp
+      input.data,
+      ttl
     );
 
-    logger.info("GA4 data submitted successfully", {
+    logger.info("GA4 data cached successfully", {
       actorId: input.actorId,
       dateRange: input.data.dateRange,
       sessions: input.data.sessions,
+      cachedAt: result.cachedAt,
     });
 
     return {
@@ -45,15 +45,16 @@ const submitGA4DataEffect = (input: SubmitGA4DataInput) =>
           text: JSON.stringify(
             {
               success: true,
-              actorType: "GA4DataActor",
-              actorId: input.actorId,
-              message: "GA4 data persisted successfully",
+              cacheKey: input.actorId,
+              message: "GA4 data cached successfully",
               dateRange: input.data.dateRange,
               metrics: {
                 sessions: input.data.sessions,
                 activeUsers: input.data.activeUsers,
                 conversions: input.data.conversions,
               },
+              cachedAt: result.cachedAt,
+              ttl: ttl ? `${ttl} seconds` : "no expiration",
             },
             null,
             2
@@ -62,44 +63,23 @@ const submitGA4DataEffect = (input: SubmitGA4DataInput) =>
       ],
       structuredContent: {
         success: true,
-        actorType: "GA4DataActor",
-        actorId: input.actorId,
-        message: "GA4 data persisted successfully",
+        cacheKey: input.actorId,
+        message: "GA4 data cached successfully",
+        cachedAt: result.cachedAt,
       },
     };
   }).pipe(
-    Effect.catchTags({
-      DaprActorError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Failed to submit GA4 data: ${error.message}`,
-            },
-          ],
-          isError: true as const,
-        }),
-      DaprTimeoutError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `GA4 data submission timed out after ${error.duration}: ${error.message}`,
-            },
-          ],
-          isError: true as const,
-        }),
-      DaprConnectionError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Dapr connection error: ${error.message} (${error.host}:${error.port})`,
-            },
-          ],
-          isError: true as const,
-        }),
-    })
+    Effect.catchTag("CacheError", (error) =>
+      Effect.succeed({
+        content: [
+          {
+            type: "text" as const,
+            text: `Failed to cache GA4 data: ${error.message}${error.key ? ` (key: ${error.key})` : ""}`,
+          },
+        ],
+        isError: true as const,
+      })
+    )
   );
 
 /**
@@ -112,7 +92,7 @@ export function registerSubmitGA4DataTool(server: McpServer): void {
     {
       title: "Submit GA4 Analytics Data",
       description:
-        "Persist GA4 analytics data to the GA4DataActor. Call this after gathering data using ga4_run_report to save the results. The data will be stored and can be retrieved later for analysis without re-fetching from GA4.",
+        "Cache GA4 analytics data to the state store. Call this after gathering data using ga4_run_report to save the results. The data will be cached with automatic TTL and can be retrieved later for analysis without re-fetching from GA4.",
       inputSchema: submitGA4DataSchema,
     },
     (args) => {
@@ -122,7 +102,7 @@ export function registerSubmitGA4DataTool(server: McpServer): void {
       };
 
       return Effect.runPromise(
-        submitGA4DataEffect(input).pipe(Effect.provide(DaprActorSvc.Default))
+        submitGA4DataEffect(input).pipe(Effect.provide(DataCacheSvc.Default))
       );
     }
   );

@@ -270,9 +270,31 @@ PORT=3003
 1. In your app dashboard, click "Add Product"
 2. Find "Marketing API" and click "Set Up"
 
-**Step 3: Create a System User (Recommended for Production)**
+**Step 3: Generate Access Token**
 
-System User tokens don't expire, unlike personal tokens which expire in 60 days.
+Choose the appropriate method based on your use case:
+
+#### Option A: Development/Testing (Graph API Explorer)
+
+**Best for:** Quick testing, development environments
+
+1. Go to [Graph API Explorer](https://developers.facebook.com/tools/explorer/)
+2. Select your app from the dropdown
+3. Click "Generate Access Token"
+4. Select these permissions:
+   - `ads_management`
+   - `ads_read`
+   - `read_insights`
+5. Click "Generate Access Token" and copy the token
+
+⚠️ **Important Limitations:**
+- Expires in 1-2 hours
+- Cannot select "no expiry" option in the UI
+- For longer-lived tokens, see the token exchange API or use system users
+
+#### Option B: Production (System User - UI Method)
+
+**Best for:** Production environments, long-running services
 
 1. Go to [Business Settings](https://business.facebook.com/settings/)
 2. Navigate to "Users" → "System Users"
@@ -286,6 +308,48 @@ System User tokens don't expire, unlike personal tokens which expire in 60 days.
    - `read_insights`
 8. Click "Generate Token" and copy it securely
 
+✅ **Benefits:**
+- Permanent tokens (no expiry) or 60-day expiry (configurable)
+- Recommended for production use
+- More secure than user tokens
+
+#### Option C: Production (System User - API Method)
+
+**Best for:** Automated provisioning, infrastructure-as-code
+
+System user tokens can be generated programmatically using Meta's Business Management APIs. This requires:
+1. An existing admin access token
+2. A system user ID
+3. Your app ID and app secret
+
+**Install the app for the system user:**
+```bash
+curl \
+  -F "business_app=YOUR_APP_ID" \
+  -F "access_token=ADMIN_ACCESS_TOKEN" \
+  "https://graph.facebook.com/v21.0/SYSTEM_USER_ID/applications"
+```
+
+**Generate a permanent access token:**
+```bash
+curl \
+  -F "business_app=YOUR_APP_ID" \
+  -F "scope=ads_management,ads_read,read_insights" \
+  -F "appsecret_proof=HMAC_SHA256_HASH" \
+  -F "access_token=ADMIN_ACCESS_TOKEN" \
+  "https://graph.facebook.com/v21.0/SYSTEM_USER_ID/access_tokens"
+```
+
+**Generate a 60-day expiring token:**
+```bash
+# Add this parameter:
+-F "set_token_expires_in_60_days=true"
+```
+
+📖 **Documentation:**
+- [Business Management APIs - Install Apps and Generate Tokens](https://developers.facebook.com/docs/business-management-apis/system-users/install-apps-and-generate-tokens/)
+- [System User Access Token Handling](https://developers.facebook.com/docs/marketing-api/guides/smb/system-user-access-token-handling/)
+
 **Step 4: Get Your Ad Account ID**
 
 1. Go to [Ads Manager](https://adsmanager.facebook.com/)
@@ -298,16 +362,30 @@ System User tokens don't expire, unlike personal tokens which expire in 60 days.
 
 ```bash
 # In src/meta-ads-mcp/.env
+
+# Access token (use system user token for production)
 META_ACCESS_TOKEN=EAAxxxxxxxxxxxxxxx...
+
 # Add the "act_" prefix to your numeric Ad Account ID
 META_AD_ACCOUNT_ID=act_123456789
+
 PORT=3004
 ```
 
+**Token Recommendations:**
+- **Development:** Use Graph API Explorer tokens (short-lived, 1-2 hours)
+- **CI/CD & Testing:** Use long-lived user tokens or system user tokens (60 days)
+- **Production:** Use system user tokens (permanent or 60-day, depending on your security policy)
+
 **Troubleshooting:**
 
-- If you see "Invalid OAuth access token", your token may have expired (if using a personal token)
-- If you see permission errors, ensure the system user has the Ad Account assigned
+- **"Invalid OAuth access token"**: Your token has expired
+  - Graph API Explorer tokens expire in 1-2 hours
+  - User access tokens expire in 60 days
+  - System user tokens can be permanent or 60-day (check your settings)
+  - Generate a new token using one of the methods above
+- **Permission errors**: Ensure the system user has the Ad Account assigned with appropriate permissions
+- **"Unsupported get request"**: Verify the Ad Account ID has the `act_` prefix
 
 #### Shopify Setup
 

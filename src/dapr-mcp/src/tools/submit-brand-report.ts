@@ -1,36 +1,42 @@
 import { Effect } from "effect";
 import { type McpServer, createLogger } from "mcp-core";
-import { DaprActorSvc } from "dapr-core";
 import type { SubmitBrandReportInput } from "../types.js";
 import { submitBrandReportSchema } from "../types.js";
+import { DataCacheSvc } from "../services/data-cache.service.js";
+import { calculateCacheTTL } from "../utils/cache-ttl.js";
 
 const logger = createLogger("submit_brand_report");
 
 /**
- * Effect for submitting a brand insights report to the BrandInsightsActor.
- * Validates and persists the complete report.
+ * Effect for submitting a brand insights report to the state store cache.
+ * Validates and persists the complete report with history tracking.
  */
 const submitBrandReportEffect = (input: SubmitBrandReportInput) =>
   Effect.gen(function* () {
-    const actorSvc = yield* DaprActorSvc;
+    const cacheSvc = yield* DataCacheSvc;
 
-    logger.debug("Submitting brand report", {
+    // Brand reports don't expire (no date range in actorId)
+    const ttl = calculateCacheTTL(input.actorId);
+
+    logger.debug("Submitting brand report to cache", {
       actorId: input.actorId,
       healthScore: input.report.summary.overallHealthScore,
       sources: input.report.metadata.sources,
+      ttl: ttl ? `${ttl}s` : "no expiration",
     });
 
-    yield* actorSvc.invokeMethod(
-      "BrandInsightsActor",
+    // Save to state store
+    const result = yield* cacheSvc.saveData(
       input.actorId,
-      "saveReport",
-      input.report
+      input.report,
+      ttl
     );
 
-    logger.info("Brand report submitted successfully", {
+    logger.info("Brand report cached successfully", {
       actorId: input.actorId,
       healthScore: input.report.summary.overallHealthScore,
       dateRange: input.report.metadata.dateRange,
+      cachedAt: result.cachedAt,
     });
 
     return {
@@ -40,9 +46,8 @@ const submitBrandReportEffect = (input: SubmitBrandReportInput) =>
           text: JSON.stringify(
             {
               success: true,
-              actorType: "BrandInsightsActor",
-              actorId: input.actorId,
-              message: "Brand insights report persisted successfully",
+              cacheKey: input.actorId,
+              message: "Brand insights report cached successfully",
               summary: {
                 healthScore: input.report.summary.overallHealthScore,
                 sources: input.report.metadata.sources,
@@ -51,6 +56,8 @@ const submitBrandReportEffect = (input: SubmitBrandReportInput) =>
                 concernsCount: input.report.insights.concerns.length,
                 recommendationsCount: input.report.insights.recommendations.length,
               },
+              cachedAt: result.cachedAt,
+              ttl: ttl ? `${ttl} seconds` : "no expiration",
             },
             null,
             2
@@ -59,44 +66,23 @@ const submitBrandReportEffect = (input: SubmitBrandReportInput) =>
       ],
       structuredContent: {
         success: true,
-        actorType: "BrandInsightsActor",
-        actorId: input.actorId,
-        message: "Brand insights report persisted successfully",
+        cacheKey: input.actorId,
+        message: "Brand insights report cached successfully",
+        cachedAt: result.cachedAt,
       },
     };
   }).pipe(
-    Effect.catchTags({
-      DaprActorError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Failed to submit brand report: ${error.message}`,
-            },
-          ],
-          isError: true as const,
-        }),
-      DaprTimeoutError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Brand report submission timed out after ${error.duration}: ${error.message}`,
-            },
-          ],
-          isError: true as const,
-        }),
-      DaprConnectionError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Dapr connection error: ${error.message} (${error.host}:${error.port})`,
-            },
-          ],
-          isError: true as const,
-        }),
-    })
+    Effect.catchTag("CacheError", (error) =>
+      Effect.succeed({
+        content: [
+          {
+            type: "text" as const,
+            text: `Failed to cache brand report: ${error.message}${error.key ? ` (key: ${error.key})` : ""}`,
+          },
+        ],
+        isError: true as const,
+      })
+    )
   );
 
 /**
@@ -109,7 +95,7 @@ export function registerSubmitBrandReportTool(server: McpServer): void {
     {
       title: "Submit Brand Insights Report",
       description:
-        "Persist a brand insights report to the BrandInsightsActor. Call this after synthesizing analytics data from GA4, Shopify, and other sources. The report will be stored with history for trend analysis.",
+        "Cache a brand insights report to the state store. Call this after synthesizing analytics data from GA4, Shopify, and other sources. The report will be cached with history tracking for trend analysis.",
       inputSchema: submitBrandReportSchema,
     },
     (args) => {
@@ -119,7 +105,7 @@ export function registerSubmitBrandReportTool(server: McpServer): void {
       };
 
       return Effect.runPromise(
-        submitBrandReportEffect(input).pipe(Effect.provide(DaprActorSvc.Default))
+        submitBrandReportEffect(input).pipe(Effect.provide(DataCacheSvc.Default))
       );
     }
   );

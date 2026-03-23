@@ -192,6 +192,40 @@ export const submitShopifyDataSchema = {
 };
 
 /**
+ * Meta campaign breakdown schema
+ */
+const metaCampaignSchema = z.object({
+  campaignName: z.string().describe("Campaign name"),
+  spend: z.number().describe("Total spend on this campaign"),
+  conversions: z.number().describe("Number of conversions from this campaign"),
+  roas: z.number().describe("Return on ad spend for this campaign"),
+});
+
+/**
+ * Input schema for submit_meta_data tool.
+ * Structured output tool for Meta Ads analyst agents.
+ */
+export const submitMetaDataSchema = {
+  actorId: z
+    .string()
+    .describe(
+      "The actor ID for storing this data. Use format: 'meta-{brandId}-{startDate}-{endDate}' (e.g., 'meta-default-2025-03-01-2025-03-07')"
+    ),
+  data: z.object({
+    dateRange: dateRangeSchema.describe("The date range this data covers"),
+    totalSpend: z.number().describe("Total ad spend"),
+    totalImpressions: z.number().describe("Total impressions"),
+    totalClicks: z.number().describe("Total clicks"),
+    totalConversions: z.number().describe("Total conversions"),
+    averageCPA: z.number().describe("Average cost per acquisition"),
+    averageROAS: z.number().describe("Average return on ad spend"),
+    averageCTR: z.number().describe("Average click-through rate as percentage (0-100)"),
+    topCampaigns: z.array(metaCampaignSchema).describe("Top performing campaigns (limit to 5)"),
+    observations: z.array(z.string()).optional().describe("Key observations from the data (2-3 insights)"),
+  }).describe("The Meta Ads analytics data to persist"),
+};
+
+/**
  * Brand recommendation schema
  */
 const brandRecommendationSchema = z.object({
@@ -246,7 +280,7 @@ export const submitBrandReportSchema = {
  */
 export const getCachedDataSchema = {
   source: z
-    .enum(["ga4", "shopify"])
+    .enum(["ga4", "shopify", "meta"])
     .describe("The data source to retrieve from"),
   actorId: z
     .string()
@@ -291,6 +325,22 @@ export interface SubmitShopifyDataInput {
   };
 }
 
+export interface SubmitMetaDataInput {
+  actorId: string;
+  data: {
+    dateRange: { startDate: string; endDate: string };
+    totalSpend: number;
+    totalImpressions: number;
+    totalClicks: number;
+    totalConversions: number;
+    averageCPA: number;
+    averageROAS: number;
+    averageCTR: number;
+    topCampaigns: Array<{ campaignName: string; spend: number; conversions: number; roas: number }>;
+    observations?: string[];
+  };
+}
+
 export interface SubmitBrandReportInput {
   actorId: string;
   report: {
@@ -326,7 +376,7 @@ export interface SubmitBrandReportInput {
 }
 
 export interface GetCachedDataInput {
-  source: "ga4" | "shopify";
+  source: "ga4" | "shopify" | "meta";
   actorId: string;
 }
 

@@ -33,6 +33,17 @@ export class DaprConnectionError extends Data.TaggedError("DaprConnectionError")
 }> {}
 
 /**
+ * Error when state store operations fail
+ */
+export class DaprStateError extends Data.TaggedError("DaprStateError")<{
+  readonly message: string;
+  readonly storeName?: string;
+  readonly key?: string;
+  readonly statusCode?: number;
+  readonly cause?: unknown;
+}> {}
+
+/**
  * Union type of all Dapr errors for exhaustive error handling
  */
-export type DaprError = DaprActorError | DaprTimeoutError | DaprConnectionError;
+export type DaprError = DaprActorError | DaprTimeoutError | DaprConnectionError | DaprStateError;

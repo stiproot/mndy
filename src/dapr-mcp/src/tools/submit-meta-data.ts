@@ -1,24 +1,27 @@
 import { Effect } from "effect";
 import { type McpServer, createLogger } from "mcp-core";
-import type { SubmitShopifyDataInput } from "../types.js";
-import { submitShopifyDataSchema } from "../types.js";
+import type { SubmitMetaDataInput } from "../types.js";
+import { submitMetaDataSchema } from "../types.js";
 import { DataCacheSvc } from "../services/data-cache.service.js";
 import { calculateCacheTTL } from "../utils/cache-ttl.js";
 
-const logger = createLogger("submit_shopify_data");
+const logger = createLogger("submit_meta_data");
 
 /**
- * Effect for submitting Shopify data to the state store cache.
+ * Effect for submitting Meta Ads data to the state store cache.
  * Validates and persists the data with automatic TTL based on date range.
+ *
+ * NOTE: This FIXES the missing MetaDataActor bug - previously this tool
+ * referenced a non-existent actor, causing Meta caching to fail.
  */
-const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
+const submitMetaDataEffect = (input: SubmitMetaDataInput) =>
   Effect.gen(function* () {
     const cacheSvc = yield* DataCacheSvc;
 
     // Calculate TTL based on date range
     const ttl = calculateCacheTTL(input.actorId);
 
-    logger.debug("Submitting Shopify data to cache", {
+    logger.debug("Submitting Meta data to cache", {
       actorId: input.actorId,
       dateRange: input.data.dateRange,
       ttl: ttl ? `${ttl}s` : "no expiration",
@@ -31,10 +34,10 @@ const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
       ttl
     );
 
-    logger.info("Shopify data cached successfully", {
+    logger.info("Meta data cached successfully", {
       actorId: input.actorId,
       dateRange: input.data.dateRange,
-      totalOrders: input.data.totalOrders,
+      totalSpend: input.data.totalSpend,
       cachedAt: result.cachedAt,
     });
 
@@ -46,12 +49,13 @@ const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
             {
               success: true,
               cacheKey: input.actorId,
-              message: "Shopify data cached successfully",
+              message: "Meta data cached successfully",
               dateRange: input.data.dateRange,
               metrics: {
-                totalRevenue: input.data.totalRevenue,
-                totalOrders: input.data.totalOrders,
-                averageOrderValue: input.data.averageOrderValue,
+                totalSpend: input.data.totalSpend,
+                totalConversions: input.data.totalConversions,
+                averageROAS: input.data.averageROAS,
+                averageCPA: input.data.averageCPA,
               },
               cachedAt: result.cachedAt,
               ttl: ttl ? `${ttl} seconds` : "no expiration",
@@ -64,7 +68,7 @@ const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
       structuredContent: {
         success: true,
         cacheKey: input.actorId,
-        message: "Shopify data cached successfully",
+        message: "Meta data cached successfully",
         cachedAt: result.cachedAt,
       },
     };
@@ -74,7 +78,7 @@ const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
         content: [
           {
             type: "text" as const,
-            text: `Failed to cache Shopify data: ${error.message}${error.key ? ` (key: ${error.key})` : ""}`,
+            text: `Failed to cache Meta data: ${error.message}${error.key ? ` (key: ${error.key})` : ""}`,
           },
         ],
         isError: true as const,
@@ -83,26 +87,26 @@ const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
   );
 
 /**
- * Register the submit_shopify_data tool on the MCP server.
- * This is a structured output tool for Shopify analyst agents to persist collected data.
+ * Register the submit_meta_data tool on the MCP server.
+ * This is a structured output tool for Meta Ads analyst agents to persist collected data.
  */
-export function registerSubmitShopifyDataTool(server: McpServer): void {
+export function registerSubmitMetaDataTool(server: McpServer): void {
   server.registerTool(
-    "submit_shopify_data",
+    "submit_meta_data",
     {
-      title: "Submit Shopify Analytics Data",
+      title: "Submit Meta Ads Analytics Data",
       description:
-        "Cache Shopify analytics data to the state store. Call this after gathering data using shopify_get_analytics or shopify_get_orders to save the results. The data will be cached with automatic TTL and can be retrieved later for analysis without re-fetching from Shopify.",
-      inputSchema: submitShopifyDataSchema,
+        "Cache Meta Ads analytics data to the state store. Call this after gathering data using meta_get_insights to save the results. The data will be cached with automatic TTL and can be retrieved later for analysis without re-fetching from Meta.",
+      inputSchema: submitMetaDataSchema,
     },
     (args) => {
-      const input: SubmitShopifyDataInput = {
+      const input: SubmitMetaDataInput = {
         actorId: args.actorId as string,
-        data: args.data as SubmitShopifyDataInput["data"],
+        data: args.data as SubmitMetaDataInput["data"],
       };
 
       return Effect.runPromise(
-        submitShopifyDataEffect(input).pipe(Effect.provide(DataCacheSvc.Default))
+        submitMetaDataEffect(input).pipe(Effect.provide(DataCacheSvc.Default))
       );
     }
   );

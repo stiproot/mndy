@@ -19,16 +19,54 @@ MCP (Model Context Protocol) server for Meta Marketing API (Facebook/Instagram A
 
 ### 2. Generate Access Token
 
-**For Development (short-lived):**
-1. Go to [Graph API Explorer](https://developers.facebook.com/tools/explorer/)
-2. Select your app
-3. Generate a User Access Token with `ads_read` permission
+Choose based on your use case:
 
-**For Production (long-lived):**
-1. Go to Business Manager → Settings → System Users
+#### Development (Quick Start)
+
+Use the [Graph API Explorer](https://developers.facebook.com/tools/explorer/):
+1. Select your app
+2. Click "Generate Access Token"
+3. Select permissions: `ads_read`, `read_insights`
+4. Generate and copy the token
+
+**Note:** These tokens expire in 1-2 hours. The "no expiry" option is no longer available in the UI.
+
+#### Production (System User - Recommended)
+
+**Manual Generation:**
+1. Go to [Business Manager](https://business.facebook.com/settings/) → Settings → System Users
 2. Create a system user with Admin role
 3. Assign the system user to your ad accounts
-4. Generate a token - these don't expire
+4. Generate a token (permanent or 60-day expiry)
+
+**Programmatic Generation:**
+System user tokens can be created via API for automated provisioning:
+
+```bash
+# Step 1: Install the app for the system user
+curl -X POST \
+  -F "business_app=YOUR_APP_ID" \
+  -F "access_token=ADMIN_ACCESS_TOKEN" \
+  "https://graph.facebook.com/v21.0/SYSTEM_USER_ID/applications"
+
+# Step 2: Generate permanent access token
+curl -X POST \
+  -F "business_app=YOUR_APP_ID" \
+  -F "scope=ads_management,ads_read,read_insights" \
+  -F "appsecret_proof=HMAC_SHA256_HASH" \
+  -F "access_token=ADMIN_ACCESS_TOKEN" \
+  "https://graph.facebook.com/v21.0/SYSTEM_USER_ID/access_tokens"
+```
+
+**For 60-day expiring tokens:** Add `-F "set_token_expires_in_60_days=true"`
+
+**Requirements:**
+- Initial admin access token (to make API calls)
+- `appsecret_proof` = HMAC-SHA256(access_token, app_secret)
+
+**Resources:**
+- [Install Apps and Generate Tokens](https://developers.facebook.com/docs/business-management-apis/system-users/install-apps-and-generate-tokens/)
+- [System User Access Token Handling](https://developers.facebook.com/docs/marketing-api/guides/smb/system-user-access-token-handling/)
 
 ### 3. Get Ad Account ID
 
@@ -52,6 +90,39 @@ META_AD_ACCOUNT_ID=act_123456789
 PORT=3004
 LOG_LEVEL=info
 ```
+
+## Token Management
+
+### Token Types
+
+| Type | Expiry | Best For | Generation |
+|------|--------|----------|------------|
+| User (short) | 1-2 hours | Quick testing | Graph API Explorer |
+| User (long) | 60 days | Development | Token exchange API |
+| System User | Permanent or 60-day | Production | Business Manager or API |
+
+### Token Security
+
+**Best Practices:**
+1. Never commit tokens to version control
+2. Use environment variables or secret management systems
+3. Rotate tokens periodically (even if permanent)
+4. Use system users for production, not personal accounts
+5. Limit token permissions to minimum required scopes
+
+### Token Refresh
+
+System user tokens can be refreshed programmatically:
+
+```bash
+# Refresh a 60-day token before it expires
+curl -X POST \
+  -F "grant_type=fb_refresh_token" \
+  -F "fb_refresh_token=CURRENT_TOKEN" \
+  "https://graph.facebook.com/v21.0/oauth/access_token?client_id=APP_ID&client_secret=APP_SECRET"
+```
+
+**Note:** Permanent system user tokens don't need refreshing.
 
 ## Running
 

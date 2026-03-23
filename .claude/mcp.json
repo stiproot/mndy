@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "ga4": {
+      "transport": "http",
+      "url": "http://localhost:3003/mcp"
+    },
+    "meta-ads": {
+      "transport": "http",
+      "url": "http://localhost:3004/mcp"
+    },
+    "shopify": {
+      "transport": "http",
+      "url": "http://localhost:3005/mcp"
+    },
+    "dapr": {
+      "transport": "http",
+      "url": "http://localhost:3006/mcp"
+    },
+    "github-issues": {
+      "transport": "http",
+      "url": "http://localhost:3001/mcp"
+    }
+  }
+}

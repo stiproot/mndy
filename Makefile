@@ -9,6 +9,7 @@ DOCKER ?= podman
 .PHONY: install install-node install-python \
         dev serve-ui serve-vis serve-azdo run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
         run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp run-dapr-mcp run-dapr-actor-svc build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
+        refresh-meta-token \
         build build-ui build-vis build-azdo build-ui-api \
         lint lint-md lint-md-fix lint-python lint-node lint-vis \
         lock lock-python lock-node \
@@ -98,7 +99,7 @@ run-github-issues-mcp: build-mcp ## Run GitHub Issues MCP server (port 3001)
 run-ga4-mcp: build-mcp ## Run GA4 MCP server (port 3001)
 	bun run --cwd src/ga4-mcp start
 
-run-meta-ads-mcp: build-mcp ## Run Meta Ads MCP server (port 3001)
+run-meta-ads-mcp: build-mcp ## Run Meta Ads MCP server (port 3004)
 	bun run --cwd src/meta-ads-mcp start
 
 run-shopify-mcp: build-mcp ## Run Shopify MCP server (port 3001)
@@ -138,6 +139,13 @@ run-dapr-actor-svc: build-dapr-actor-svc ## Run Dapr actor service with sidecar 
 		--app-port 3007 \
 		--components-path src/dapr/components.localhost \
 		-- bun run --cwd src/dapr-actor-svc start
+
+# ==============================================================================
+# Scripts
+# ==============================================================================
+
+refresh-meta-token: ## Refresh Meta access token and update .env file
+	bun run --cwd scripts refresh-meta-token
 
 # ==============================================================================
 # Claude Code / Agent

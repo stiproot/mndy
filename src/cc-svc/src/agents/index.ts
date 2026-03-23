@@ -187,7 +187,9 @@ export function createGA4AnalystAgent(): Agent | null {
     .permissionMode("bypassPermissions")
     .maxTurns(config.MAX_SUBAGENT_TURNS)
     .maxBudget(config.MAX_SUBAGENT_BUDGET_USD)
-    .persistSession(false);
+    .persistSession(false)
+    // Disable filesystem tools - only use MCP tools
+    .disallowTools("Read", "Write", "Edit", "Bash", "Glob", "Grep");
 
   if (daprServer) {
     builder.mcpServer("dapr", daprServer);
@@ -215,7 +217,9 @@ export function createShopifyAnalystAgent(): Agent | null {
     .permissionMode("bypassPermissions")
     .maxTurns(config.MAX_SUBAGENT_TURNS)
     .maxBudget(config.MAX_SUBAGENT_BUDGET_USD)
-    .persistSession(false);
+    .persistSession(false)
+    // Disable filesystem tools - only use MCP tools
+    .disallowTools("Read", "Write", "Edit", "Bash", "Glob", "Grep");
 
   if (daprServer) {
     builder.mcpServer("dapr", daprServer);
@@ -243,7 +247,9 @@ export function createMetaAnalystAgent(): Agent | null {
     .permissionMode("bypassPermissions")
     .maxTurns(config.MAX_SUBAGENT_TURNS)
     .maxBudget(config.MAX_SUBAGENT_BUDGET_USD)
-    .persistSession(false);
+    .persistSession(false)
+    // Disable filesystem tools - only use MCP tools
+    .disallowTools("Read", "Write", "Edit", "Bash", "Glob", "Grep");
 
   if (daprServer) {
     builder.mcpServer("dapr", daprServer);
@@ -265,7 +271,9 @@ export function createBrandOrchestratorAgent(): Agent {
     .permissionMode("bypassPermissions")
     .maxTurns(config.MAX_ORCHESTRATOR_TURNS)
     .maxBudget(config.MAX_BUDGET_USD)
-    .persistSession(false);
+    .persistSession(false)
+    // Disable filesystem tools - only use MCP tools
+    .disallowTools("Read", "Write", "Edit", "Bash", "Glob", "Grep");
 
   if (daprServer) {
     builder.mcpServer("dapr", daprServer);

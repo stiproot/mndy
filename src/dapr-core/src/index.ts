@@ -6,8 +6,9 @@ export {
   DaprActorError,
   DaprTimeoutError,
   DaprConnectionError,
+  DaprStateError,
   type DaprError,
 } from "./errors.js";
 
 // Services
-export { DaprHttpSvc, DaprActorSvc } from "./services/index.js";
+export { DaprHttpSvc, DaprActorSvc, DaprStateSvc, type StateItem, type StateMetadata } from "./services/index.js";

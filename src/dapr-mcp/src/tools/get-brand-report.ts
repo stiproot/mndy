@@ -1,30 +1,27 @@
 import { Effect } from "effect";
 import { type McpServer, createLogger } from "mcp-core";
-import { DaprActorSvc } from "dapr-core";
 import type { GetBrandReportInput } from "../types.js";
 import { getBrandReportSchema } from "../types.js";
+import { DataCacheSvc, CacheError } from "../services/data-cache.service.js";
 
 const logger = createLogger("get_brand_report");
 
 /**
- * Effect for retrieving a brand insights report from the BrandInsightsActor.
+ * Effect for retrieving a brand insights report from the state store.
+ * Brand reports don't have TTL expiration (no date ranges).
  */
 const getBrandReportEffect = (input: GetBrandReportInput) =>
   Effect.gen(function* () {
-    const actorSvc = yield* DaprActorSvc;
+    const cacheSvc = yield* DataCacheSvc;
 
     logger.debug("Retrieving brand report", {
       actorId: input.actorId,
     });
 
-    const data = yield* actorSvc.invokeMethod(
-      "BrandInsightsActor",
-      input.actorId,
-      "getReport",
-      undefined
-    );
+    // Get report from state store
+    const result = yield* cacheSvc.getData(input.actorId);
 
-    if (!data) {
+    if (!result.found) {
       logger.info("No brand report found", {
         actorId: input.actorId,
       });
@@ -38,7 +35,7 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
                 success: true,
                 found: false,
                 actorId: input.actorId,
-                message: "No brand report found for this actor ID",
+                message: "No brand report found for this cache key",
               },
               null,
               2
@@ -56,6 +53,7 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
 
     logger.info("Brand report retrieved successfully", {
       actorId: input.actorId,
+      cachedAt: result.metadata?.cachedAt,
     });
 
     return {
@@ -67,7 +65,8 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
               success: true,
               found: true,
               actorId: input.actorId,
-              data,
+              data: result.data,
+              metadata: result.metadata,
             },
             null,
             2
@@ -78,47 +77,15 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
         success: true,
         found: true,
         actorId: input.actorId,
-        data,
+        data: result.data,
+        metadata: result.metadata,
       },
     };
-  }).pipe(
-    Effect.catchTags({
-      DaprActorError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Failed to retrieve brand report: ${error.message}`,
-            },
-          ],
-          isError: true as const,
-        }),
-      DaprTimeoutError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Brand report retrieval timed out after ${error.duration}: ${error.message}`,
-            },
-          ],
-          isError: true as const,
-        }),
-      DaprConnectionError: (error) =>
-        Effect.succeed({
-          content: [
-            {
-              type: "text" as const,
-              text: `Dapr connection error: ${error.message} (${error.host}:${error.port})`,
-            },
-          ],
-          isError: true as const,
-        }),
-    })
-  );
+  });
 
 /**
  * Register the get_brand_report tool on the MCP server.
- * This tool retrieves a persisted brand insights report from BrandInsightsActor.
+ * This tool retrieves a persisted brand insights report from the state store.
  */
 export function registerGetBrandReportTool(server: McpServer): void {
   server.registerTool(
@@ -126,7 +93,7 @@ export function registerGetBrandReportTool(server: McpServer): void {
     {
       title: "Get Brand Insights Report",
       description:
-        "Retrieve a persisted brand insights report from the BrandInsightsActor. Use this to get a previously generated report for a brand.",
+        "Retrieve a persisted brand insights report from the state store. Use this to get a previously generated report for a brand. Brand reports don't expire (no TTL).",
       inputSchema: getBrandReportSchema,
     },
     (args) => {
@@ -135,7 +102,7 @@ export function registerGetBrandReportTool(server: McpServer): void {
       };
 
       return Effect.runPromise(
-        getBrandReportEffect(input).pipe(Effect.provide(DaprActorSvc.Default))
+        getBrandReportEffect(input).pipe(Effect.provide(DataCacheSvc.Default))
       );
     }
   );

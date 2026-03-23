@@ -115,6 +115,47 @@ export class DaprHttpSvc extends Effect.Service<DaprHttpSvc>()("DaprHttpSvc", {
         ),
 
       /**
+       * Make a DELETE request to the Dapr sidecar
+       */
+      delete: (
+        path: string,
+        headers: Record<string, string> = {}
+      ): Effect.Effect<void, DaprConnectionError | DaprTimeoutError> =>
+        Effect.tryPromise({
+          try: async () => {
+            const response = await fetch(`${baseUrl}/${path}`, {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                ...headers,
+              },
+            });
+
+            if (!response.ok) {
+              const errorText = await response.text().catch(() => "Unknown error");
+              throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+          },
+          catch: (error) =>
+            new DaprConnectionError({
+              message: `Dapr HTTP DELETE failed: ${error instanceof Error ? error.message : String(error)}`,
+              host: config.daprHost,
+              port: config.daprHttpPort,
+              cause: error,
+            }),
+        }).pipe(
+          Effect.timeoutFail({
+            duration: REQUEST_TIMEOUT,
+            onTimeout: () =>
+              new DaprTimeoutError({
+                message: "Dapr HTTP request timed out",
+                duration: Duration.format(REQUEST_TIMEOUT),
+              }),
+          }),
+          Effect.withSpan("DaprHttpSvc.delete", { attributes: { path } })
+        ),
+
+      /**
        * Get the base URL for the Dapr sidecar
        */
       getBaseUrl: () => baseUrl,
