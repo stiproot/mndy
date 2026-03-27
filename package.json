@@ -17,6 +17,7 @@
     "src/ga4-mcp",
     "src/meta-ads-mcp",
     "src/shopify-mcp",
+    "src/markdown-mcp",
     "src/cc-core",
     "src/cc-svc",
     "scripts"
