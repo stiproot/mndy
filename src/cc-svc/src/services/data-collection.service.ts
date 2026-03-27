@@ -17,7 +17,7 @@ import { getConfig } from "../config/index.js";
 
 /**
  * Service for collecting raw analytics data from various sources
- * and persisting to Dapr actors via the submit tools.
+ * and persisting to state store cache via the submit tools.
  */
 export class DataCollectionService {
   /**
@@ -57,12 +57,12 @@ export class DataCollectionService {
     const collectionPromises = sources.map(async (source) => {
       // Skip if cached and not forcing refresh
       if (cacheStatus[source] && !force) {
-        const actorId = this.buildActorId(source, brandId, startDate, endDate);
+        const stateKey = this.buildActorId(source, brandId, startDate, endDate);
         return {
           source,
           result: {
             status: "cached" as const,
-            actorId,
+            stateKey,
             message: "Data already cached",
           },
         };
@@ -80,12 +80,12 @@ export class DataCollectionService {
       }
 
       try {
-        const actorId = await this.collectFromSource(source, startDate, endDate, brandId);
+        const stateKey = await this.collectFromSource(source, startDate, endDate, brandId);
         return {
           source,
           result: {
             status: "success" as const,
-            actorId,
+            stateKey,
           },
         };
       } catch (error) {
@@ -142,15 +142,15 @@ export class DataCollectionService {
     // Check each source in parallel
     const checks = await Promise.all(
       sources.map(async (source) => {
-        const actorId = this.buildActorId(source, brandId, dateRange.startDate, dateRange.endDate);
-        const cached = await this.checkActorData(source, actorId);
+        const stateKey = this.buildActorId(source, brandId, dateRange.startDate, dateRange.endDate);
+        const cached = await this.checkActorData(source, stateKey);
 
-        logger.info(`Cache status for ${source}: ${cached ? "HIT" : "MISS"}`, { actorId }, "DataCollection");
+        logger.info(`Cache status for ${source}: ${cached ? "HIT" : "MISS"}`, { stateKey }, "DataCollection");
 
         return {
           source,
           cached,
-          actorId,
+          stateKey,
         };
       })
     );
@@ -159,7 +159,8 @@ export class DataCollectionService {
   }
 
   /**
-   * Build actor ID for a source
+   * Build cache key for a source
+   * Format: {source}-{brandId}-{startDate}-{endDate}
    */
   private buildActorId(
     source: DataSource,
@@ -171,11 +172,11 @@ export class DataCollectionService {
   }
 
   /**
-   * Check if data exists in Dapr actor using dapr-mcp's get_cached_data tool
+   * Check if data exists in state store cache using dapr-mcp's get_cached_data tool
    */
   private async checkActorData(
     source: DataSource,
-    actorId: string
+    stateKey: string
   ): Promise<boolean> {
     try {
       const config = getConfig();
@@ -196,7 +197,7 @@ export class DataCollectionService {
           method: "tools/call",
           params: {
             name: "get_cached_data",
-            arguments: { source, actorId },
+            arguments: { source, stateKey },
           },
         }),
       });
@@ -214,14 +215,14 @@ export class DataCollectionService {
       };
 
       if (result.error) {
-        logger.debug("Cache check error", { source, actorId, error: result.error }, "DataCollection");
+        logger.debug("Cache check error", { source, stateKey, error: result.error }, "DataCollection");
         return false;
       }
 
       // Check if data was found in the structured response
       const found = result.result?.structuredContent?.found ?? false;
 
-      logger.debug("Cache check result", { source, actorId, found }, "DataCollection");
+      logger.debug("Cache check result", { source, stateKey, found }, "DataCollection");
       return found;
     } catch (error) {
       logger.warn(
@@ -308,7 +309,7 @@ export class DataCollectionService {
       );
     }
 
-    // Return the actor ID where data was persisted
+    // Return the cache key where data was persisted
     return `ga4-${brandId}-${startDate}-${endDate}`;
   }
 
@@ -339,7 +340,7 @@ export class DataCollectionService {
       );
     }
 
-    // Return the actor ID where data was persisted
+    // Return the cache key where data was persisted
     return `shopify-${brandId}-${startDate}-${endDate}`;
   }
 
@@ -370,7 +371,7 @@ export class DataCollectionService {
       );
     }
 
-    // Return the actor ID where data was persisted
+    // Return the cache key where data was persisted
     return `meta-${brandId}-${startDate}-${endDate}`;
   }
 }

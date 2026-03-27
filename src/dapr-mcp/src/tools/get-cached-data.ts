@@ -16,16 +16,16 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
 
     logger.debug("Retrieving cached data", {
       source: input.source,
-      actorId: input.actorId,
+      actorId: input.stateKey,
     });
 
     // Get data from state store with TTL validation
-    const result = yield* cacheSvc.getData(input.actorId);
+    const result = yield* cacheSvc.getData(input.stateKey);
 
     if (!result.found) {
       logger.info("No cached data found", {
         source: input.source,
-        actorId: input.actorId,
+        actorId: input.stateKey,
       });
 
       return {
@@ -38,7 +38,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
                 found: false,
                 valid: false,
                 source: input.source,
-                actorId: input.actorId,
+                actorId: input.stateKey,
                 message: "No cached data found for this cache key",
               },
               null,
@@ -51,7 +51,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
           found: false,
           valid: false,
           source: input.source,
-          actorId: input.actorId,
+          actorId: input.stateKey,
           data: null,
         },
       };
@@ -61,7 +61,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
     if (!result.valid) {
       logger.info("Cached data found but expired", {
         source: input.source,
-        actorId: input.actorId,
+        actorId: input.stateKey,
         expiresAt: result.metadata?.expiresAt,
       });
 
@@ -75,7 +75,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
                 found: true,
                 valid: false,
                 source: input.source,
-                actorId: input.actorId,
+                actorId: input.stateKey,
                 message: "Cached data found but has expired",
                 metadata: result.metadata,
               },
@@ -89,7 +89,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
           found: true,
           valid: false,
           source: input.source,
-          actorId: input.actorId,
+          actorId: input.stateKey,
           data: null,
           metadata: result.metadata,
         },
@@ -98,7 +98,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
 
     logger.info("Cached data retrieved successfully", {
       source: input.source,
-      actorId: input.actorId,
+      actorId: input.stateKey,
       cachedAt: result.metadata?.cachedAt,
     });
 
@@ -112,7 +112,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
               found: true,
               valid: true,
               source: input.source,
-              actorId: input.actorId,
+              actorId: input.stateKey,
               data: result.data,
               metadata: result.metadata,
             },
@@ -126,7 +126,7 @@ const getCachedDataEffect = (input: GetCachedDataInput) =>
         found: true,
         valid: true,
         source: input.source,
-        actorId: input.actorId,
+        actorId: input.stateKey,
         data: result.data,
         metadata: result.metadata,
       },
@@ -149,7 +149,7 @@ export function registerGetCachedDataTool(server: McpServer): void {
     (args) => {
       const input: GetCachedDataInput = {
         source: args.source as "ga4" | "shopify" | "meta",
-        actorId: args.actorId as string,
+        stateKey: args.stateKey as string,
       };
 
       return Effect.runPromise(

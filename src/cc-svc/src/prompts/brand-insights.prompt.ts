@@ -9,7 +9,7 @@ export const GA4_ANALYST_PROMPT = `You are a Google Analytics 4 data analyst age
 You have access to GA4 and data persistence tools.
 
 ## Your Task
-When given a date range and actor ID, you must:
+When given a date range and cache key, you must:
 1. Query overall traffic metrics (sessions, users, conversions)
 2. Analyze traffic sources and channels
 3. Identify top performing pages
@@ -18,7 +18,7 @@ When given a date range and actor ID, you must:
 
 ## Tools Available
 - ga4_run_report: Query GA4 reports with dimensions and metrics
-- submit_ga4_data: **REQUIRED** - Persist your analysis to the GA4DataActor
+- submit_ga4_data: **REQUIRED** - Persist your analysis to the state store cache
 
 ## Common Metrics to Query
 - sessions, activeUsers, newUsers, totalUsers
@@ -37,7 +37,7 @@ When given a date range and actor ID, you must:
 
 ## submit_ga4_data Parameters
 You MUST call submit_ga4_data with:
-- actorId: Use the format provided in your task (e.g., "ga4-default-2025-03-01-2025-03-07")
+- stateKey: Use the format provided in your task (e.g., "ga4-default-2025-03-01-2025-03-07")
 - data: Object containing:
   - dateRange: { startDate, endDate }
   - sessions, activeUsers, newUsers, conversions
@@ -66,7 +66,7 @@ export const SHOPIFY_ANALYST_PROMPT = `You are a Shopify e-commerce analyst agen
 You have access to Shopify and data persistence tools.
 
 ## Your Task
-When given a date range and actor ID, you must:
+When given a date range and cache key, you must:
 1. Retrieve overall sales metrics (revenue, orders, AOV)
 2. Analyze customer segments (new vs returning)
 3. Identify top selling products
@@ -76,7 +76,7 @@ When given a date range and actor ID, you must:
 ## Tools Available
 - shopify_get_analytics: Get aggregated store analytics for a date range
 - shopify_get_orders: Get detailed order data with filtering options
-- submit_shopify_data: **REQUIRED** - Persist your analysis to the ShopifyDataActor
+- submit_shopify_data: **REQUIRED** - Persist your analysis to the state store cache
 
 ## Workflow
 1. Use shopify_get_analytics for aggregate metrics
@@ -86,7 +86,7 @@ When given a date range and actor ID, you must:
 
 ## submit_shopify_data Parameters
 You MUST call submit_shopify_data with:
-- actorId: Use the format provided in your task (e.g., "shopify-default-2025-03-01-2025-03-07")
+- stateKey: Use the format provided in your task (e.g., "shopify-default-2025-03-01-2025-03-07")
 - data: Object containing:
   - dateRange: { startDate, endDate }
   - totalRevenue, totalOrders, averageOrderValue, totalItemsSold
@@ -115,7 +115,7 @@ export const META_ANALYST_PROMPT = `You are a Meta Ads (Facebook/Instagram) adve
 You have access to Meta Ads and data persistence tools.
 
 ## Your Task
-When given a date range and actor ID, you must:
+When given a date range and cache key, you must:
 1. Retrieve overall ad spend and performance metrics
 2. Analyze campaign effectiveness (ROAS, CPA, CTR)
 3. Identify top performing campaigns and ad sets
@@ -125,7 +125,7 @@ When given a date range and actor ID, you must:
 ## Tools Available
 - meta_get_insights: Get advertising insights at campaign/adset/ad level
 - meta_get_campaigns: List active campaigns
-- submit_meta_data: **REQUIRED** - Persist your analysis to the MetaDataActor
+- submit_meta_data: **REQUIRED** - Persist your analysis to the state store cache
 
 ## Workflow
 1. Use meta_get_campaigns to get campaign list
@@ -135,7 +135,7 @@ When given a date range and actor ID, you must:
 
 ## submit_meta_data Parameters
 You MUST call submit_meta_data with:
-- actorId: Use the format provided in your task (e.g., "meta-default-2025-03-01-2025-03-07")
+- stateKey: Use the format provided in your task (e.g., "meta-default-2025-03-01-2025-03-07")
 - data: Object containing:
   - dateRange: { startDate, endDate }
   - totalSpend, totalImpressions, totalClicks, totalConversions
@@ -177,7 +177,7 @@ Your job is to:
 6. **PERSIST the report using the submit_brand_report tool**
 
 ## Tools Available
-- submit_brand_report: **REQUIRED** - Persist your brand insights report to BrandInsightsActor
+- submit_brand_report: **REQUIRED** - Persist your brand insights report to the state store cache
 
 ## Health Score Calculation
 Consider these factors:
@@ -194,7 +194,7 @@ Consider these factors:
 
 ## submit_brand_report Parameters
 You MUST call submit_brand_report with:
-- actorId: Use the format provided in your task (e.g., "brand-default")
+- stateKey: Use the format provided in your task (e.g., "brand-default")
 - report: Object containing:
   - brand: { analyzedAt: ISO timestamp }
   - summary: { overallHealthScore (0-100), keyMetrics, briefDescription }
@@ -214,67 +214,67 @@ You MUST call submit_brand_report with:
 `;
 
 /**
- * Build the GA4 analyst prompt with date range and actor ID
+ * Build the GA4 analyst prompt with date range and cache key
  */
 export function buildGA4AnalystPrompt(startDate: string, endDate: string, brandId = "default"): string {
-  const actorId = `ga4-${brandId}-${startDate}-${endDate}`;
+  const stateKey = `ga4-${brandId}-${startDate}-${endDate}`;
   return `Analyze GA4 data for the date range: ${startDate} to ${endDate}
 
-Actor ID for persistence: ${actorId}
+Cache Key for persistence: ${stateKey}
 
 WORKFLOW:
 1. Use ga4_run_report to gather traffic and conversion metrics
-2. **REQUIRED**: Call submit_ga4_data with actorId "${actorId}" to persist your findings
+2. **REQUIRED**: Call submit_ga4_data with stateKey "${stateKey}" to persist your findings to the cache
 
 CRITICAL: You MUST call submit_ga4_data as your final action. Do NOT use Bash, shell commands, or other tools to process data. Submit the data directly using submit_ga4_data.
 
 submit_ga4_data expects:
-- actorId: "${actorId}"
+- stateKey: "${stateKey}" (this is the cache key)
 - data: { dateRange: { startDate: "${startDate}", endDate: "${endDate}" }, sessions, activeUsers, newUsers, conversions, conversionRate, bounceRate, avgSessionDuration, topChannels: [{ channel, sessions, conversions }], topPages: [{ page, views }], observations: ["insight1", "insight2"] }
 
 Your task is NOT complete until submit_ga4_data returns success.`;
 }
 
 /**
- * Build the Shopify analyst prompt with date range and actor ID
+ * Build the Shopify analyst prompt with date range and cache key
  */
 export function buildShopifyAnalystPrompt(startDate: string, endDate: string, brandId = "default"): string {
-  const actorId = `shopify-${brandId}-${startDate}-${endDate}`;
+  const stateKey = `shopify-${brandId}-${startDate}-${endDate}`;
   return `Analyze Shopify data for the date range: ${startDate} to ${endDate}
 
-Actor ID for persistence: ${actorId}
+Cache Key for persistence: ${stateKey}
 
 WORKFLOW:
 1. Use shopify_get_analytics to get aggregate metrics
 2. Use shopify_get_orders to get order details for top products
-3. **REQUIRED**: Call submit_shopify_data with actorId "${actorId}" to persist your findings
+3. **REQUIRED**: Call submit_shopify_data with stateKey "${stateKey}" to persist your findings to the cache
 
 CRITICAL: You MUST call submit_shopify_data as your final action. Do NOT use Bash, shell commands, or other tools to process data. Submit the data directly using submit_shopify_data.
 
 submit_shopify_data expects:
-- actorId: "${actorId}"
+- stateKey: "${stateKey}" (this is the cache key)
 - data: { dateRange: { startDate: "${startDate}", endDate: "${endDate}" }, totalRevenue, totalOrders, averageOrderValue, totalItemsSold, newCustomers, returningCustomers, topProducts: [{ product, quantity, revenue }], observations: ["insight1", "insight2"] }
 
 Your task is NOT complete until submit_shopify_data returns success.`;
 }
 
 /**
- * Build the Meta analyst prompt with date range and actor ID
+ * Build the Meta analyst prompt with date range and cache key
  */
 export function buildMetaAnalystPrompt(startDate: string, endDate: string, brandId = "default"): string {
-  const actorId = `meta-${brandId}-${startDate}-${endDate}`;
+  const stateKey = `meta-${brandId}-${startDate}-${endDate}`;
   return `Analyze Meta Ads data for the date range: ${startDate} to ${endDate}
 
-Actor ID for persistence: ${actorId}
+Cache Key for persistence: ${stateKey}
 
 WORKFLOW:
 1. Use meta_get_insights to gather ad performance metrics
-2. **REQUIRED**: Call submit_meta_data with actorId "${actorId}" to persist your findings
+2. **REQUIRED**: Call submit_meta_data with stateKey "${stateKey}" to persist your findings to the cache
 
 CRITICAL: You MUST call submit_meta_data as your final action. Do NOT use Bash, shell commands, or other tools to process data. Submit the data directly using submit_meta_data.
 
 submit_meta_data expects:
-- actorId: "${actorId}"
+- stateKey: "${stateKey}" (this is the cache key)
 - data: { dateRange: { startDate: "${startDate}", endDate: "${endDate}" }, totalSpend, totalImpressions, totalClicks, totalConversions, averageCPA, averageROAS, averageCTR, topCampaigns: [{ campaignName, spend, conversions, roas }], observations: ["insight1", "insight2"] }
 
 Your task is NOT complete until submit_meta_data returns success.`;
@@ -294,7 +294,7 @@ export function buildBrandSynthesisPrompt(
 ): string {
   const sources: string[] = [];
   let dataSection = "";
-  const actorId = `brand-${brandId}`;
+  const stateKey = `brand-${brandId}`;
 
   if (ga4Analysis) {
     sources.push("ga4");
@@ -317,7 +317,7 @@ export function buildBrandSynthesisPrompt(
 
 Date Range: ${startDate} to ${endDate}
 Available Sources: ${sources.join(", ")}
-Actor ID for persistence: ${actorId}
+Cache Key for persistence: ${stateKey}
 Processing Time: ${processingTimeMs}ms
 
 ${dataSection}
@@ -325,12 +325,12 @@ ${dataSection}
 WORKFLOW:
 1. First use get_cached_data to retrieve data for each source
 2. Analyze the data and calculate health score
-3. **REQUIRED**: Call submit_brand_report with actorId "${actorId}" to persist your report
+3. **REQUIRED**: Call submit_brand_report with stateKey "${stateKey}" to persist your report to the cache
 
 CRITICAL: You MUST call submit_brand_report as your final action. Do NOT use Bash, shell commands, jq, or other tools. Submit the report directly using submit_brand_report.
 
 submit_brand_report expects:
-- actorId: "${actorId}"
+- stateKey: "${stateKey}" (this is the cache key)
 - report: {
     brand: { analyzedAt: "<ISO timestamp>" },
     summary: { overallHealthScore: <0-100>, keyMetrics: { revenue, sessions, conversions, roas }, briefDescription: "<string>" },

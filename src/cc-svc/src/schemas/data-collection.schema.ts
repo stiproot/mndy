@@ -16,7 +16,7 @@ export type DataSource = z.infer<typeof dataSourceSchema>;
 
 /**
  * Request schema for /brand-insights/collect
- * Collects raw data from analytics sources and persists to actors
+ * Collects raw data from analytics sources and persists to state store cache
  */
 export const collectRequestSchema = z.object({
   dateRange: dateRangeSchema,
@@ -35,7 +35,7 @@ export const collectResponseSchema = z.object({
     dataSourceSchema,
     z.object({
       status: z.enum(["success", "failed", "skipped", "cached"]),
-      actorId: z.string().optional(),
+      stateKey: z.string().optional(),
       message: z.string().optional(),
     })
   ),
@@ -67,6 +67,6 @@ export type AnalyzeRequest = z.infer<typeof analyzeRequestSchema>;
 export interface SourceCacheStatus {
   source: DataSource;
   cached: boolean;
-  actorId: string;
+  stateKey: string;
   data?: unknown;
 }

@@ -32,6 +32,7 @@ app.listen(PORT, () => {
   );
   console.log(`  MCP Servers:`);
   console.log(`    - GitHub Issues: ${config.GITHUB_ISSUES_MCP_URL}`);
+
   if (config.GA4_MCP_URL) console.log(`    - GA4: ${config.GA4_MCP_URL}`);
   if (config.META_MCP_URL) console.log(`    - Meta Ads: ${config.META_MCP_URL}`);
   if (config.SHOPIFY_MCP_URL) console.log(`    - Shopify: ${config.SHOPIFY_MCP_URL}`);

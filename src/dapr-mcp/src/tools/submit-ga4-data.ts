@@ -16,23 +16,23 @@ const submitGA4DataEffect = (input: SubmitGA4DataInput) =>
     const cacheSvc = yield* DataCacheSvc;
 
     // Calculate TTL based on date range
-    const ttl = calculateCacheTTL(input.actorId);
+    const ttl = calculateCacheTTL(input.stateKey);
 
     logger.debug("Submitting GA4 data to cache", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       dateRange: input.data.dateRange,
       ttl: ttl ? `${ttl}s` : "no expiration",
     });
 
     // Save to state store with TTL
     const result = yield* cacheSvc.saveData(
-      input.actorId,
+      input.stateKey,
       input.data,
       ttl
     );
 
     logger.info("GA4 data cached successfully", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       dateRange: input.data.dateRange,
       sessions: input.data.sessions,
       cachedAt: result.cachedAt,
@@ -45,7 +45,7 @@ const submitGA4DataEffect = (input: SubmitGA4DataInput) =>
           text: JSON.stringify(
             {
               success: true,
-              cacheKey: input.actorId,
+              cacheKey: input.stateKey,
               message: "GA4 data cached successfully",
               dateRange: input.data.dateRange,
               metrics: {
@@ -63,7 +63,7 @@ const submitGA4DataEffect = (input: SubmitGA4DataInput) =>
       ],
       structuredContent: {
         success: true,
-        cacheKey: input.actorId,
+        cacheKey: input.stateKey,
         message: "GA4 data cached successfully",
         cachedAt: result.cachedAt,
       },
@@ -97,7 +97,7 @@ export function registerSubmitGA4DataTool(server: McpServer): void {
     },
     (args) => {
       const input: SubmitGA4DataInput = {
-        actorId: args.actorId as string,
+        stateKey: args.stateKey as string,
         data: args.data as SubmitGA4DataInput["data"],
       };
 

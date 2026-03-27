@@ -139,10 +139,10 @@ const ga4PageSchema = z.object({
  * Structured output tool for GA4 analyst agents.
  */
 export const submitGA4DataSchema = {
-  actorId: z
+  stateKey: z
     .string()
     .describe(
-      "The actor ID for storing this data. Use format: 'ga4-{brandId}-{startDate}-{endDate}' (e.g., 'ga4-default-2025-03-01-2025-03-07')"
+      "The state store cache key for storing this data. Use format: 'ga4-{brandId}-{startDate}-{endDate}' (e.g., 'ga4-default-2025-03-01-2025-03-07')"
     ),
   data: z.object({
     dateRange: dateRangeSchema.describe("The date range this data covers"),
@@ -173,10 +173,10 @@ const shopifyProductSchema = z.object({
  * Structured output tool for Shopify analyst agents.
  */
 export const submitShopifyDataSchema = {
-  actorId: z
+  stateKey: z
     .string()
     .describe(
-      "The actor ID for storing this data. Use format: 'shopify-{brandId}-{startDate}-{endDate}' (e.g., 'shopify-default-2025-03-01-2025-03-07')"
+      "The state store cache key for storing this data. Use format: 'shopify-{brandId}-{startDate}-{endDate}' (e.g., 'shopify-default-2025-03-01-2025-03-07')"
     ),
   data: z.object({
     dateRange: dateRangeSchema.describe("The date range this data covers"),
@@ -206,10 +206,10 @@ const metaCampaignSchema = z.object({
  * Structured output tool for Meta Ads analyst agents.
  */
 export const submitMetaDataSchema = {
-  actorId: z
+  stateKey: z
     .string()
     .describe(
-      "The actor ID for storing this data. Use format: 'meta-{brandId}-{startDate}-{endDate}' (e.g., 'meta-default-2025-03-01-2025-03-07')"
+      "The state store cache key for storing this data. Use format: 'meta-{brandId}-{startDate}-{endDate}' (e.g., 'meta-default-2025-03-01-2025-03-07')"
     ),
   data: z.object({
     dateRange: dateRangeSchema.describe("The date range this data covers"),
@@ -239,10 +239,10 @@ const brandRecommendationSchema = z.object({
  * Structured output tool for brand orchestrator agents.
  */
 export const submitBrandReportSchema = {
-  actorId: z
+  stateKey: z
     .string()
     .describe(
-      "The actor ID for storing this report. Use format: 'brand-{brandId}' (e.g., 'brand-default')"
+      "The state store cache key for storing this report. Use format: 'brand-{brandId}' (e.g., 'brand-default')"
     ),
   report: z.object({
     brand: z.object({
@@ -282,10 +282,10 @@ export const getCachedDataSchema = {
   source: z
     .enum(["ga4", "shopify", "meta"])
     .describe("The data source to retrieve from"),
-  actorId: z
+  stateKey: z
     .string()
     .describe(
-      "The actor ID to query. Use format: '{source}-{brandId}-{startDate}-{endDate}' (e.g., 'ga4-default-2025-03-01-2025-03-07')"
+      "The state store cache key to query. Use format: '{source}-{brandId}-{startDate}-{endDate}' (e.g., 'ga4-default-2025-03-01-2025-03-07')"
     ),
 };
 
@@ -294,7 +294,7 @@ export const getCachedDataSchema = {
 // =============================================================================
 
 export interface SubmitGA4DataInput {
-  actorId: string;
+  stateKey: string;
   data: {
     dateRange: { startDate: string; endDate: string };
     sessions: number;
@@ -311,7 +311,7 @@ export interface SubmitGA4DataInput {
 }
 
 export interface SubmitShopifyDataInput {
-  actorId: string;
+  stateKey: string;
   data: {
     dateRange: { startDate: string; endDate: string };
     totalRevenue: number;
@@ -326,7 +326,7 @@ export interface SubmitShopifyDataInput {
 }
 
 export interface SubmitMetaDataInput {
-  actorId: string;
+  stateKey: string;
   data: {
     dateRange: { startDate: string; endDate: string };
     totalSpend: number;
@@ -342,7 +342,7 @@ export interface SubmitMetaDataInput {
 }
 
 export interface SubmitBrandReportInput {
-  actorId: string;
+  stateKey: string;
   report: {
     brand: { analyzedAt: string };
     summary: {
@@ -377,21 +377,21 @@ export interface SubmitBrandReportInput {
 
 export interface GetCachedDataInput {
   source: "ga4" | "shopify" | "meta";
-  actorId: string;
+  stateKey: string;
 }
 
 /**
  * Schema for get_brand_report tool.
- * Retrieves a persisted brand insights report from BrandInsightsActor.
+ * Retrieves a persisted brand insights report from the state store cache.
  */
 export const getBrandReportSchema = {
-  actorId: z
+  stateKey: z
     .string()
     .describe(
-      "The actor ID for the brand report. Use format: 'brand-{brandId}' (e.g., 'brand-default', 'brand-test')"
+      "The state store cache key for the brand report. Use format: 'brand-{brandId}' (e.g., 'brand-default', 'brand-test')"
     ),
 };
 
 export interface GetBrandReportInput {
-  actorId: string;
+  stateKey: string;
 }

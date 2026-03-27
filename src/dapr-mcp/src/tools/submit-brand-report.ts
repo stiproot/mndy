@@ -16,10 +16,10 @@ const submitBrandReportEffect = (input: SubmitBrandReportInput) =>
     const cacheSvc = yield* DataCacheSvc;
 
     // Brand reports don't expire (no date range in actorId)
-    const ttl = calculateCacheTTL(input.actorId);
+    const ttl = calculateCacheTTL(input.stateKey);
 
     logger.debug("Submitting brand report to cache", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       healthScore: input.report.summary.overallHealthScore,
       sources: input.report.metadata.sources,
       ttl: ttl ? `${ttl}s` : "no expiration",
@@ -27,13 +27,13 @@ const submitBrandReportEffect = (input: SubmitBrandReportInput) =>
 
     // Save to state store
     const result = yield* cacheSvc.saveData(
-      input.actorId,
+      input.stateKey,
       input.report,
       ttl
     );
 
     logger.info("Brand report cached successfully", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       healthScore: input.report.summary.overallHealthScore,
       dateRange: input.report.metadata.dateRange,
       cachedAt: result.cachedAt,
@@ -46,7 +46,7 @@ const submitBrandReportEffect = (input: SubmitBrandReportInput) =>
           text: JSON.stringify(
             {
               success: true,
-              cacheKey: input.actorId,
+              cacheKey: input.stateKey,
               message: "Brand insights report cached successfully",
               summary: {
                 healthScore: input.report.summary.overallHealthScore,
@@ -66,7 +66,7 @@ const submitBrandReportEffect = (input: SubmitBrandReportInput) =>
       ],
       structuredContent: {
         success: true,
-        cacheKey: input.actorId,
+        cacheKey: input.stateKey,
         message: "Brand insights report cached successfully",
         cachedAt: result.cachedAt,
       },
@@ -100,7 +100,7 @@ export function registerSubmitBrandReportTool(server: McpServer): void {
     },
     (args) => {
       const input: SubmitBrandReportInput = {
-        actorId: args.actorId as string,
+        stateKey: args.stateKey as string,
         report: args.report as SubmitBrandReportInput["report"],
       };
 

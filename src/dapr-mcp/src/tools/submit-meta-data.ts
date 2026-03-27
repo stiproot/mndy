@@ -19,23 +19,23 @@ const submitMetaDataEffect = (input: SubmitMetaDataInput) =>
     const cacheSvc = yield* DataCacheSvc;
 
     // Calculate TTL based on date range
-    const ttl = calculateCacheTTL(input.actorId);
+    const ttl = calculateCacheTTL(input.stateKey);
 
     logger.debug("Submitting Meta data to cache", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       dateRange: input.data.dateRange,
       ttl: ttl ? `${ttl}s` : "no expiration",
     });
 
     // Save to state store with TTL
     const result = yield* cacheSvc.saveData(
-      input.actorId,
+      input.stateKey,
       input.data,
       ttl
     );
 
     logger.info("Meta data cached successfully", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       dateRange: input.data.dateRange,
       totalSpend: input.data.totalSpend,
       cachedAt: result.cachedAt,
@@ -48,7 +48,7 @@ const submitMetaDataEffect = (input: SubmitMetaDataInput) =>
           text: JSON.stringify(
             {
               success: true,
-              cacheKey: input.actorId,
+              cacheKey: input.stateKey,
               message: "Meta data cached successfully",
               dateRange: input.data.dateRange,
               metrics: {
@@ -67,7 +67,7 @@ const submitMetaDataEffect = (input: SubmitMetaDataInput) =>
       ],
       structuredContent: {
         success: true,
-        cacheKey: input.actorId,
+        cacheKey: input.stateKey,
         message: "Meta data cached successfully",
         cachedAt: result.cachedAt,
       },
@@ -101,7 +101,7 @@ export function registerSubmitMetaDataTool(server: McpServer): void {
     },
     (args) => {
       const input: SubmitMetaDataInput = {
-        actorId: args.actorId as string,
+        stateKey: args.stateKey as string,
         data: args.data as SubmitMetaDataInput["data"],
       };
 

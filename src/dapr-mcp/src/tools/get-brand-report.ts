@@ -15,15 +15,15 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
     const cacheSvc = yield* DataCacheSvc;
 
     logger.debug("Retrieving brand report", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
     });
 
     // Get report from state store
-    const result = yield* cacheSvc.getData(input.actorId);
+    const result = yield* cacheSvc.getData(input.stateKey);
 
     if (!result.found) {
       logger.info("No brand report found", {
-        actorId: input.actorId,
+        actorId: input.stateKey,
       });
 
       return {
@@ -34,7 +34,7 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
               {
                 success: true,
                 found: false,
-                actorId: input.actorId,
+                actorId: input.stateKey,
                 message: "No brand report found for this cache key",
               },
               null,
@@ -45,14 +45,14 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
         structuredContent: {
           success: true,
           found: false,
-          actorId: input.actorId,
+          actorId: input.stateKey,
           data: null,
         },
       };
     }
 
     logger.info("Brand report retrieved successfully", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       cachedAt: result.metadata?.cachedAt,
     });
 
@@ -64,7 +64,7 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
             {
               success: true,
               found: true,
-              actorId: input.actorId,
+              actorId: input.stateKey,
               data: result.data,
               metadata: result.metadata,
             },
@@ -76,7 +76,7 @@ const getBrandReportEffect = (input: GetBrandReportInput) =>
       structuredContent: {
         success: true,
         found: true,
-        actorId: input.actorId,
+        actorId: input.stateKey,
         data: result.data,
         metadata: result.metadata,
       },
@@ -98,7 +98,7 @@ export function registerGetBrandReportTool(server: McpServer): void {
     },
     (args) => {
       const input: GetBrandReportInput = {
-        actorId: args.actorId as string,
+        stateKey: args.stateKey as string,
       };
 
       return Effect.runPromise(

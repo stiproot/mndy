@@ -16,23 +16,23 @@ const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
     const cacheSvc = yield* DataCacheSvc;
 
     // Calculate TTL based on date range
-    const ttl = calculateCacheTTL(input.actorId);
+    const ttl = calculateCacheTTL(input.stateKey);
 
     logger.debug("Submitting Shopify data to cache", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       dateRange: input.data.dateRange,
       ttl: ttl ? `${ttl}s` : "no expiration",
     });
 
     // Save to state store with TTL
     const result = yield* cacheSvc.saveData(
-      input.actorId,
+      input.stateKey,
       input.data,
       ttl
     );
 
     logger.info("Shopify data cached successfully", {
-      actorId: input.actorId,
+      actorId: input.stateKey,
       dateRange: input.data.dateRange,
       totalOrders: input.data.totalOrders,
       cachedAt: result.cachedAt,
@@ -45,7 +45,7 @@ const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
           text: JSON.stringify(
             {
               success: true,
-              cacheKey: input.actorId,
+              cacheKey: input.stateKey,
               message: "Shopify data cached successfully",
               dateRange: input.data.dateRange,
               metrics: {
@@ -63,7 +63,7 @@ const submitShopifyDataEffect = (input: SubmitShopifyDataInput) =>
       ],
       structuredContent: {
         success: true,
-        cacheKey: input.actorId,
+        cacheKey: input.stateKey,
         message: "Shopify data cached successfully",
         cachedAt: result.cachedAt,
       },
@@ -97,7 +97,7 @@ export function registerSubmitShopifyDataTool(server: McpServer): void {
     },
     (args) => {
       const input: SubmitShopifyDataInput = {
-        actorId: args.actorId as string,
+        stateKey: args.stateKey as string,
         data: args.data as SubmitShopifyDataInput["data"],
       };
 
