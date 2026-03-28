@@ -13,7 +13,7 @@ router.get("/health", healthHandler);
 // Insights routes
 router.use("/", insightsRouter);
 
-// Brand insights routes (legacy endpoint)
+// Brand insights routes
 router.use("/", brandInsightsRouter);
 
 // Data collection and analysis routes (new architecture)

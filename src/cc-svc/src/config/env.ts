@@ -15,6 +15,7 @@ const envSchema = z.object({
   META_MCP_URL: z.string().url().optional(),
   SHOPIFY_MCP_URL: z.string().url().optional(),
   DAPR_MCP_URL: z.string().url().optional(),
+  MARKDOWN_MCP_URL: z.string().url().optional(),
 
   // Anthropic API Base URL (optional - for internal proxies/LiteLLM)
   ANTHROPIC_BASE_URL: z.string().url().optional(),

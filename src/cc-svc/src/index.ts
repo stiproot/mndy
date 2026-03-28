@@ -37,6 +37,7 @@ app.listen(PORT, () => {
   if (config.META_MCP_URL) console.log(`    - Meta Ads: ${config.META_MCP_URL}`);
   if (config.SHOPIFY_MCP_URL) console.log(`    - Shopify: ${config.SHOPIFY_MCP_URL}`);
   if (config.DAPR_MCP_URL) console.log(`    - Dapr: ${config.DAPR_MCP_URL}`);
+  if (config.MARKDOWN_MCP_URL) console.log(`    - Markdown: ${config.MARKDOWN_MCP_URL}`);
 });
 
 export { app };

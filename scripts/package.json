@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "insights": "bun run src/contributor-insights.ts",
-    "refresh-meta-token": "bun run src/refresh-meta-token.ts"
+    "refresh-meta-token": "bun run src/refresh-meta-token.ts",
+    "test:brand:meta": "bun run src/test-brand-meta.ts",
+    "test:brand:ga4": "bun run src/test-brand-ga4.ts",
+    "test:brand:shopify": "bun run src/test-brand-shopify.ts",
+    "test:brand:all": "bun run src/test-brand-all.ts"
   },
   "dependencies": {
     "cc-svc": "workspace:*",

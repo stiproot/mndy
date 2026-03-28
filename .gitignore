@@ -285,3 +285,5 @@ build/
 nscacert.pem
 
 /scripts/output/*.md
+
+docs/reports/samples/

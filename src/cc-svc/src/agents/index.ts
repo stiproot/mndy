@@ -62,6 +62,16 @@ function getDaprMcpServer() {
 }
 
 /**
+ * Get the Markdown MCP server configuration (if available)
+ * Used for generating markdown files
+ */
+function getMarkdownMcpServer() {
+  const config = getConfig();
+  if (!config.MARKDOWN_MCP_URL) return null;
+  return createHttpMcpServer(config.MARKDOWN_MCP_URL);
+}
+
+/**
  * Create the issue analyzer agent
  */
 export function createIssueAnalyzerAgent(): Agent {
@@ -165,6 +175,11 @@ export function createChatAgent(): Agent {
     builder.mcpServer("dapr", daprServer);
   }
 
+  const markdownServer = getMarkdownMcpServer();
+  if (markdownServer) {
+    builder.mcpServer("markdown", markdownServer);
+  }
+
   return builder.build();
 }
 
@@ -264,6 +279,7 @@ export function createMetaAnalystAgent(): Agent | null {
 export function createBrandOrchestratorAgent(): Agent {
   const config = getConfig();
   const daprServer = getDaprMcpServer();
+  const markdownServer = getMarkdownMcpServer();
 
   const builder = agentBuilder("brand-orchestrator")
     .model(config.CLAUDE_MODEL)
@@ -277,6 +293,10 @@ export function createBrandOrchestratorAgent(): Agent {
 
   if (daprServer) {
     builder.mcpServer("dapr", daprServer);
+  }
+
+  if (markdownServer) {
+    builder.mcpServer("markdown", markdownServer);
   }
 
   return builder.build();

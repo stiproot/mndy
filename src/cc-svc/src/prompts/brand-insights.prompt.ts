@@ -211,6 +211,16 @@ You MUST call submit_brand_report with:
 - Include 3-5 prioritized recommendations
 - Be specific and actionable in recommendations
 - **ALWAYS finish by calling submit_brand_report** - this is critical for the workflow
+
+## Markdown Report Generation
+After persisting the brand report, generate a comprehensive markdown report using the markdown MCP tools. The report should include:
+- Executive summary with overall health score
+- Key metrics visualization (tables/lists)
+- Detailed insights from each analytics source
+- Wins and concerns sections
+- Prioritized recommendations with action items
+
+Use the markdown MCP server to create a professional report suitable for stakeholder review. This helps validate that the markdown generation tools are working correctly.
 `;
 
 /**
