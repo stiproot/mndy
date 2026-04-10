@@ -11,6 +11,7 @@ This directory contains sensitive credentials for the marketing analytics MCP se
 - `ga4-service-account.json` - Service account key for GA4 Data API
 
 **How to obtain:**
+
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create or select a project
 3. Enable the "Google Analytics Data API"
