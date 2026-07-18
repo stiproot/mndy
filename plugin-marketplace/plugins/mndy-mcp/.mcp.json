@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "mndy-github-issues": {
+      "type": "http",
+      "url": "${MNDY_GITHUB_ISSUES_MCP_URL:-http://localhost:3001/mcp}"
+    },
+    "mndy-ga4": {
+      "type": "http",
+      "url": "${MNDY_GA4_MCP_URL:-http://localhost:3003/mcp}"
+    },
+    "mndy-meta-ads": {
+      "type": "http",
+      "url": "${MNDY_META_MCP_URL:-http://localhost:3004/mcp}"
+    },
+    "mndy-shopify": {
+      "type": "http",
+      "url": "${MNDY_SHOPIFY_MCP_URL:-http://localhost:3005/mcp}"
+    },
+    "mndy-dapr": {
+      "type": "http",
+      "url": "${MNDY_DAPR_MCP_URL:-http://localhost:3006/mcp}"
+    }
+  }
+}

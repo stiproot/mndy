@@ -1,0 +1,11 @@
+{
+  "name": "mndy",
+  "owner": { "name": "stiproot" },
+  "plugins": [
+    {
+      "name": "mndy-mcp",
+      "source": "./plugins/mndy-mcp",
+      "description": "Connect to and use the mndy MCP servers (GitHub Issues, GA4, Meta Ads, Shopify, Dapr cache) from Claude Code."
+    }
+  ]
+}

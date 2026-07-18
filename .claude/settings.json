@@ -1,4 +1,15 @@
 {
+  "extraKnownMarketplaces": {
+    "mndy": {
+      "source": {
+        "source": "directory",
+        "path": "./plugin-marketplace"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "mndy-mcp@mndy": true
+  },
   "hooks": {
     "PreToolUse": [
       {

@@ -108,6 +108,9 @@ make docker-compose-infra  # Starts Dapr sidecar, MongoDB, RabbitMQ, Zipkin
 
 **Option A: Individual servers** (recommended for development):
 
+> The three analytics servers (GA4, Meta Ads, Shopify) need **no infrastructure** and can
+> be started together in one terminal with `make run-analytics-mcps` (Ctrl-C stops all).
+
 ```bash
 # Terminal 1: GA4 MCP (port 3003)
 make run-ga4-mcp
@@ -145,7 +148,10 @@ curl http://localhost:3001/health  # GitHub
 
 ### Step 5: Restart Claude Code CLI
 
-The `.claude/mcp.json` configuration file is already created. Restart Claude Code to load it:
+MCP connectivity comes from the **`mndy-mcp` plugin**, which is enabled for this repo in
+`.claude/settings.json`. When you first trust the project folder, Claude Code prompts you
+to install the `mndy` marketplace and the `mndy-mcp` plugin — accept it. Restart Claude
+Code to load everything:
 
 ```bash
 # Exit current session
@@ -156,42 +162,46 @@ cd /path/to/mndy
 claude
 ```
 
-Claude Code will automatically discover and connect to all running MCP servers.
+Claude Code will connect to all running MCP servers (exposed under the `mndy-*` names,
+e.g. `mndy-ga4`) and load the per-server usage skills. The tool names themselves are
+unchanged (`ga4_run_report`, `meta_get_insights`, etc.).
 
 ---
 
 ## Configuration
 
-### MCP Configuration File
+### MCP Configuration (via the `mndy-mcp` plugin)
 
-**Location:** `.claude/mcp.json`
+MCP servers are declared by the **`mndy-mcp` plugin**, not a standalone `.claude/mcp.json`.
+The plugin is registered and enabled for this repo in `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "mndy": { "source": { "source": "directory", "path": "./plugin-marketplace" } }
+  },
+  "enabledPlugins": { "mndy-mcp@mndy": true }
+}
+```
+
+The server list lives in the plugin's bundled config at
+**`plugin-marketplace/plugins/mndy-mcp/.mcp.json`** (servers named `mndy-github-issues`,
+`mndy-ga4`, `mndy-meta-ads`, `mndy-shopify`, `mndy-dapr`). Each URL can be overridden with
+an env var (e.g. `MNDY_GA4_MCP_URL`) and otherwise defaults to its localhost port:
 
 ```json
 {
   "mcpServers": {
-    "ga4": {
-      "transport": "http",
-      "url": "http://localhost:3003/mcp"
-    },
-    "meta-ads": {
-      "transport": "http",
-      "url": "http://localhost:3004/mcp"
-    },
-    "shopify": {
-      "transport": "http",
-      "url": "http://localhost:3005/mcp"
-    },
-    "dapr": {
-      "transport": "http",
-      "url": "http://localhost:3006/mcp"
-    },
-    "github-issues": {
-      "transport": "http",
-      "url": "http://localhost:3001/mcp"
-    }
+    "mndy-ga4":           { "type": "http", "url": "${MNDY_GA4_MCP_URL:-http://localhost:3003/mcp}" },
+    "mndy-meta-ads":      { "type": "http", "url": "${MNDY_META_MCP_URL:-http://localhost:3004/mcp}" },
+    "mndy-shopify":       { "type": "http", "url": "${MNDY_SHOPIFY_MCP_URL:-http://localhost:3005/mcp}" },
+    "mndy-dapr":          { "type": "http", "url": "${MNDY_DAPR_MCP_URL:-http://localhost:3006/mcp}" },
+    "mndy-github-issues": { "type": "http", "url": "${MNDY_GITHUB_ISSUES_MCP_URL:-http://localhost:3001/mcp}" }
   }
 }
 ```
+
+The plugin also ships one usage skill per server. See `plugin-marketplace/README.md`.
 
 ### Transport Options
 
@@ -475,10 +485,13 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 
 **Solutions:**
 
-1. **Verify `.claude/mcp.json` syntax**:
+1. **Verify the plugin is enabled and its config parses**:
    ```bash
-   cat .claude/mcp.json | jq .  # Should parse without errors
+   jq . .claude/settings.json                                   # enabledPlugins has "mndy-mcp@mndy": true
+   jq . plugin-marketplace/plugins/mndy-mcp/.mcp.json           # server list parses without errors
    ```
+   If Claude never prompted to install the plugin, re-trust the folder (`/permissions` or
+   reopen the repo) and accept the install prompt.
 
 2. **Check MCP servers are running**:
    ```bash

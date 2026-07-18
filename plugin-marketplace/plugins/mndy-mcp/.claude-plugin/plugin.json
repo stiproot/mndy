@@ -1,0 +1,6 @@
+{
+  "name": "mndy-mcp",
+  "description": "Wires the mndy MCP servers into Claude Code and teaches an agent how to use them. Bundles a .mcp.json that registers the GitHub Issues, GA4, Meta Ads, Shopify, and Dapr cache MCP servers over HTTP, plus one skill per server documenting its tools, parameters, and usage. Use the mndy MCP servers directly from a shell agent or as part of the full mndy solution.",
+  "version": "0.1.0",
+  "author": { "name": "stiproot" }
+}
