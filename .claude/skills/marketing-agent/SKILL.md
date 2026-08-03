@@ -157,33 +157,54 @@ interface ReportingOutput {
 
 ## MCP Tool Usage
 
+Parameter casing differs by server — GA4 and Meta take **camelCase**, Shopify takes
+**snake_case**. Match the tool's schema exactly; these examples are kept in sync with it.
+
 ### GA4 Reports
+
+`dateRanges`, `dimensions`, and `metrics` are arrays of **objects**, not bare strings.
+
 ```typescript
 const ga4Report = yield* mcpClient.callTool("ga4_run_report", {
-  property_id: "123456789",
-  start_date: "2024-01-01",
-  end_date: "2024-01-31",
-  metrics: ["sessions", "conversions", "purchaseRevenue"],
-  dimensions: ["date", "sourceMedium"],
+  propertyId: "123456789", // omit to use the server's default GA4_PROPERTY_ID
+  dateRanges: [{ startDate: "2024-01-01", endDate: "2024-01-31" }],
+  metrics: [
+    { name: "sessions" },
+    { name: "conversions" },
+    { name: "purchaseRevenue" },
+  ],
+  dimensions: [{ name: "date" }, { name: "sessionDefaultChannelGroup" }],
 });
 ```
 
 ### Meta Insights
+
+Provide `datePreset` OR `timeRange`, not both — `timeRange` wins when set.
+
 ```typescript
 const metaInsights = yield* mcpClient.callTool("meta_get_insights", {
+  adAccountId: "act_123456789", // omit to use the server's default META_AD_ACCOUNT_ID
   level: "campaign",
-  date_preset: "last_30d",
+  datePreset: "last_30d",
   fields: ["spend", "impressions", "clicks", "actions", "action_values"],
 });
 ```
 
 ### Shopify Analytics
+
 ```typescript
 const shopifyAnalytics = yield* mcpClient.callTool("shopify_get_analytics", {
   start_date: "2024-01-01",
   end_date: "2024-01-31",
 });
 ```
+
+### Targeting a brand
+
+`propertyId` and `adAccountId` are the per-call overrides that let one running server serve
+many brands — pass the brand's IDs rather than restarting the server. The Shopify tools have
+**no store parameter**, so a running shopify-mcp serves exactly one store. See the `brands`
+skill in the `mndy-mcp` plugin for the registry format and resolution order.
 
 ## Anomaly Detection Rules
 

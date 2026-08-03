@@ -9,6 +9,19 @@ Rules for developing and maintaining the marketing analytics multi-agent system.
 - Use snake_case for tool names
 - Examples: `ga4_run_report`, `meta_get_insights`, `shopify_get_orders`
 
+### Account Targeting (multi-brand)
+- Every platform tool that can serve more than one account MUST accept an optional
+  per-call account override, falling back to the server's env default:
+  - GA4: `propertyId` → `GA4_PROPERTY_ID`
+  - Meta: `adAccountId` → `META_AD_ACCOUNT_ID`
+- This is what lets one running server serve many brands without a restart. Do not add a
+  "current account" mutable field to a service — targeting is per call, not per process.
+- Shopify is the exception: auth is OAuth bound to one store, so `shopify_*` tools have no
+  store parameter and a running server serves exactly one store. Never answer a request for
+  brand A with brand B's Shopify numbers — report the mismatch instead.
+- Brand identifiers live in a registry file, not in code. See the `brands` skill in the
+  `mndy-mcp` plugin for the format and resolution order.
+
 ### Error Handling
 - Define tagged errors for each platform:
   - `GA4ApiError`, `GA4QuotaError`
@@ -132,6 +145,9 @@ export function registerTool(server: McpServer): void {
 - Store tokens in environment variables
 - Use `secrets/` directory for JSON key files
 - Never commit `.env` files
+- The brand registry (`mndy-brands.json`, `.mndy/brands.json`) is gitignored. It holds
+  account identifiers rather than credentials, but keep it out of commits — only the
+  `mndy-brands.example.json` template is committed
 - Rotate tokens before expiration:
   - Meta System User tokens: Never expire
   - Shopify Admin tokens: Never expire

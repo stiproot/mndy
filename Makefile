@@ -96,13 +96,13 @@ run-workflows-worker: ## Run workflows worker with Dapr (port 6006)
 run-github-issues-mcp: build-mcp ## Run GitHub Issues MCP server (port 3001)
 	bun run --cwd src/github-issues-mcp start
 
-run-ga4-mcp: build-mcp ## Run GA4 MCP server (port 3001)
+run-ga4-mcp: build-mcp ## Run GA4 MCP server (port 3003)
 	bun run --cwd src/ga4-mcp start
 
 run-meta-ads-mcp: build-mcp ## Run Meta Ads MCP server (port 3004)
 	bun run --cwd src/meta-ads-mcp start
 
-run-shopify-mcp: build-mcp ## Run Shopify MCP server (port 3001)
+run-shopify-mcp: build-mcp ## Run Shopify MCP server (port 3005)
 	bun run --cwd src/shopify-mcp start
 
 run-markdown-mcp: build-mcp ## Run Markdown MCP server (port 3008)
@@ -321,4 +321,4 @@ help: ## Show this help message
 	@echo ""
 	@echo "Usage: make [target]"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'

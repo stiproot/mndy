@@ -16,7 +16,17 @@ Microservices architecture using Dapr:
 MCP (Model Context Protocol) servers:
 
 - `src/mcp-core/` - Shared TypeScript library for building MCP servers
-- `src/github-issues-mcp/` - GitHub Issues MCP server
+- `src/github-issues-mcp/` - GitHub Issues MCP server (port 3001)
+- `src/ga4-mcp/` - Google Analytics 4 MCP server (port 3003)
+- `src/meta-ads-mcp/` - Meta Ads MCP server (port 3004)
+- `src/shopify-mcp/` - Shopify MCP server (port 3005)
+- `src/dapr-mcp/` - Dapr state/cache MCP server (port 3006, requires a Dapr sidecar)
+- `src/markdown-mcp/` - Markdown MCP server (port 3008)
+- `src/google-ads-mcp/` - Google Ads MCP server (in progress; no make target yet)
+
+The analytics servers (GA4, Meta Ads, Shopify) and github-issues need **no
+infrastructure** — they are plain HTTP processes needing only their own `.env`.
+Only `dapr-mcp` requires a Dapr sidecar plus `make docker-compose-infra`.
 
 ## Commands
 
@@ -47,6 +57,17 @@ Use `make help` to see all available commands. The Makefile is the single entry 
 ### MCP Servers
 
 - `make run-github-issues-mcp` - GitHub Issues MCP server (port 3001). [Details](src/github-issues-mcp/README.md)
+- `make run-analytics-mcps` - GA4 + Meta + Shopify together, no infra needed
+- `make run-ga4-mcp` / `run-meta-ads-mcp` / `run-shopify-mcp` - individually
+- `make run-markdown-mcp` - Markdown MCP server (port 3008)
+- `make run-dapr-mcp` - Dapr MCP server (needs a sidecar + infra, port 3006)
+
+**Multi-brand:** the GA4 and Meta tools take a per-call `propertyId` /
+`adAccountId` that overrides the server's `.env` default, so one running server
+serves many brands without a restart. Brands live in a gitignored
+`mndy-brands.json`; the template is at
+`plugin-marketplace/plugins/mndy-mcp/skills/brands/mndy-brands.example.json`.
+Shopify is single-store per running server. See the `brands` skill.
 
 ### Lint
 
