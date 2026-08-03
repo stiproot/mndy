@@ -12,6 +12,8 @@ One plugin, **`mndy-mcp`**, which bundles:
   `mndy-github-issues`, `mndy-ga4`, `mndy-meta-ads`, `mndy-shopify`, `mndy-dapr`.
 - **Skills** — one orientation skill (`mndy-mcps`) plus one per server, documenting each
   server's tools, parameters, and usage so the agent knows what to call and how.
+- **Operational skills** — `brands` (target a specific brand/account per session without
+  restarting servers) and `meta-token` (verify and refresh the Meta access token).
 
 The MCP servers themselves live in the mndy repo under `src/*-mcp/` and are run from there
 (`make run-<name>-mcp`). This plugin is the client-side wiring and know-how only.
@@ -34,6 +36,28 @@ claude plugin install mndy-mcp@mndy
      docker-compose. Only `mndy-dapr` requires a sidecar + `make docker-compose-infra`.
 2. In a Claude Code session with the plugin installed, ask for the task — the agent picks
    up the matching skill and calls the server's tools.
+
+## Working with multiple brands
+
+Each analytics server starts pointed at whatever account is in its own `.env`. To target a
+different brand — or switch mid-session — you don't restart anything: the GA4 and Meta tools
+accept a per-call `propertyId` / `adAccountId`, and the `brands` skill applies them for you.
+
+Copy the template out of the `brands` skill directory
+(`plugins/mndy-mcp/skills/brands/mndy-brands.example.json`) to one of:
+
+- `mndy-brands.json` at the mndy repo root (gitignored), or
+- `~/.mndy/brands.json`, or
+- any path you point `MNDY_BRANDS_FILE` at
+
+Fill in each brand's `ga4PropertyId` and `metaAdAccountId`, then just name the brand in your
+request ("pull last month's spend for AF Brands"). The running server's credentials must have
+access to the accounts you list — one GA4 service account and one Meta token can each serve
+every property/ad account they've been granted.
+
+**Shopify is the exception:** its tools have no store parameter, so a running `mndy-shopify`
+serves exactly one store. To analyse another store, repoint `src/shopify-mcp/.env` and
+restart, or run one shopify-mcp per store on separate ports.
 
 By default the plugin connects to the servers on `localhost` (ports 3001/3003/3004/3005/3006).
 To target Docker or a remote host, set the override env vars before launching Claude Code:

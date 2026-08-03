@@ -95,6 +95,14 @@ A healthy server returns HTTP 200. If Claude's tools for a server aren't respond
 check `/health` first, then confirm the URL matches the port the server logged on
 startup (`... listening on port <N>`).
 
+## Selecting a brand per session
+
+By default each analytics server targets the account in its own `.env`. To work with a
+specific brand this session — or switch between brands — use the `brands` skill: it reads a
+brand registry (`mndy-brands.json`) and applies each brand's GA4 `propertyId` and Meta
+`adAccountId` per call. Shopify stays single-store per running server. Reach for the
+`brands` skill whenever the user names a brand or asks to switch.
+
 ## Choosing a tool
 
 - GitHub issues (list, triage, label, update) → `github-issues` skill

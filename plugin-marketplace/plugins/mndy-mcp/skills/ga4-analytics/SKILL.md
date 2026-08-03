@@ -74,6 +74,12 @@ Top pages for organic search only, March 2025:
 }
 ```
 
+## Brand selection
+
+`propertyId` overrides the server's default `GA4_PROPERTY_ID` per call. If the user has
+selected a brand this session (see the `brands` skill), pass that brand's `ga4PropertyId`
+as `propertyId` on every call. The service account must have access to that property.
+
 ## Tips
 
 - Always send at least one date range and one metric — both are required.
