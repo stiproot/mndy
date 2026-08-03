@@ -59,6 +59,18 @@ Page through orders created after a given time:
 { "created_at_min": "2025-03-01T00:00:00Z", "limit": 250, "since_id": "450789469" }
 ```
 
+## Brand selection (single store per server)
+
+Unlike GA4 and Meta, the Shopify tools have **no store parameter** — they always hit the
+store the running `mndy-shopify` server is configured for (`SHOPIFY_STORE_URL` + OAuth
+credentials in its `.env`). So per-session brand switching does **not** apply to Shopify.
+
+If the user has selected a brand (see the `brands` skill) whose `shopifyStore` differs from
+the running server's store, say so and treat Shopify data as unavailable for that brand this
+session — do not return another store's numbers as if they were the selected brand's. To
+analyse a different store, repoint `src/shopify-mcp/.env` and restart the server, or run one
+shopify-mcp per store on separate ports.
+
 ## Tips
 
 - Credentials are validated at call time (OAuth token exchange from client ID/secret). If a

@@ -37,6 +37,19 @@ interface ParsedArgs {
   appSecret?: string;
   currentToken?: string;
   dryRun: boolean;
+  verifyOnly: boolean;
+  skipVerify: boolean;
+}
+
+interface TokenInfo {
+  isValid: boolean;
+  type?: string;
+  appId?: string;
+  application?: string;
+  expiresAt?: number;
+  dataAccessExpiresAt?: number;
+  scopes?: string[];
+  error?: string;
 }
 
 /**
@@ -53,6 +66,8 @@ function parseArgs(): ParsedArgs {
   const parsed: ParsedArgs = {
     envFilePath: resolve(repoRoot, "src/meta-ads-mcp/.env"),
     dryRun: false,
+    verifyOnly: false,
+    skipVerify: false,
   };
 
   for (const arg of args) {
@@ -70,6 +85,10 @@ function parseArgs(): ParsedArgs {
       parsed.currentToken = arg.split("=")[1];
     } else if (arg === "--dry-run") {
       parsed.dryRun = true;
+    } else if (arg === "--verify" || arg === "--verify-only") {
+      parsed.verifyOnly = true;
+    } else if (arg === "--no-verify") {
+      parsed.skipVerify = true;
     } else if (arg === "--help" || arg === "-h") {
       console.log("Usage: bun run refresh-meta-token [options]");
       console.log("\nOptions:");
@@ -77,6 +96,8 @@ function parseArgs(): ParsedArgs {
       console.log("  --app-id=<id>         Meta App ID");
       console.log("  --app-secret=<secret> Meta App Secret");
       console.log("  --token=<token>       Current access token");
+      console.log("  --verify, --verify-only  Check the current token's status and exit (no refresh)");
+      console.log("  --no-verify           Write the new token without verifying it first");
       console.log("  --dry-run             Print new token without updating .env");
       console.log("  --help, -h            Show this help message");
       process.exit(0);
@@ -142,6 +163,60 @@ function calculateAppSecretProof(accessToken: string, appSecret: string): string
     .createHmac("sha256", appSecret)
     .update(accessToken)
     .digest("hex");
+}
+
+/**
+ * Inspect a token via the debug_token endpoint. Works even for EXPIRED tokens —
+ * it reports validity, type, expiry, and granted scopes rather than just failing.
+ */
+async function verifyToken(
+  appId: string,
+  appSecret: string,
+  token: string
+): Promise<TokenInfo> {
+  const url = new URL("https://graph.facebook.com/v21.0/debug_token");
+  url.searchParams.set("input_token", token);
+  // App access token: "<app_id>|<app_secret>"
+  url.searchParams.set("access_token", `${appId}|${appSecret}`);
+
+  const response = await fetch(url.toString());
+  const body = await response.json();
+
+  if (!response.ok || !body.data) {
+    return {
+      isValid: false,
+      error: body.error?.message || `debug_token failed (HTTP ${response.status})`,
+    };
+  }
+
+  const d = body.data;
+  return {
+    isValid: Boolean(d.is_valid),
+    type: d.type,
+    appId: d.app_id,
+    application: d.application,
+    expiresAt: d.expires_at,
+    dataAccessExpiresAt: d.data_access_expires_at,
+    scopes: d.scopes,
+    error: d.error?.message,
+  };
+}
+
+/**
+ * Print a human-readable summary of a TokenInfo.
+ */
+function printTokenInfo(label: string, info: TokenInfo): void {
+  console.log(`\n${label}`);
+  console.log(`  Valid:   ${info.isValid ? "✅ yes" : "❌ no"}`);
+  if (info.type) console.log(`  Type:    ${info.type}`);
+  if (info.application) console.log(`  App:     ${info.application} (${info.appId ?? "?"})`);
+  if (info.scopes?.length) console.log(`  Scopes:  ${info.scopes.join(", ")}`);
+  const fmt = (t?: number) =>
+    !t ? "never (permanent)" : new Date(t * 1000).toISOString();
+  if (info.expiresAt !== undefined) console.log(`  Expires: ${fmt(info.expiresAt)}`);
+  if (info.dataAccessExpiresAt !== undefined)
+    console.log(`  Data access expires: ${fmt(info.dataAccessExpiresAt)}`);
+  if (info.error) console.log(`  Note:    ${info.error}`);
 }
 
 /**
@@ -254,6 +329,26 @@ async function main() {
 
   console.log(`App ID: ${appId}`);
   console.log(`Current token: ${currentToken.substring(0, 20)}...`);
+
+  // Inspect the current token first (works even if expired)
+  try {
+    const info = await verifyToken(appId, appSecret, currentToken);
+    printTokenInfo("Current token status:", info);
+    if (info.isValid && info.type === "USER" && info.expiresAt) {
+      console.log(
+        "\n💡 This is a USER token with an expiry. Consider a System User token for a permanent credential."
+      );
+    }
+  } catch (error) {
+    console.warn(
+      `\n⚠️  Could not verify current token: ${error instanceof Error ? error.message : error}`
+    );
+  }
+
+  if (args.verifyOnly) {
+    console.log("\n🔍 Verify-only mode — no refresh attempted.");
+    return;
+  }
   console.log();
 
   // Refresh the token
@@ -268,6 +363,40 @@ async function main() {
       console.log(`Expires in: ${expiryDays} days (${result.expiresIn} seconds)`);
     } else {
       console.log("Token type: Permanent (no expiry)");
+    }
+
+    // Confirm the new token is actually valid before writing it to .env.
+    // A token we could not verify is treated the same as one that verified
+    // invalid: we do not write it. Otherwise a transient debug_token failure
+    // would silently install an unchecked credential.
+    //
+    // The gate only guards the write — under --dry-run (which writes nothing)
+    // we report the verification result and still print the token.
+    if (args.skipVerify) {
+      console.log("\n⏭️  Skipping verification of the new token (--no-verify).");
+    } else {
+      let verified = false;
+      try {
+        const newInfo = await verifyToken(appId, appSecret, result.accessToken);
+        printTokenInfo("New token status:", newInfo);
+        verified = newInfo.isValid;
+        if (!verified) {
+          console.warn("\n⚠️  The new token did not verify as valid.");
+        }
+      } catch (error) {
+        console.warn(
+          `\n⚠️  Could not verify new token: ${error instanceof Error ? error.message : error}`
+        );
+      }
+
+      if (!verified && !args.dryRun) {
+        console.warn("⚠️  Not updating .env.");
+        console.log(
+          "\n💡 The exchange itself succeeded — re-run to try again, add --dry-run to print\n" +
+            "   the token without writing, or --no-verify to write it unverified."
+        );
+        process.exit(1);
+      }
     }
 
     if (args.dryRun) {

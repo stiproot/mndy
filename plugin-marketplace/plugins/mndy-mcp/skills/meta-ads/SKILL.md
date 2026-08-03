@@ -69,3 +69,19 @@ Ad-level insights for a custom range, specific campaigns:
 - Provide `timeRange` OR `datePreset`, not both — `timeRange` takes precedence when set.
 - Rate limits: the server retries transient 429/5xx with backoff. If you still get a rate
   error, reduce `limit` or narrow the date range.
+
+## Brand selection
+
+`adAccountId` overrides the server's default `META_AD_ACCOUNT_ID` per call. If the user has
+selected a brand this session (see the `brands` skill), pass that brand's `metaAdAccountId`
+(with the `act_` prefix) as `adAccountId` on every call. The access token must be able to
+see that ad account.
+
+## Troubleshooting
+
+- **`Error validating access token: Session has expired ...`** — the `META_ACCESS_TOKEN`
+  in `src/meta-ads-mcp/.env` has expired. This is a credential issue, not a bad request.
+  Refresh it from the mndy repo root with `make refresh-meta-token` (updates the `.env`),
+  then restart the server. A long-lived System User token is recommended to avoid expiry.
+- **`Invalid OAuth access token`** — the token is malformed or lacks `ads_read` /
+  `read_insights` scope, or `META_AD_ACCOUNT_ID` is missing the `act_` prefix.
