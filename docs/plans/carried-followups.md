@@ -9,14 +9,6 @@ context is one link away.
 
 ## Open
 
-### Rotate the Azure DevOps PAT
-
-From [monorepo-maturity/02](./impl/monorepo-maturity/02-monorepo-restructure.md). `src/.core.env`
-was tracked in git and holds a `BASE64_AZDO_PAT`. The ignore rule is fixed and the file is
-untracked now, but **the credential is still in git history**. Rotate it. Purging history is
-a separate decision — for a repo with a remote and a merged PR, rotation is the cheaper and
-more reliable fix.
-
 ### Frontend Docker images cannot build
 
 From [monorepo-maturity/02](./impl/monorepo-maturity/02-monorepo-restructure.md). `apps/ui`,

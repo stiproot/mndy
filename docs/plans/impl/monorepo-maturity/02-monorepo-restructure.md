@@ -72,12 +72,20 @@ The moves are the easy half. Every path reference has to follow, and they are sc
 The move went cleanly. What it *uncovered* was the interesting part — six latent breakages
 that the flat layout had been hiding.
 
-**1. A credential was committed.** `src/.core.env` was tracked in git and contains a
-`BASE64_AZDO_PAT`. The `.gitignore` rule was `**/.env`, which matches only files named
-exactly `.env` — never the dotted variants. Fixed the rule (`**/.*.env`, `**/.env.*`) and
-moved the file to the repo root, where the Makefile's `--env-file .core.env` actually
-expects it. **The PAT is still in git history and must be rotated** — an ignore rule does
-not unring that bell.
+**1. A gap in the ignore rules, but no leak.** `src/.core.env` was tracked in git, and
+`.gitignore`'s `**/.env` matches only files named exactly `.env` — never dotted variants
+like `.core.env`, `.local.env`. Fixed the rule (`**/.*.env`, `**/.env.*`) and moved the file
+to the repo root, where the Makefile's `--env-file .core.env` actually expects it.
+
+**Corrected 2026-08-06:** this was first written up as a committed credential requiring
+rotation, and commits `101c389` and `682ff3e` say so. That was wrong. The tracked value is
+`<<azdo-pat>>` — a placeholder in this repo's own `<<...>>` template convention, 12
+characters where a real `BASE64_AZDO_PAT` would be ~72 of base64. A scan of all 1,570 blobs
+in history against markers for Meta, Shopify, GitHub, GCP, Google, AWS, Slack and Azure
+DevOps tokens found **no real credentials** — the only hit was `ghp_xxxx…` in
+`github-issues-mcp/.env.template`, also a placeholder. Nothing needs rotating and no history
+rewrite is warranted. The ignore-rule fix stands on its own: a real dotted env file would
+otherwise have been committed.
 
 **2. Four worker targets pointed at a directory that has never existed.** `make
 run-azdo-worker` and its three siblings passed `--resources-path

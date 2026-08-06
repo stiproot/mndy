@@ -39,8 +39,9 @@ bld/
 **/.env
 !**/.env.template
 .env.local
-# `**/.env` matches only files named exactly `.env` — dotted variants need their own
-# rules, or they get committed. `src/.core.env` was tracked for exactly this reason.
+# `**/.env` matches only files named exactly `.env` — dotted variants (.core.env,
+# .local.env) need their own rules or they get committed. `.core.env` was tracked for
+# exactly this reason; it held only a `<<azdo-pat>>` placeholder, but the next one might not.
 **/.*.env
 **/.env.*
 !**/.env.template
