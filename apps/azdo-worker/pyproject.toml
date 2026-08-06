@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+  "mndy-framework",
   "fastapi",
   "dapr-ext-fastapi-dev",
   "dapr>=1.16.0",

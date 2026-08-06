@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { Response, Request } from "express";
 import { ChatSvc, LabelsSvc, AppLayer } from "../svc";
+import { ChatError, ForbiddenError, LabelError, NotFoundError } from "../errors";
 import type { IChatMessage, IChatConversation, ILabel } from "../svc";
 
 // Type for authenticated request
@@ -182,15 +183,19 @@ export const updateLabel = (req: AuthenticatedRequest, res: Response): void => {
   const effect = LabelsSvc.pipe(
     Effect.flatMap((labelsSvc) =>
       labelsSvc.getLabel(labelId).pipe(
-        Effect.flatMap((label) => {
-          if (!label) {
-            return Effect.fail({ status: 404, message: "Label not found" });
-          }
-          if (label.userId !== userId) {
-            return Effect.fail({ status: 403, message: "Forbidden" });
-          }
-          return labelsSvc.updateLabel(labelId, { name, color });
-        })
+        Effect.flatMap(
+          (label): Effect.Effect<ILabel, LabelError | NotFoundError | ForbiddenError> => {
+            if (!label) {
+              return Effect.fail(
+                new NotFoundError({ message: "Label not found", resource: "Label" }),
+              );
+            }
+            if (label.userId !== userId) {
+              return Effect.fail(new ForbiddenError({ message: "Forbidden" }));
+            }
+            return labelsSvc.updateLabel(labelId, { name, color });
+          },
+        )
       )
     ),
     Effect.provide(AppLayer)
@@ -199,12 +204,12 @@ export const updateLabel = (req: AuthenticatedRequest, res: Response): void => {
   Effect.runPromise(effect)
     .then((result) => res.json(result))
     .catch((error: unknown) => {
-      const err = error as { status?: number; message?: string };
-      if (err.status === 404) {
+      const err = error as { _tag?: string; message?: string };
+      if (err._tag === "NotFoundError") {
         res.status(404).json({ error: err.message });
         return;
       }
-      if (err.status === 403) {
+      if (err._tag === "ForbiddenError") {
         res.status(403).json({ error: err.message });
         return;
       }
@@ -226,15 +231,19 @@ export const deleteLabel = (req: AuthenticatedRequest, res: Response): void => {
   const effect = LabelsSvc.pipe(
     Effect.flatMap((labelsSvc) =>
       labelsSvc.getLabel(labelId).pipe(
-        Effect.flatMap((label) => {
-          if (!label) {
-            return Effect.fail({ status: 404, message: "Label not found" });
-          }
-          if (label.userId !== userId) {
-            return Effect.fail({ status: 403, message: "Forbidden" });
-          }
-          return labelsSvc.deleteLabel(labelId);
-        })
+        Effect.flatMap(
+          (label): Effect.Effect<void, LabelError | NotFoundError | ForbiddenError> => {
+            if (!label) {
+              return Effect.fail(
+                new NotFoundError({ message: "Label not found", resource: "Label" }),
+              );
+            }
+            if (label.userId !== userId) {
+              return Effect.fail(new ForbiddenError({ message: "Forbidden" }));
+            }
+            return labelsSvc.deleteLabel(labelId);
+          },
+        )
       )
     ),
     Effect.provide(AppLayer)
@@ -243,12 +252,12 @@ export const deleteLabel = (req: AuthenticatedRequest, res: Response): void => {
   Effect.runPromise(effect)
     .then(() => res.status(204).send())
     .catch((error: unknown) => {
-      const err = error as { status?: number; message?: string };
-      if (err.status === 404) {
+      const err = error as { _tag?: string; message?: string };
+      if (err._tag === "NotFoundError") {
         res.status(404).json({ error: err.message });
         return;
       }
-      if (err.status === 403) {
+      if (err._tag === "ForbiddenError") {
         res.status(403).json({ error: err.message });
         return;
       }
@@ -278,10 +287,10 @@ export const assignLabelsToMessage = (req: AuthenticatedRequest, res: Response):
   const effect = ChatSvc.pipe(
     Effect.flatMap((chatSvc) =>
       chatSvc.getMessages(conversationId).pipe(
-        Effect.flatMap((messages) => {
+        Effect.flatMap((messages): Effect.Effect<IChatMessage, ChatError | NotFoundError> => {
           const messageIndex = messages.findIndex((m) => m.id === messageId);
           if (messageIndex === -1) {
-            return Effect.fail({ status: 404, message: "Message not found" });
+            return Effect.fail(new NotFoundError({ message: "Message not found", resource: "Message" }));
           }
 
           const updatedMessages = [...messages];
@@ -302,8 +311,8 @@ export const assignLabelsToMessage = (req: AuthenticatedRequest, res: Response):
   Effect.runPromise(effect)
     .then((message) => res.json(message))
     .catch((error: unknown) => {
-      const err = error as { status?: number; message?: string };
-      if (err.status === 404) {
+      const err = error as { _tag?: string; message?: string };
+      if (err._tag === "NotFoundError") {
         res.status(404).json({ error: err.message });
         return;
       }
@@ -331,10 +340,10 @@ export const removeLabelFromMessage = (req: AuthenticatedRequest, res: Response)
   const effect = ChatSvc.pipe(
     Effect.flatMap((chatSvc) =>
       chatSvc.getMessages(conversationId).pipe(
-        Effect.flatMap((messages) => {
+        Effect.flatMap((messages): Effect.Effect<IChatMessage, ChatError | NotFoundError> => {
           const messageIndex = messages.findIndex((m) => m.id === messageId);
           if (messageIndex === -1) {
-            return Effect.fail({ status: 404, message: "Message not found" });
+            return Effect.fail(new NotFoundError({ message: "Message not found", resource: "Message" }));
           }
 
           const updatedMessages = [...messages];
@@ -355,8 +364,8 @@ export const removeLabelFromMessage = (req: AuthenticatedRequest, res: Response)
   Effect.runPromise(effect)
     .then((message) => res.json(message))
     .catch((error: unknown) => {
-      const err = error as { status?: number; message?: string };
-      if (err.status === 404) {
+      const err = error as { _tag?: string; message?: string };
+      if (err._tag === "NotFoundError") {
         res.status(404).json({ error: err.message });
         return;
       }

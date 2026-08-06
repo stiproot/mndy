@@ -8,6 +8,7 @@
 // hold servers this repo knows nothing about, and clobbering someone's existing setup to
 // install ours would be unforgivable. A timestamped backup is taken before any write.
 
+import { execFileSync } from "node:child_process";
 import { createInterface } from "node:readline/promises";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import { homedir, platform } from "node:os";
@@ -69,6 +70,21 @@ const SERVERS = [
     ],
   },
 ];
+
+/**
+ * An ABSOLUTE path to the bun binary.
+ *
+ * Claude Desktop launches servers with a minimal environment — it is a GUI app, not a
+ * login shell — so a bare `bun` frequently is not on PATH even when it works in a
+ * terminal. Resolving it here means the config keeps working regardless.
+ */
+function bunPath() {
+  try {
+    return execFileSync("which", ["bun"], { encoding: "utf8" }).trim() || "bun";
+  } catch {
+    return "bun";
+  }
+}
 
 /** Where Claude Desktop keeps its config, per OS. */
 function desktopConfigPath() {
@@ -239,10 +255,15 @@ async function main() {
   }
 
   config.mcpServers ??= {};
+  const runtime = bunPath();
   for (const { server, env } of chosen) {
     config.mcpServers[server.client] = {
-      command: "node",
+      command: runtime,
       args: [join(root, "apps", server.app, "dist", "index.js")],
+      // Credentials are passed via `env` below, but setting cwd means the server also
+      // picks up its own .env — so a credential added there later works without
+      // re-running this installer.
+      cwd: join(root, "apps", server.app),
       env: { ...env, MCP_TRANSPORT: "stdio" },
     };
   }

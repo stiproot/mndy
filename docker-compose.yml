@@ -252,6 +252,7 @@ services:
   mndy-ui-api:
     profiles: [apps]
     image: xo-feed/mndy/ui-api:dev
+    restart: unless-stopped
     build:
       context: ./apps/ui-api/
       dockerfile: Dockerfile

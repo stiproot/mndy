@@ -1,0 +1,12 @@
+# The build context is this app directory, so the repo-root .dockerignore does not apply.
+# Without this, the local node_modules is copied over the one `npm install` just built —
+# which fails outright when a package's layout differs between host and image.
+node_modules
+dist
+.env
+.env.*
+!.env.template
+*.log
+.turbo
+Dockerfile
+.dockerignore

@@ -17,15 +17,6 @@ but it still needs git, bun and a clone. A published package would make the Desk
 outside the team. Deferred because it is a real packaging and release effort; revisit when
 this is handed to people who will not clone a monorepo.
 
-### Frontend Docker images cannot build
-
-From [monorepo-maturity/02](./impl/monorepo-maturity/02-monorepo-restructure.md). `apps/ui`,
-`apps/vis` and `apps/azdo` build with their own directory as the compose context, but their
-Dockerfiles `COPY bun.lockb ./` — a file that is neither in that context nor in the repo
-(bun 1.3 writes `bun.lock`). Either switch them to root-context builds like the MCP images,
-or drop the lockfile COPY. Not guessed at during the restructure because nothing in `make
-lint` exercises image builds, so there was no signal to verify a fix against.
-
 ### `azdoproxy-api`'s Dockerfile COPY cannot resolve
 
 From [monorepo-maturity/02](./impl/monorepo-maturity/02-monorepo-restructure.md). Its compose
@@ -41,15 +32,6 @@ From [monorepo-maturity/02](./impl/monorepo-maturity/02-monorepo-restructure.md)
 `apps/azdo` had `lint` scripts that had never worked (no eslint plugin installed); they were
 removed rather than left as false coverage. `apps/ui` is the only frontend that actually
 lints. Give the other two the same setup, or decide they are not worth linting and say so.
-
-### Python workers do not declare their framework dependency
-
-From [monorepo-maturity/02](./impl/monorepo-maturity/02-monorepo-restructure.md). Each worker's
-`pyproject.toml` carries `[tool.uv.sources] mndy-framework = { workspace = true }` but does
-**not** list `mndy-framework` in `dependencies`, so `uv sync` never installs it and
-`import mndy_framework` fails in a fresh environment. It works today only because
-`packages/py/mndy-framework/install.sh` is run by hand. Add the dependency so the workspace
-is self-sufficient, or document the manual step as deliberate.
 
 ### `markdown-mcp` needs a real Effect rewrite (and some tools)
 
@@ -78,9 +60,12 @@ platform's server: it reads Google Ads, Meta, GA4 and Shopify together, so putti
 one server's app would both hide it from other consumers and give that server dependencies
 on four platforms.
 
-### `ui-api` does not compile
+### `apps/azdo` pins codemirror 5 but uses the vue-codemirror 6 component
 
-From [monorepo-maturity/02](./impl/monorepo-maturity/02-monorepo-restructure.md). `turbo build`
-is red on `apps/ui-api` — Effect type errors in `src/handlers/chat.handlers.ts`, predating
-and unrelated to the restructure. Owned by [`effect-ui-api.md`](./effect-ui-api.md); noted
-here because it is what stands between the repo and a green `bun run build`.
+Found while fixing the image builds. `package.json` declares `codemirror@^5.65.0` alongside
+`vue-codemirror@^6.1.1`, whose peer is `codemirror@6`. bun tolerates it by nesting both
+versions; npm could not, which is what surfaced it. Worse, `BulkCreateAzdoWisView.vue` passes
+`:options` — the CodeMirror **5** prop — to the vue-codemirror **6** component, which expects
+`:extensions`, so the editor config is likely being ignored at runtime. Decide which major
+version the app targets and align both the dependency and the component usage; not guessed
+at here because either direction changes app behaviour.

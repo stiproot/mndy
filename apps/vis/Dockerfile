@@ -1,15 +1,15 @@
-FROM node:20-alpine as build
+FROM oven/bun:1-alpine AS build
 
 WORKDIR /app
 
+# Build context is this app directory, so the workspace lockfile is not reachable.
 COPY package.json ./
-COPY bun.lockb ./
 
-RUN npm install
+RUN bun install
 
 COPY . .
 
-RUN npm run build
+RUN bun run build
 
 FROM nginx:alpine
 

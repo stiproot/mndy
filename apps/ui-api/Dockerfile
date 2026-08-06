@@ -1,24 +1,26 @@
-FROM node:20-alpine as build
+FROM oven/bun:1-alpine AS build
   WORKDIR /app
-  COPY package*.json .
-  RUN npm install
+  COPY package.json .
+  RUN bun install
 
   COPY tsconfig.json .
   COPY . .
-  RUN npm run build
+  RUN bun run build
 
-FROM node:20-alpine as runtime
+FROM oven/bun:1-alpine AS runtime
   WORKDIR /app
   COPY nscacert.pem /app/nscacert.pem
   ENV NODE_EXTRA_CA_CERTS=/app/nscacert.pem
 
-  RUN npm install -g pm2 && \
-    apk add --no-cache nginx
+  RUN apk add --no-cache nginx
 
   COPY --from=build /app .
-  COPY pm2.config.js /app/pm2.config.js
   COPY nginx.conf /etc/nginx/http.d/default.conf
 
   EXPOSE 3002
 
-  CMD ["sh", "-c", "nginx -g 'daemon off;' & pm2-runtime start pm2.config.js"]
+  # pm2 is gone: its config was `instances: 1` with autorestart and a memory cap, which is
+  # exactly what the container runtime already provides (`restart:` policy + memory limits)
+  # — a whole node process manager to duplicate Docker. Restart behaviour is preserved by
+  # `restart: unless-stopped` on the compose service.
+  CMD ["sh", "-c", "nginx -g 'daemon off;' & bun dist/index.js"]

@@ -60,6 +60,17 @@ export class ForbiddenError extends Data.TaggedError("ForbiddenError")<{
   readonly reason?: string;
 }> {}
 
+/**
+ * A resource the caller asked for does not exist.
+ *
+ * `resource` names the kind ("Label", "Message") so a handler can build the response
+ * message without the failure site having to format one.
+ */
+export class NotFoundError extends Data.TaggedError("NotFoundError")<{
+  readonly message: string;
+  readonly resource?: string;
+}> {}
+
 // AzDO Errors
 export class AzdoApiError extends Data.TaggedError("AzdoApiError")<{
   readonly message: string;

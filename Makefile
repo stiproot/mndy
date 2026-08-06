@@ -191,7 +191,7 @@ restart-analytics-mcps: build-mcp ## Rebuild and restart the analytics MCP serve
 	@echo "Restarted. Reconnect in Claude Code with /mcp — no need to restart the session."
 
 install-desktop: build-mcp ## Wire the analytics MCP servers into Claude Desktop (stdio; no terminal needed afterwards)
-	@node scripts/install-desktop.mjs
+	@bun scripts/install-desktop.mjs
 
 status-analytics-mcps: ## Show whether each analytics MCP server is up, and on which port
 	@$(MCP_LIFECYCLE) status $(ANALYTICS_MCPS)
@@ -243,11 +243,12 @@ build-ui-api: ## Build UI API
 
 lint: lint-guards lint-md lint-node ## Run all linters (markdown gate is green as of 2026-08-06 — keep it that way)
 
-lint-guards: ## Run the repo structure guards (ports, hex boundaries, MCP parity, secrets)
+lint-guards: ## Run the repo structure guards (ports, hex, MCP parity, secrets, docker workspace)
 	bun run check-ports
 	bun run check-hex-lint
 	bun run check-mcp-parity
 	bun run check-secrets
+	bun run check-docker-workspace
 
 lint-md: ## Lint markdown files
 	bun run lint:md

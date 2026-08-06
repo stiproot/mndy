@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 
 [manifest]
@@ -169,6 +169,7 @@ dependencies = [
     { name = "environs" },
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "mndy-framework" },
     { name = "requests" },
     { name = "typing-extensions" },
     { name = "uvicorn" },
@@ -181,6 +182,7 @@ requires-dist = [
     { name = "environs" },
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "mndy-framework", editable = "packages/py/mndy-framework" },
     { name = "requests" },
     { name = "typing-extensions" },
     { name = "uvicorn" },
@@ -196,6 +198,7 @@ dependencies = [
     { name = "environs" },
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "mndy-framework" },
     { name = "pyxi-azdo-http-client" },
     { name = "requests" },
     { name = "typing-extensions" },
@@ -209,6 +212,7 @@ requires-dist = [
     { name = "environs" },
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "mndy-framework", editable = "packages/py/mndy-framework" },
     { name = "pyxi-azdo-http-client" },
     { name = "requests" },
     { name = "typing-extensions" },
@@ -591,6 +595,7 @@ dependencies = [
     { name = "environs" },
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "mndy-framework" },
     { name = "pyxi-azdo-http-client" },
     { name = "requests" },
     { name = "typing-extensions" },
@@ -604,6 +609,7 @@ requires-dist = [
     { name = "environs" },
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "mndy-framework", editable = "packages/py/mndy-framework" },
     { name = "pyxi-azdo-http-client" },
     { name = "requests" },
     { name = "typing-extensions" },
