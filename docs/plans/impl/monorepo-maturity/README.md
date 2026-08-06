@@ -1,8 +1,7 @@
 # Monorepo maturity
 
-Status: Active — bring mndy up to h's structural standard: shared Claude Code plugins,
-an `apps/` + `packages/` monorepo, Effect-based MCP servers whose logic lives in packages,
-hardened analytics-only-mode docs, and a Google Ads MCP.
+Status: Complete — all five parts landed on `main`. `src/` is gone, five domain packages
+carry the logic, analytics-MCP mode is the documented front door, and Google Ads is live.
 Established: 2026-08-06
 
 ## Why
@@ -53,9 +52,32 @@ If you find yourself writing business logic inside `apps/`, it is in the wrong p
 | 04 | [Analytics-mode doc hardening](./04-analytics-mode-docs.md) | Complete |
 | 05 | [Google Ads MCP](./05-google-ads-mcp.md) | Complete |
 
-The parts are ordered by dependency: plugins carry the conventions the later parts follow;
-the restructure creates the `packages/` homes part 03 moves logic into; part 05 is written
-against the finished shape so the new server is born correct rather than retrofitted.
+The parts were ordered by dependency: plugins carry the conventions the later parts follow;
+the restructure creates the `packages/` homes part 03 moves logic into; part 05 was written
+against the finished shape so the new server was born correct rather than retrofitted.
+
+**Executed 04 after 05**, contrary to the numbering: writing the analytics-mode docs before
+the fifth analytics server existed would have meant rewriting them immediately.
+
+## Lifted to
+
+Everything durable from these five parts now lives outside them:
+
+| Context | Home |
+| --- | --- |
+| Reusable machinery belongs in `packages/`; apps are containers | [CLAUDE.md § Where code lives](../../../../CLAUDE.md) |
+| The two modes, and which servers need infrastructure | [README.md § Which servers need infrastructure](../../../../README.md#which-servers-need-infrastructure) + CLAUDE.md § Two modes |
+| Plan lifecycle policy | CLAUDE.md § Plans (on top of the `plan-management` skill) |
+| Diagram policy | CLAUDE.md § Diagrams |
+| zod is a presentation-layer concern, not a mistake | [`.claude/rules/mcp-server.md`](../../../../.claude/rules/mcp-server.md) § Schemas |
+| One shared runtime per server; never `provide` per tool call | `.claude/rules/mcp-server.md` § The shared runtime |
+| MCP server + package directory contract | `.claude/rules/mcp-server.md` § Directory Structure |
+| KPI formulas, metric normalization, anomaly thresholds | `packages/js/analytics-core` (tested); [`.claude/rules/marketing-analytics.md`](../../../../.claude/rules/marketing-analytics.md) cites it |
+| Hex boundaries | `.dependency-cruiser.cjs` + `scripts/check-hex-lint.mjs` |
+| No two apps may claim a port | `scripts/check-ports.mjs` |
+| MCP servers stay wired, documented, and honest about infrastructure | `scripts/check-mcp-parity.mjs` |
+| Google Ads credential setup, micros, MCC gotcha | [`apps/google-ads-mcp/README.md`](../../../../apps/google-ads-mcp/README.md) + the `google-ads` skill |
+| Parked items | [carried-followups.md](../../carried-followups.md) |
 
 ## Shared context
 

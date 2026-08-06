@@ -123,7 +123,7 @@ and `uv sync` both succeed.
 `ui-api`'s failure is **pre-existing and unrelated to the move** — verified by diffing its
 sources against `HEAD`, which are byte-identical. The errors are Effect type errors in
 `src/handlers/chat.handlers.ts`, exactly the migration tracked by
-[`docs/plans/effect-ui-api.md`](../effect-ui-api.md). Not fixed here; it is that plan's job.
+[`docs/plans/effect-ui-api.md`](../../effect-ui-api.md). Not fixed here; it is that plan's job.
 
 ## Learnings
 

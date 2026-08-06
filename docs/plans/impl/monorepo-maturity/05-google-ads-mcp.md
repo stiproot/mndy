@@ -12,7 +12,7 @@ Part of [monorepo-maturity](./README.md).
 no entry in the plugin's `.mcp.json`, no skill. It is not in the workspace list, so it is
 invisible to `bun install` and to every build.
 
-There is a design doc at [`docs/plans/google-ads-mcp-paid-media-report.md`](../google-ads-mcp-paid-media-report.md)
+There is a design doc at [`docs/plans/google-ads-mcp-paid-media-report.md`](../../google-ads-mcp-paid-media-report.md)
 — read it before starting; this part is the delivery half of that idea.
 
 ## Why it goes last

@@ -153,7 +153,7 @@ layer — the parts that were actually buggy — but its `data-cache.service.ts`
 reusable domain, so the payoff is smaller than for the analytics platforms; it should follow
 the same shape when someone next touches it.
 
-Both are recorded in [carried-followups](../carried-followups.md).
+Both are recorded in [carried-followups](../../carried-followups.md).
 
 ## Verification
 
