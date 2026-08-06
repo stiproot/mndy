@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "lint": "bun scripts/check-workspaces.mjs && bun scripts/check-ports.mjs && bun scripts/check-hex-lint.mjs && bun scripts/check-mcp-parity.mjs && bun scripts/check-secrets.mjs && bun scripts/check-docker-workspace.mjs && bun run lint:md && bunx gen-code-diagram --check --dir docs/diagrams && turbo lint",
+    "lint": "bun scripts/check-workspaces.mjs && bun scripts/check-plans.mjs && bun scripts/check-ports.mjs && bun scripts/check-hex-lint.mjs && bun scripts/check-mcp-parity.mjs && bun scripts/check-secrets.mjs && bun scripts/check-docker-workspace.mjs && bun run lint:md && bunx gen-code-diagram --check --dir docs/diagrams && turbo lint",
     "test": "turbo test",
     "check-ports": "bun scripts/check-ports.mjs",
     "check-hex-lint": "bun scripts/check-hex-lint.mjs",
@@ -29,7 +29,8 @@
     "check-secrets": "bun scripts/check-secrets.mjs",
     "check-docker-workspace": "bun scripts/check-docker-workspace.mjs",
     "check-workspaces": "bun scripts/check-workspaces.mjs",
-    "diagrams": "bunx gen-code-diagram --dir docs/diagrams"
+    "diagrams": "bunx gen-code-diagram --dir docs/diagrams",
+    "check-plans": "bun scripts/check-plans.mjs"
   },
   "devDependencies": {
     "@stiproot/code-comprehension": "github:stiproot/code-comprehension",

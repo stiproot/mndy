@@ -1,5 +1,14 @@
 # Marketing Analytics Implementation Progress
 
+Status: Complete — all 17 implementation steps done (GA4, Meta and Shopify MCP servers,
+the analyst agents, the brand orchestrator, persistence and E2E tests). What remains under
+"Future enhancements" is unstarted scope, not unfinished work; those items are tracked as
+their own ideas rather than by keeping this plan open.
+Established: 2026-03-30
+Lifted to: the servers themselves (`apps/*-mcp`), `packages/js/analytics-core` for the
+shared domain, the `analytics` skill for the workflows, and
+[`docs/how-it-works.md`](../../how-it-works.md) for how the pieces fit.
+
 This document tracks the progress of the Marketing Analytics Multi-Agent System implementation.
 
 ## Overview

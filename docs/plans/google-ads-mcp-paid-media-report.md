@@ -1,9 +1,31 @@
 # Google Ads MCP & Paid Media Report Implementation Plan
 
-**Status:** 🚧 In Progress
-**Start Date:** 2026-03-30
-**Target Completion:** TBD
-**Priority:** High
+Status: Active — Phase 1 (the Google Ads MCP server) is DONE as of 2026-08-06. The report
+itself, which is the point of the plan, is not built. Phases 2-3 as written assume a
+Dapr-and-agents design that predates the packages split; see "Revised approach" below
+before following them.
+Established: 2026-03-30
+Priority: High — this is the deliverable the analytics stack exists to produce.
+
+## Revised approach (2026-08-06)
+
+Phase 1 delivered `packages/js/google-ads-core` + `apps/google-ads-mcp`, which completes the
+DATA layer: all four platforms (Google Ads, Meta, GA4, Shopify) are now readable, with
+shared KPI maths in `analytics-core`.
+
+The remaining phases should NOT be built as originally written:
+
+- **Phase 2 (Dapr persistence)** is optional, not required. It matters only for multi-step
+  runs that would otherwise re-fetch and burn API quota. A single report does not need it.
+- **Phase 3 (agents in cc-svc)** assumed the report is produced by an orchestrated agent
+  pipeline. The cheaper path now: the report is a **composition in
+  `packages/js/analytics-core`** that the `analytics` skill drives, because it reads four
+  platforms and must not live in any one server's app. Reserve the agent pipeline for if
+  and when a single request genuinely cannot do the work.
+- **The attribution rule is non-negotiable in either design:** platform-reported conversions
+  double-count against each other and against Shopify. Shopify is the source of truth for
+  revenue; platform figures compare a platform against itself over time. Blended ROAS is
+  Shopify revenue over total spend, and must be labelled as such.
 
 ---
 
@@ -1002,18 +1024,21 @@ The orchestrator already has markdown MCP access. Reports will be saved to:
 
 ## 📊 Progress Tracking
 
-**Overall Progress:** 0% (0/17 tasks completed)
+**Overall Progress:** 8/17 — Phase 1 complete, the report unbuilt.
 
-### Phase 1: Google Ads MCP (0/8)
+### Phase 1: Google Ads MCP (8/8) — done 2026-08-06
 
-- [ ] Directory structure
-- [ ] types.ts
-- [ ] GoogleAdsClient Service
-- [ ] get-campaigns tool
-- [ ] get-performance tool
-- [ ] index.ts bootstrap
-- [ ] Config files
-- [ ] README.md
+- [x] Directory structure — `packages/js/google-ads-core` + `apps/google-ads-mcp`
+- [x] types.ts — split into `domain/models.ts`, `domain/errors.ts`, `domain/ports.ts`
+- [x] GoogleAdsClient Service — `infrastructure/google-ads.client.ts`
+- [x] get-campaigns tool
+- [x] get-performance tool
+- [x] index.ts bootstrap — composition root on the shared runtime, stdio + http
+- [x] Config files — `.env.template`, port 3010, Makefile targets, plugin `.mcp.json`
+- [x] README.md — including the credential acquisition path
+
+> Not yet verified against the live API — see
+> [live-verification.md](./live-verification.md).
 
 ### Phase 2: Dapr Integration (0/2)
 

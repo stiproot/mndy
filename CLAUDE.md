@@ -131,6 +131,13 @@ Non-trivial work is scoped and tracked in a plan doc — a living log, not a fro
   Plans are transient; knowledge left inside one is lost when it is filed away.
 - **Source code never cites `docs/plans/*`** — state the rationale in the comment itself
   or cite the durable home.
+- Small parked items go to `docs/plans/carried-followups.md`, not into a new near-empty
+  follow-up doc. **But work that needs its own context — a decision, a blocker, a real body
+  of work — gets a real plan.** `docs/plans/live-verification.md` is the shape: what is
+  blocked, why it cannot proceed here, and exactly what unblocks it.
+- **Nothing outstanding may live only in a conversation.** A session ends and takes its
+  context with it; `docs/plans/` is what survives. `scripts/check-plans.mjs` keeps the plans
+  themselves well-formed, but only a human notices when something was never written down.
 
 ## Where code lives
 
@@ -159,6 +166,7 @@ exists because the thing it checks actually went wrong:
 | Guard | Fails when |
 | --- | --- |
 | `check-workspaces` | a `package.json`/`pyproject.toml` belongs to no workspace, or a non-bun lockfile exists |
+| `check-plans` | a plan lacks `Status:`/`Established:`, a `Deferred` one lacks `Revisit when:`, a `Complete` one still sits in `docs/plans/`, or a cited plan path no longer resolves |
 | `check-ports` | two apps declare the same `PORT` in their `.env.template` |
 | `check-hex-lint` | a package has `domain/` or `presentation/` but its `lint` does not run depcruise |
 | `check-mcp-parity` | an MCP server lacks a README, `.env.template`, make target or README-table row — or is documented as infra-free while depending on Dapr |

@@ -245,6 +245,7 @@ lint: lint-guards lint-md lint-node ## Run all linters (markdown gate is green a
 
 lint-guards: ## Run the repo structure guards (ports, hex, MCP parity, secrets, docker workspace)
 	bun run check-workspaces
+	bun run check-plans
 	bun run check-ports
 	bun run check-hex-lint
 	bun run check-mcp-parity
