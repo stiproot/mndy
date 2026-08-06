@@ -302,3 +302,6 @@ docs/reports/samples/
 
 # Turbo build cache
 .turbo/
+
+# Detached MCP server pids and logs
+.mcp-run/

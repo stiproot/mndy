@@ -8,7 +8,8 @@ DOCKER ?= podman
 
 .PHONY: install install-node install-python \
         dev serve-ui serve-vis serve-azdo run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
-        run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp run-google-ads-mcp run-markdown-mcp run-dapr-mcp run-analytics-mcps run-dapr-actor-svc build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
+        run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp run-google-ads-mcp run-markdown-mcp run-dapr-mcp run-analytics-mcps run-dapr-actor-svc \
+        start-analytics-mcps stop-analytics-mcps restart-analytics-mcps status-analytics-mcps logs-analytics-mcps build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
         refresh-meta-token \
         build build-ui build-vis build-azdo build-ui-api \
         lint lint-guards lint-md lint-md-fix lint-python lint-node \
@@ -156,6 +157,44 @@ run-dapr-actor-svc: build-dapr-actor-svc ## Run Dapr actor service with sidecar 
 		--app-port 3007 \
 		--components-path config/dapr/components.localhost \
 		-- bun run --cwd apps/dapr-actor-svc start
+
+# ==============================================================================
+# MCP lifecycle (detached)
+# ==============================================================================
+# `run-analytics-mcps` runs in the FOREGROUND — fine for a terminal, useless when an agent
+# is connected to the servers and you want to ship a code change without dropping the
+# session. These targets run them detached so you can rebuild and restart in place.
+#
+# The dev loop, verified end to end:
+#   1. edit code
+#   2. make restart-analytics-mcps      # rebuilds, then restarts in place
+#   3. in Claude Code: /mcp  -> reconnect the server
+#
+# Step 3 is required and sufficient. A restarted server does NOT keep its sessions: a
+# client holding a stale one gets `400 Bad Request: Server not initialized`. Re-running
+# the MCP handshake on the SAME session id works immediately and picks up the new tool
+# definitions — so you never need to restart Claude itself.
+
+MCP_RUN_DIR ?= .mcp-run
+ANALYTICS_MCPS := ga4-mcp meta-ads-mcp shopify-mcp google-ads-mcp
+MCP_LIFECYCLE := MCP_RUN_DIR=$(MCP_RUN_DIR) scripts/mcp-lifecycle.sh
+
+start-analytics-mcps: build-mcp ## Start the analytics MCP servers detached (pids + logs in .mcp-run/)
+	@$(MCP_LIFECYCLE) start $(ANALYTICS_MCPS)
+
+stop-analytics-mcps: ## Stop the detached analytics MCP servers
+	@$(MCP_LIFECYCLE) stop $(ANALYTICS_MCPS)
+
+restart-analytics-mcps: build-mcp ## Rebuild and restart the analytics MCP servers in place
+	@$(MCP_LIFECYCLE) restart $(ANALYTICS_MCPS)
+	@echo ""
+	@echo "Restarted. Reconnect in Claude Code with /mcp — no need to restart the session."
+
+status-analytics-mcps: ## Show whether each analytics MCP server is up, and on which port
+	@$(MCP_LIFECYCLE) status $(ANALYTICS_MCPS)
+
+logs-analytics-mcps: ## Tail the detached analytics MCP server logs
+	@$(MCP_LIFECYCLE) logs $(ANALYTICS_MCPS)
 
 # ==============================================================================
 # Scripts

@@ -90,6 +90,16 @@ one foreground command; Ctrl-C stops all of them. It does **not** start `github-
 `make run-dapr-mcp` additionally launches a **Dapr sidecar** (needs
 `make docker-compose-infra` up first).
 
+## After changing server code
+
+A restarted server does **not** keep its sessions: the next tool call fails with
+`400 Bad Request: Server not initialized`. That is not a broken server — reconnect it
+(`/mcp` in Claude Code) and the tools work again, serving the new definitions. **You never
+need to restart the Claude session** to pick up a code change.
+
+From the mndy repo, `make restart-analytics-mcps` rebuilds and restarts in place;
+`make status-analytics-mcps` shows what is up, down, or orphaned.
+
 ## Verifying a server is up
 
 Each server exposes a `/health` endpoint:

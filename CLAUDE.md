@@ -22,6 +22,41 @@ suffices.
 The one exception is `dapr-mcp`, which is a Mode 2 component. The authoritative table is
 [README.md § Which servers need infrastructure](./README.md#which-servers-need-infrastructure).
 
+## Iterating on an MCP server
+
+You do **not** need to restart Claude to pick up a code change. Verified loop:
+
+```bash
+# 1. edit code
+make restart-analytics-mcps     # rebuilds, stops, restarts in place
+# 2. in Claude Code: /mcp  -> reconnect the server
+```
+
+Step 2 is required *and* sufficient. A restarted server does not keep its sessions — a
+client holding a stale one gets `400 Bad Request: Server not initialized` on every call.
+Re-running the MCP handshake (what `/mcp` reconnect does) on the same session id succeeds
+immediately and serves the **new** tool definitions, because `createMcpApp` builds a fresh
+`McpServer` per session. So new tools, renamed tools and changed schemas all appear on
+reconnect.
+
+`make run-analytics-mcps` still exists and runs in the foreground — fine for a terminal,
+but it cannot be restarted without dropping the shell. Prefer the detached targets when an
+agent is connected:
+
+| Target | Does |
+| --- | --- |
+| `make start-analytics-mcps` | build + start detached; pids and logs in `.mcp-run/` |
+| `make stop-analytics-mcps` | stop, including orphans whose pidfile is stale |
+| `make restart-analytics-mcps` | the loop above |
+| `make status-analytics-mcps` | per-server up / down / **ORPHAN** / broken, with ports |
+| `make logs-analytics-mcps` | tail every server log |
+
+These are `scripts/mcp-lifecycle.sh`. It identifies a server by the **working directory**
+of its process (`/proc/<pid>/cwd`), not its command line — every server runs as
+`node dist/index.js`, so the command line cannot tell them apart, and an orphan that
+survived a `pkill` will keep holding its port while the next start dies on `EADDRINUSE`.
+A server with no `.env` is skipped with a message rather than started and left to crash.
+
 ## Conventions come from plugins
 
 The repo's working conventions are carried by installed Claude Code plugins
