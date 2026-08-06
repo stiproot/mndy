@@ -176,10 +176,13 @@ PublishScripts/
 
 # NuGet Packages
 *.nupkg
-# The packages folder can be ignored because of Package Restore
-**/packages/*
-# except build/, which is used as an MSBuild target.
-!**/packages/build/
+# The NuGet restore folder, scoped to the ONE C# project that has one.
+#
+# This was `**/packages/*`, which silently swallowed the entire `packages/` workspace when
+# it was created — five TypeScript packages were untracked and a fresh clone could not
+# build. Never re-broaden this: `packages/` is now a first-class source directory.
+apps/azdoproxy-api/**/packages/*
+!apps/azdoproxy-api/**/packages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
 # NuGet v3's project.json files produces more ignoreable files
@@ -296,3 +299,6 @@ nscacert.pem
 /scripts/output/*.md
 
 docs/reports/samples/
+
+# Turbo build cache
+.turbo/

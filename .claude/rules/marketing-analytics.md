@@ -34,6 +34,15 @@ Rules for developing and maintaining the marketing analytics multi-agent system.
 - All API calls must have timeouts (60s default)
 - Implement exponential backoff with jitter for retries
 - Only retry transient errors (429, 5xx)
+- **Authentication and quota failures are terminal — never retry them.** An expired token
+  will not become valid, and Google Ads quotas are daily. Give each a distinct tagged error
+  (`MetaAuthError`, `GoogleAdsAuthError`, `GoogleAdsQuotaError`) so the retry predicate
+  cannot see it, and return a message naming the credential to fix.
+- **Default unknown errors to retryable only if you have classified the terminal ones
+  first.** A predicate of the form `if (!code) return true` silently retries every failure
+  the SDK fails to attach a code to. That is exactly how an expired Meta token turned an
+  instant failure into four doomed requests over eight seconds; see
+  `packages/js/meta-ads-core/src/domain/errors.test.ts`.
 - Respect platform rate limits:
   - GA4: Quota-based, check `quotaExceeded` errors
   - Meta: Rate limiting with retry headers

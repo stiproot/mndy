@@ -1,0 +1,29 @@
+{
+  "name": "google-ads-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "lint": "depcruise --config ../../../.dependency-cruiser.cjs src"
+  },
+  "dependencies": {
+    "analytics-core": "workspace:*",
+    "google-ads-api": "^24.1.0",
+    "effect": "^3.12.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "dependency-cruiser": "^18.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

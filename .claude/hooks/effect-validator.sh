@@ -19,6 +19,14 @@ if [[ ! "$FILE_PATH" =~ ^.*src/.*\.ts$ ]]; then
   exit 0
 fi
 
+# Tests are exempt. A regression test's job is often to EXERCISE the anti-pattern and
+# assert that it misbehaves — packages/js/mcp-core/src/runtime.test.ts deliberately calls
+# `Effect.runPromise(effect.pipe(Effect.provide(...)))` in a loop to prove it rebuilds the
+# service each time, which is exactly why createServerRuntime exists.
+if [[ "$FILE_PATH" =~ \.(test|spec)\.ts$ ]]; then
+  exit 0
+fi
+
 # Extract the new content being written
 NEW_CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // .tool_input.content // empty')
 

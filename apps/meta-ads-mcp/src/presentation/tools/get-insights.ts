@@ -120,6 +120,20 @@ const getInsightsEffect = (input: GetInsightsInput) =>
           ],
           isError: true as const,
         }),
+      MetaAuthError: (error) =>
+        Effect.succeed({
+          content: [
+            {
+              type: "text" as const,
+              text:
+                `Meta authentication failed: ${error.message} ` +
+                "The access token is expired, revoked or invalid — retrying will not help. " +
+                "Generate a new token (see the `meta-token` skill or `make refresh-meta-token`) " +
+                "and restart the server.",
+            },
+          ],
+          isError: true as const,
+        }),
       MetaRateLimitError: (error) =>
         Effect.succeed({
           content: [
