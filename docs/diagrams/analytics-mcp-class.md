@@ -23,7 +23,10 @@ See [how-it-works.md](../how-it-works.md) for the request flow through these pie
     {"id": "Ga4Port", "kind": "interface", "file": "packages/js/ga4-core/src/domain/ports.ts", "symbol": "GA4ReportReader", "stereotype": "the port", "note": "what presentation depends on — never the SDK"},
     {"id": "Ga4Models", "kind": "interface", "file": "packages/js/ga4-core/src/domain/models.ts", "symbol": "RunReportInput", "stereotype": "domain"},
     
-    {"id": "Ga4Client", "kind": "const", "file": "packages/js/ga4-core/src/infrastructure/ga4.client.ts", "symbol": "GA4Config", "stereotype": "outbound adapter", "note": "implements the port; timeout + jittered retry; the only file that knows the Google SDK"},
+    {"id": "Ga4Client", "kind": "const",
+     "file": "packages/js/ga4-core/src/infrastructure/ga4.client.ts", "symbol": "GA4Config",
+     "stereotype": "outbound adapter",
+     "note": "implements the port; timeout + jittered retry; the only file that knows the Google SDK"},
     {"id": "RunReportTool", "kind": "module", "file": "apps/ga4-mcp/src/presentation/tools/run-report.ts", "functions": ["registerRunReportTool"], "stereotype": "inbound adapter", "note": "the only place zod appears — the MCP SDK's schema language"},
     {"id": "Steering", "kind": "module", "file": "apps/ga4-mcp/src/presentation/steering.ts", "functions": ["registerPrompts"], "stereotype": "inbound adapter"},
     {"id": "GoogleApi", "kind": "external", "stereotype": "vendor", "note": "Google Analytics Data API"}
