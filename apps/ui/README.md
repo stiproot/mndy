@@ -87,7 +87,7 @@ When enabled:
 
 ## Architecture
 
-```
+```text
 src/ui/
 ├── public/
 │   ├── index.html           # HTML template

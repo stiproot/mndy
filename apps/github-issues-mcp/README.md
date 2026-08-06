@@ -2,6 +2,14 @@
 
 MCP server providing tools for GitHub issue operations via the Model Context Protocol.
 
+> **Needs no infrastructure.** A plain HTTP process — no Dapr, no database, no
+> `docker-compose`. Just its own `.env` and a free port. Port **3009**; health at
+> `http://localhost:3009/health`. See
+> [README § Which servers need infrastructure](../../README.md#which-servers-need-infrastructure).
+
+The domain and platform adapter live in [`packages/js/github-core`](../../packages/js/github-core);
+this app is the container (config, tool schemas, composition root).
+
 ## Features
 
 - List issues with filters (state, labels, assignee, creator, milestone)
@@ -78,7 +86,7 @@ Copy `.env.template` to `.env` and configure:
 
 ## Architecture
 
-```
+```text
 src/
 ├── index.ts           # Server entry point
 ├── types.ts           # Schemas, errors, config
@@ -118,17 +126,17 @@ bun run --cwd apps/github-issues-mcp lint
 
 ## Troubleshooting
 
-**"GITHUB_TOKEN not set"**
+### "GITHUB_TOKEN not set"
 
 - Public repos work without a token
 - For private repos, create a PAT with `repo` scope
 
-**Rate limit exceeded**
+### Rate limit exceeded
 
 - The server handles rate limits with automatic retry
 - For heavy usage, use a token with higher limits
 
-**Connection refused on port 3009**
+### Connection refused on port 3009
 
 - Check if another service is using the port
 - Set a different `PORT` in `.env`

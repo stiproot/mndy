@@ -46,7 +46,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
 ### Initialization
 
-```
+```text
 Client                     Server
   │                          │
   │── initialize ───────────►│

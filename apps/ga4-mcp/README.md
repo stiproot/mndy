@@ -2,6 +2,14 @@
 
 MCP (Model Context Protocol) server for Google Analytics 4 Data API.
 
+> **Needs no infrastructure.** A plain HTTP process — no Dapr, no database, no
+> `docker-compose`. Just its own `.env` and a free port. Port **3003**; health at
+> `http://localhost:3003/health`. See
+> [README § Which servers need infrastructure](../../README.md#which-servers-need-infrastructure).
+
+The domain and platform adapter live in [`packages/js/ga4-core`](../../packages/js/ga4-core);
+this app is the container (config, tool schemas, composition root).
+
 ## Features
 
 - Run custom GA4 reports with dimensions, metrics, and filters

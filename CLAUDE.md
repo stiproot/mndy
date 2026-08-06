@@ -1,6 +1,26 @@
 # mndy
 
-Project analytics platform for Azure DevOps integration.
+Project analytics platform for Azure DevOps integration — **and** a set of standalone
+analytics MCP servers. Those are two different modes of using this repo, and conflating
+them is the most common mistake here.
+
+## Two modes
+
+| | Mode 1 — Analytics MCP | Mode 2 — Full platform |
+| --- | --- | --- |
+| What runs | 1–4 plain HTTP processes | Vue apps, Express gateway, 4 Python workers, Dapr, MongoDB, RabbitMQ, Zipkin |
+| Setup | a `.env` per server, a free port | `make docker-compose` + credentials |
+| Started with | `make run-analytics-mcps` | `make docker-compose` |
+| Language surface | TypeScript only | TypeScript + Python + C# |
+
+**Mode 1 is what most users want, and it needs no infrastructure whatsoever** — no Dapr, no
+database, no compose, no Python. When a user asks about GA4, Meta Ads, Google Ads or
+Shopify data, they are in Mode 1: do not tell them to stand up infrastructure, and do not
+run `make install` (which syncs the Python workspace they do not need) when `bun install`
+suffices.
+
+The one exception is `dapr-mcp`, which is a Mode 2 component. The authoritative table is
+[README.md § Which servers need infrastructure](./README.md#which-servers-need-infrastructure).
 
 ## Conventions come from plugins
 
@@ -114,19 +134,23 @@ Microservices architecture using Dapr:
 
 ### MCP servers
 
-| Server | Port | Infrastructure |
-| --- | --- | --- |
-| `apps/ga4-mcp` | 3003 | none |
-| `apps/meta-ads-mcp` | 3004 | none |
-| `apps/shopify-mcp` | 3005 | none |
-| `apps/dapr-mcp` | 3006 | **Dapr sidecar + `make docker-compose-infra`** |
-| `apps/markdown-mcp` | 3008 | none |
-| `apps/github-issues-mcp` | 3009 | none |
-| `apps/google-ads-mcp` | 3010 | none |
+| Server | Port |
+| --- | --- |
+| `apps/ga4-mcp` | 3003 |
+| `apps/meta-ads-mcp` | 3004 |
+| `apps/shopify-mcp` | 3005 |
+| `apps/dapr-mcp` | 3006 |
+| `apps/markdown-mcp` | 3008 |
+| `apps/github-issues-mcp` | 3009 |
+| `apps/google-ads-mcp` | 3010 |
 
-**Only `dapr-mcp` needs infrastructure.** Every other server is a plain HTTP process
-needing nothing but its own `.env` and a free port. See the Modes section for what that
-enables.
+Ports are declared as `PORT=<n>` in each app's `.env.template` and guarded by
+`scripts/check-ports.mjs`.
+
+**Which of these need infrastructure is stated in exactly one place:**
+[README.md § Which servers need infrastructure](./README.md#which-servers-need-infrastructure).
+Do not restate it here or anywhere else — link to it. The short version, for orientation
+only: only `dapr-mcp` does.
 
 ### Shared packages
 

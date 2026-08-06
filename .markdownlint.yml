@@ -8,5 +8,11 @@ MD013:
 MD046:
   style: fenced
 
+# Repeating a subheading under a DIFFERENT parent is normal in reference docs — several
+# sections each having "Protocol Messages" or "Error Handling" is a feature, not drift.
+# Repeating one under the SAME parent still fails.
+MD024:
+  siblings_only: true
+
 MD007:
   indent: 2

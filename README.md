@@ -6,9 +6,123 @@
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
 [![Dapr](https://img.shields.io/badge/Dapr-1.16+-purple.svg)](https://dapr.io/)
 
+## Two ways to use mndy
+
+This repo supports two genuinely different modes. **Pick one before reading further** —
+most people want the first, and it requires none of the infrastructure the second describes.
+
+### Mode 1 — Analytics MCP servers (no infrastructure)
+
+Start two or three plain HTTP processes, point Claude Code at them, and ask questions about
+your GA4, Meta Ads, Google Ads and Shopify data. **No Dapr, no MongoDB, no RabbitMQ, no
+docker-compose, no Python.** Each server needs only its own `.env` and a free port.
+
+This is the mode most users want. It is documented end-to-end in
+**[Analytics MCP mode](#analytics-mcp-mode)** below — go there and skip the rest.
+
+### Mode 2 — The full platform
+
+The Azure DevOps analytics platform: Vue frontends, an Express gateway, four Python
+workers, Dapr, MongoDB, RabbitMQ and Zipkin. This is what the [Architecture](#architecture)
+and [Quick Start](#quick-start-full-platform) sections describe.
+
+**Only one MCP server, `dapr-mcp`, belongs to Mode 2.** Every other server runs standalone.
+See [Which servers need infrastructure](#which-servers-need-infrastructure) — that table is
+the single source of truth, and everything else links to it.
+
+---
+
+## Analytics MCP mode
+
+Clone to first tool call. Nothing here starts a database or a sidecar.
+
+### 1. Install dependencies
+
+```bash
+git clone https://github.com/stiproot/mndy.git
+cd mndy
+bun install          # Node only — `make install` also syncs Python, which Mode 1 does not need
+```
+
+### 2. Configure the servers you want
+
+Each server reads its own `.env`. Copy the template and fill in credentials for whichever
+platforms you use — you do not need all of them:
+
+```bash
+cp apps/ga4-mcp/.env.template        apps/ga4-mcp/.env
+cp apps/meta-ads-mcp/.env.template   apps/meta-ads-mcp/.env
+cp apps/shopify-mcp/.env.template    apps/shopify-mcp/.env
+cp apps/google-ads-mcp/.env.template apps/google-ads-mcp/.env
+```
+
+Per-platform credential setup lives in each server's README — Google Ads has the most
+involved setup, so start with [its README](apps/google-ads-mcp/README.md) if you need it.
+
+### 3. Start them
+
+```bash
+make run-analytics-mcps    # GA4 3003, Meta 3004, Shopify 3005, Google Ads 3010
+```
+
+Ctrl-C stops all of them. To run just one: `make run-ga4-mcp` (and so on).
+
+Check any of them: `curl -s http://localhost:3003/health`.
+
+### 4. Connect Claude Code
+
+```bash
+claude plugin marketplace add ./plugin-marketplace
+claude plugin install mndy-mcp@mndy
+```
+
+The plugin registers the servers over HTTP and ships a skill per server, so the agent knows
+which tool to reach for. **No credentials are configured on the Claude side** — each server
+process holds its own.
+
+### 5. Ask
+
+> "What was our Meta ROAS last week compared to the week before?"
+
+### Working with several brands
+
+One running server serves every account its credentials can reach: the GA4, Meta and Google
+Ads tools take a per-call `propertyId` / `adAccountId` / `customerId`. Define your brands in
+a gitignored `mndy-brands.json` (template:
+`plugin-marketplace/plugins/mndy-mcp/skills/brands/mndy-brands.example.json`) and the
+`brands` skill applies the right IDs per call — no restarts.
+
+Shopify is the exception: its auth is bound to one store, so a running server serves exactly
+one store.
+
+---
+
+## Which servers need infrastructure
+
+**This table is the single source of truth.** Every other doc links here rather than
+restating it.
+
+| Server | Port | Needs infrastructure? | Analytics? |
+| --- | --- | --- | --- |
+| `ga4-mcp` | 3003 | **No** | Yes |
+| `meta-ads-mcp` | 3004 | **No** | Yes |
+| `shopify-mcp` | 3005 | **No** | Yes |
+| `google-ads-mcp` | 3010 | **No** | Yes |
+| `github-issues-mcp` | 3009 | **No** | No |
+| `markdown-mcp` | 3008 | **No** | No |
+| `dapr-mcp` | 3006 | **Yes** — Dapr sidecar + `make docker-compose-infra` | No |
+
+"Needs infrastructure" and "analytics" are separate axes and must not be conflated:
+`github-issues-mcp` and `markdown-mcp` are infrastructure-free but are not analytics
+servers, so `make run-analytics-mcps` does not start them.
+
+---
+
 ## Overview
 
-**mndy** (Project Metrics) is a comprehensive, data-driven project analytics platform designed for software development teams. It bridges the gap between Azure DevOps and project reporting platforms, enabling teams to make informed decisions through powerful metrics visualization and analysis.
+**mndy** (Project Metrics) is a comprehensive, data-driven project analytics platform designed for
+software development teams. It bridges the gap between Azure DevOps and project reporting platforms,
+enabling teams to make informed decisions through powerful metrics visualization and analysis.
 
 The platform provides a centralized hub for collecting, analyzing, and visualizing project data, helping teams identify bottlenecks, track progress, and optimize resource allocation—all while promoting better team behaviors through data transparency.
 
@@ -29,7 +143,7 @@ mndy is built on a modern cloud-native microservices architecture using Dapr (Di
 
 ### Services
 
-- `src/ui/` - Vue 3 + TypeScript + Quasar frontend with D3.js visualizations. [Details](src/ui/README.md)
+- `apps/ui/` - Vue 3 + TypeScript + Quasar frontend with D3.js visualizations. [Details](apps/ui/README.md)
 - `apps/ui-api/` - Express.js API gateway for authentication and data operations. [Details](apps/ui-api/README.md)
 - `apps/azdo-worker/` - Python FastAPI service for Azure DevOps data collection
 - `apps/azdoproxy-worker/` - Python FastAPI proxy for Azure DevOps API
@@ -38,11 +152,18 @@ mndy is built on a modern cloud-native microservices architecture using Dapr (Di
 
 ### MCP Servers
 
-- `packages/js/mcp-core/` - TypeScript shared library for building MCP servers
-- `apps/github-issues-mcp/` - GitHub Issues MCP server for AI assistants. [Details](apps/github-issues-mcp/README.md)
-- `apps/ga4-mcp/` - Google Analytics 4 MCP server. [Details](apps/ga4-mcp/README.md)
-- `apps/meta-ads-mcp/` - Meta (Facebook/Instagram) Ads MCP server. [Details](apps/meta-ads-mcp/README.md)
-- `apps/shopify-mcp/` - Shopify Admin API MCP server. [Details](apps/shopify-mcp/README.md)
+Each server is a thin container; its domain and platform adapter live in a package under
+`packages/js/`. See CLAUDE.md, "Where code lives". For which of these need infrastructure,
+see [the table above](#which-servers-need-infrastructure).
+
+- `packages/js/mcp-core/` - the MCP server framework every server is built on
+- `apps/ga4-mcp/` - Google Analytics 4. [Details](apps/ga4-mcp/README.md)
+- `apps/meta-ads-mcp/` - Meta (Facebook/Instagram) Ads. [Details](apps/meta-ads-mcp/README.md)
+- `apps/shopify-mcp/` - Shopify Admin API. [Details](apps/shopify-mcp/README.md)
+- `apps/google-ads-mcp/` - Google Ads paid search/display. [Details](apps/google-ads-mcp/README.md)
+- `apps/github-issues-mcp/` - GitHub Issues. [Details](apps/github-issues-mcp/README.md)
+- `apps/markdown-mcp/` - Markdown generation
+- `apps/dapr-mcp/` - Dapr state cache **(requires a Dapr sidecar + infra)**
 
 ### AI Services
 
@@ -59,7 +180,10 @@ mndy is built on a modern cloud-native microservices architecture using Dapr (Di
 
 For detailed architecture diagrams, see [docs/architecture.html](docs/architecture.html).
 
-## Quick Start
+## Quick Start (full platform)
+
+> This is **Mode 2**. If you only want the analytics MCP servers, use
+> [Analytics MCP mode](#analytics-mcp-mode) instead — none of the prerequisites below apply.
 
 ### Prerequisites
 
@@ -204,19 +328,19 @@ The marketing analytics MCP servers connect to Google Analytics 4, Meta Ads, and
 - A Google Cloud Platform (GCP) account
 - Access to a GA4 property (Viewer role or higher)
 
-**Step 1: Create a GCP Project**
+##### Step 1: Create a GCP Project
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Click "Select a project" → "New Project"
 3. Enter a project name (e.g., "mndy-analytics") and click "Create"
 
-**Step 2: Enable the GA4 Data API**
+##### Step 2: Enable the GA4 Data API
 
 1. In GCP Console, go to "APIs & Services" → "Library"
 2. Search for "Google Analytics Data API"
 3. Click on it and press "Enable"
 
-**Step 3: Create a Service Account**
+##### Step 3: Create a Service Account
 
 1. Go to "APIs & Services" → "Credentials"
 2. Click "Create Credentials" → "Service Account"
@@ -227,7 +351,7 @@ The marketing analytics MCP servers connect to Google Analytics 4, Meta Ads, and
 7. Select "JSON" and click "Create"
 8. Save the downloaded JSON file to `secrets/ga4-service-account.json`
 
-**Step 4: Grant GA4 Access**
+##### Step 4: Grant GA4 Access
 
 1. Copy the service account email (looks like `ga4-reader@project-id.iam.gserviceaccount.com`)
 2. Go to [Google Analytics](https://analytics.google.com/)
@@ -236,7 +360,7 @@ The marketing analytics MCP servers connect to Google Analytics 4, Meta Ads, and
 5. Paste the service account email
 6. Select "Viewer" role and click "Add"
 
-**Step 5: Get Your Property ID**
+##### Step 5: Get Your Property ID
 
 1. In GA4, go to Admin → Property Settings
 2. Copy the "Property ID" (a numeric value like `123456789`)
@@ -257,7 +381,7 @@ PORT=3003
 - A Meta Business Manager account
 - Admin access to an Ad Account
 
-**Step 1: Create a Meta Developer App**
+##### Step 1: Create a Meta Developer App
 
 1. Go to [Meta for Developers](https://developers.facebook.com/)
 2. Click "My Apps" → "Create App"
@@ -265,12 +389,12 @@ PORT=3003
 4. Enter an app name and select your Business Manager
 5. Click "Create App"
 
-**Step 2: Add Marketing API**
+##### Step 2: Add Marketing API
 
 1. In your app dashboard, click "Add Product"
 2. Find "Marketing API" and click "Set Up"
 
-**Step 3: Generate Access Token**
+##### Step 3: Generate Access Token
 
 Choose the appropriate method based on your use case:
 
@@ -357,7 +481,7 @@ curl \
 - [Business Management APIs - Install Apps and Generate Tokens](https://developers.facebook.com/docs/business-management-apis/system-users/install-apps-and-generate-tokens/)
 - [System User Access Token Handling](https://developers.facebook.com/docs/marketing-api/guides/smb/system-user-access-token-handling/)
 
-**Step 4: Get Your Ad Account ID**
+##### Step 4: Get Your Ad Account ID
 
 1. Go to [Ads Manager](https://adsmanager.facebook.com/)
 2. Click the dropdown showing your account name
@@ -402,7 +526,7 @@ PORT=3004
 - A Shopify store (can be a development store for testing)
 - Store owner or staff account with app development permissions
 
-**Step 1: Create an App in the Dev Dashboard**
+##### Step 1: Create an App in the Dev Dashboard
 
 1. Go to your Shopify Admin (admin.shopify.com/store/your-store)
 2. Navigate to "Settings" → "Apps and sales channels"
@@ -411,7 +535,7 @@ PORT=3004
 5. Click "Create app"
 6. Enter an app name (e.g., "mndy-analytics") and click "Create"
 
-**Step 2: Configure API Scopes**
+##### Step 2: Configure API Scopes
 
 1. In your app on dev.shopify.com, find the API configuration section
 2. Enable these Admin API scopes:
@@ -421,13 +545,13 @@ PORT=3004
    - `read_analytics` - View store analytics
 3. Save your changes
 
-**Step 3: Release and Install the App**
+##### Step 3: Release and Install the App
 
 1. Click "Release" to make the app available for installation
 2. Click "Install" to install the app on your store
 3. Copy the **Client ID** and **Client Secret** from the app credentials
 
-**Step 4: Get Your Store URL**
+##### Step 4: Get Your Store URL
 
 Your store URL is in the format: `your-store-name.myshopify.com`
 

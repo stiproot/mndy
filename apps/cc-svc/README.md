@@ -4,7 +4,9 @@ Multi-agent orchestration service for automated contributor insights and brand a
 
 ## Overview
 
-cc-svc coordinates multiple specialized AI agents to generate comprehensive insights. It uses a **two-phase orchestration pattern**: specialized agents run in parallel to gather data, then an orchestrator agent synthesizes their results into actionable intelligence.
+cc-svc coordinates multiple specialized AI agents to generate comprehensive insights. It uses a
+**two-phase orchestration pattern**: specialized agents run in parallel to gather data, then an
+orchestrator agent synthesizes their results into actionable intelligence.
 
 **Key Capabilities:**
 
@@ -17,7 +19,7 @@ cc-svc coordinates multiple specialized AI agents to generate comprehensive insi
 
 ### Two-Phase Orchestration Pattern
 
-```
+```text
 API Request (requirements)
          ↓
 ┌────────────────────────┐
@@ -43,7 +45,7 @@ API Request (requirements)
 
 #### Contributor Insights
 
-```
+```text
 POST /contributor-insights → OrchestratorService
 
 Phase 1: Promise.all([
@@ -57,7 +59,7 @@ Phase 2: Orchestrator synthesizes → ContributorInsightsResponse
 
 #### Brand Insights
 
-```
+```text
 POST /brand-insights → BrandInsightsService
 
 Phase 1: Promise.all([
@@ -73,7 +75,7 @@ Phase 2: Brand Orchestrator → BrandInsightsResponse
 
 ### How Requirements Are Communicated
 
-```
+```text
 1. HTTP Request
    → Validated against Zod schema
    → Parameters: owner, repo, username, options
@@ -163,7 +165,7 @@ curl -X POST http://localhost:3002/contributor-insights \
 
 ## Project Structure
 
-```
+```text
 src/
 ├── agents/          # Agent factory functions
 ├── controllers/     # HTTP request handlers

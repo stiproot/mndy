@@ -63,7 +63,7 @@ Enable users to request 3-month paid media reports that synthesize data from:
 
 ### Data Flow
 
-```
+```text
 User Request (POST /brand-insights)
     ↓
 BrandInsightsService
@@ -86,7 +86,7 @@ Return JSON + Markdown Report
 
 ### Google Ads MCP Components
 
-```
+```text
 google-ads-mcp (port 3006)
 ├── Tools
 │   ├── google_ads_get_campaigns - List campaigns
@@ -113,7 +113,7 @@ google-ads-mcp (port 3006)
 **Status:** Ready to create
 **Files:**
 
-```
+```text
 apps/google-ads-mcp/
 ├── src/
 │   ├── index.ts

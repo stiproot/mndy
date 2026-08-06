@@ -827,7 +827,7 @@ async function handleLogin() {
 
 **Key Standards:**
 
-```
+```text
 stores/
 ├── user.store.ts      # User authentication & profile
 ├── projects.store.ts  # Project management

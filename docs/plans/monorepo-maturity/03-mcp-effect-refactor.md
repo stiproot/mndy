@@ -18,7 +18,7 @@ and a composition root. Everything it wraps lives in a package.
 
 ## Target shape
 
-```
+```text
 packages/js/analytics-core/       pure domain, zero I/O
   src/domain/                       metric model, KPI math (CPA/ROAS/CTR/CVR/AOV),
                                     anomaly thresholds, currency + timezone normalization,

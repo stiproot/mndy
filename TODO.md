@@ -45,7 +45,7 @@ Example table structure:
 
 | Date | Channel | Campaign | Spend | CTR | CPC | Conversions | Revenue | ROAS |
 
-3. Performance Analysis Agent
+1. Performance Analysis Agent
 
 This agent identifies performance patterns.
 
@@ -66,7 +66,7 @@ Frequency > 3.5 → audience fatigue
 CPA 2x account average → budget waste
 ROAS > 3 → scaling opportunity
 
-4. Strategy Agent
+1. Strategy Agent
 
 This is where Claude or GPT excels.
 
@@ -88,7 +88,7 @@ Pause Prospecting Campaign 3 due to CTR decline.
 
 Launch new creatives for Advantage+ campaign.
 
-5. Reporting Agent
+1. Reporting Agent
 
 Outputs a structured report.
 
@@ -106,7 +106,7 @@ Retargeting campaign with ROAS 6.1.
 Action Plan
 Refresh creatives on prospecting campaigns.
 
-6. Suggested Stack (for your developer)
+1. Suggested Stack (for your developer)
 
 Backend:
 
@@ -131,7 +131,7 @@ Airflow
 or
 cron jobs
 
-7. Daily Workflow
+1. Daily Workflow
 
 Your AI system should run something like:
 
@@ -169,7 +169,7 @@ Example:
 Campaign exceeding ROAS target
 Recommend +20% budget increase
 
-9. Optional Advanced Agent (Very Powerful)
+1. Optional Advanced Agent (Very Powerful)
 
 A Creative Agent.
 
@@ -183,7 +183,7 @@ new angles
 
 This helps generate new ads automatically.
 
-10. What You Should Ask Your Developer
+1. What You Should Ask Your Developer
 
 Send them something like this:
 

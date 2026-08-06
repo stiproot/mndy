@@ -2,6 +2,14 @@
 
 MCP server for the Shopify Admin API, providing tools to fetch orders and analytics data from Shopify stores.
 
+> **Needs no infrastructure.** A plain HTTP process — no Dapr, no database, no
+> `docker-compose`. Just its own `.env` and a free port. Port **3005**; health at
+> `http://localhost:3005/health`. See
+> [README § Which servers need infrastructure](../../README.md#which-servers-need-infrastructure).
+
+The domain and platform adapter live in [`packages/js/shopify-core`](../../packages/js/shopify-core);
+this app is the container (config, tool schemas, composition root).
+
 ## Features
 
 - **shopify_get_orders**: Fetch orders with filters for status, date range, and pagination
@@ -137,7 +145,7 @@ The server includes automatic retry with exponential backoff for rate limit erro
 
 ## Architecture
 
-```
+```text
 src/
 ├── index.ts              # Server bootstrap
 ├── types.ts              # Tagged errors, Config, Schemas

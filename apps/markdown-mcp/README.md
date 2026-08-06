@@ -2,6 +2,11 @@
 
 MCP server for markdown file generation and validation.
 
+> **Needs no infrastructure.** A plain HTTP process — no Dapr, no database, no
+> `docker-compose`. Just its own `.env` and a free port. Port **3008**; health at
+> `http://localhost:3008/health`. See
+> [README § Which servers need infrastructure](../../README.md#which-servers-need-infrastructure).
+
 ## Overview
 
 This MCP server provides markdown generation, template-based creation, format conversion, and validation tools for Claude. It enables automated markdown document creation from structured data.
@@ -21,14 +26,14 @@ This MCP server provides markdown generation, template-based creation, format co
 bun install
 ```
 
-2. Configure environment:
+1. Configure environment:
 
 ```bash
 cp .env.template .env
 # Edit .env if you need to customize settings
 ```
 
-3. Start the server:
+1. Start the server:
 
 ```bash
 # Development
@@ -83,9 +88,9 @@ The `MarkdownService` provides:
 claude @mcp-tool "Create markdown_generate_file tool"
 ```
 
-2. The tool will be automatically added to `src/tools/`
-3. Export from `src/tools/index.ts`
-4. Register in `registerTools()` function
+1. The tool will be automatically added to `src/tools/`
+1. Export from `src/tools/index.ts`
+1. Register in `registerTools()` function
 
 ### Adding Service Methods
 

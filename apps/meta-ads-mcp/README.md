@@ -2,6 +2,14 @@
 
 MCP (Model Context Protocol) server for Meta Marketing API (Facebook/Instagram Ads).
 
+> **Needs no infrastructure.** A plain HTTP process — no Dapr, no database, no
+> `docker-compose`. Just its own `.env` and a free port. Port **3004**; health at
+> `http://localhost:3004/health`. See
+> [README § Which servers need infrastructure](../../README.md#which-servers-need-infrastructure).
+
+The domain and platform adapter live in [`packages/js/meta-ads-core`](../../packages/js/meta-ads-core);
+this app is the container (config, tool schemas, composition root).
+
 ## Features
 
 - Fetch advertising insights at account, campaign, ad set, or ad level

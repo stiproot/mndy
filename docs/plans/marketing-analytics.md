@@ -32,7 +32,7 @@ Build a marketing analytics platform that pulls data from Google Analytics 4, Me
 
 ### Phase 1: Infrastructure
 
-```
+```text
 secrets/
 ├── .gitignore
 └── README.md
@@ -40,7 +40,7 @@ secrets/
 
 ### Phase 2: MCP Servers
 
-```
+```text
 apps/ga4-mcp/
 ├── Dockerfile
 ├── package.json
@@ -83,7 +83,7 @@ apps/shopify-mcp/
 
 ### Phase 6: Claude Primitives
 
-```
+```text
 .claude/
 ├── rules/marketing-analytics.md
 ├── skills/marketing-agent/SKILL.md
@@ -92,7 +92,7 @@ apps/shopify-mcp/
 
 ### Phase 2.5: Integration Tests
 
-```
+```text
 tests/integration/
 ├── ga4-mcp/
 │   ├── setup.ts
@@ -113,7 +113,7 @@ package.json (added test scripts)
 
 ### Phase 3-5: Brand Insights Service
 
-```
+```text
 apps/cc-svc/src/
 ├── agents/
 │   └── index.ts  (GA4, Shopify, Meta, Brand Orchestrator agents)
@@ -140,7 +140,7 @@ apps/cc-svc/src/
 
 ## Brand Insights Architecture (Current Implementation)
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                      cc-svc (Brand Insights)                        │
 │                                                                     │

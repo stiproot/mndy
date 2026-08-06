@@ -44,7 +44,7 @@ The Model Context Protocol (MCP) enables standardized communication between AI m
 
 When developing MCP tools for agent workflows, the traditional approach is slow:
 
-```
+```text
 Modify MCP tool → Deploy → Run agent → Wait for result → Debug → Repeat
 ```
 
@@ -54,7 +54,7 @@ This cycle can take hours when iterating on MCP tools or agent prompts.
 
 Test MCPs directly with Claude Code CLI:
 
-```
+```text
 Start MCP server → Test tool in CLI → Validate response → Iterate
 ```
 
@@ -227,9 +227,9 @@ The plugin also ships one usage skill per server. See `plugin-marketplace/README
 
 **Available tool:** `ga4_run_report`
 
-**Test 1: Basic report**
+#### Test 1: Basic report
 
-```
+```text
 User: Use ga4_run_report to get sessions and conversions for the last 7 days
 ```
 
@@ -239,9 +239,9 @@ User: Use ga4_run_report to get sessions and conversions for the last 7 days
 - Metrics: sessions, conversions, totalRevenue
 - Date range: Last 7 days
 
-**Test 2: Segmented report**
+#### Test 2: Segmented report
 
-```
+```text
 User: Use ga4_run_report to get sessions by traffic source for yesterday
 ```
 
@@ -263,9 +263,9 @@ User: Use ga4_run_report to get sessions by traffic source for yesterday
 
 **Available tools:** `meta_get_insights`, `meta_get_campaigns`
 
-**Test 1: Campaign insights**
+#### Test 1: Campaign insights
 
-```
+```text
 User: Use meta_get_insights to get spend and ROAS for the last 7 days at campaign level
 ```
 
@@ -275,9 +275,9 @@ User: Use meta_get_insights to get spend and ROAS for the last 7 days at campaig
 - Fields: spend, impressions, clicks, purchase_roas
 - Date range: Last 7 days
 
-**Test 2: List campaigns**
+#### Test 2: List campaigns
 
-```
+```text
 User: Use meta_get_campaigns to list all active campaigns
 ```
 
@@ -297,9 +297,9 @@ User: Use meta_get_campaigns to list all active campaigns
 
 **Available tools:** `shopify_get_orders`, `shopify_get_analytics`
 
-**Test 1: Recent orders**
+#### Test 1: Recent orders
 
-```
+```text
 User: Use shopify_get_orders to get orders from the last 30 days
 ```
 
@@ -307,9 +307,9 @@ User: Use shopify_get_orders to get orders from the last 30 days
 
 - Array of orders with id, created_at, total_price, customer info
 
-**Test 2: Analytics summary**
+#### Test 2: Analytics summary
 
-```
+```text
 User: Use shopify_get_analytics to calculate revenue and AOV for last month
 ```
 
@@ -340,9 +340,9 @@ User: Use shopify_get_analytics to calculate revenue and AOV for last month
 - `get_cached_data` - Retrieve cached data
 - `get_brand_report` - Retrieve brand report
 
-**Test 1: Persist and retrieve GA4 data**
+#### Test 1: Persist and retrieve GA4 data
 
-```
+```text
 User: Use submit_ga4_data with this test data:
 {
   "actorId": "test-2026-03-21",
@@ -361,9 +361,9 @@ Then use get_cached_data to retrieve it with source="ga4" and actorId="test-2026
 - Submit returns success confirmation
 - Get returns the exact data plus timestamp
 
-**Test 2: Full agent workflow simulation**
+#### Test 2: Full agent workflow simulation
 
-```
+```text
 User: Simulate the brand insights workflow:
 1. Submit test GA4 data
 2. Submit test Meta data
@@ -387,7 +387,7 @@ User: Simulate the brand insights workflow:
 
 **Test:**
 
-```
+```text
 User: Use github_list_issues to get open issues for this repo
 ```
 
@@ -397,7 +397,7 @@ User: Use github_list_issues to get open issues for this repo
 
 ### The Cycle
 
-```
+```text
 1. Test MCP tool (Claude Code CLI)
    ↓
 2. Validate response (data quality, structure, errors)
@@ -442,7 +442,7 @@ You want the Meta Analyst agent to detect when ad creatives are fatigued (high f
 
 ### Traditional Approach (Slow)
 
-```
+```text
 1. Write agent prompt mentioning creative frequency
 2. Deploy cc-svc
 3. Call POST /brand-insights/analyze
@@ -463,7 +463,7 @@ You want the Meta Analyst agent to detect when ad creatives are fatigued (high f
 
 ### With Claude Code CLI (Fast)
 
-```
+```bash
 1. Test: "Use meta_get_insights and show me all available fields"
 2. Claude returns actual response with all fields
 3. Observe: Frequency is available but only at ad level, not campaign
@@ -623,7 +623,7 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 
 1. **Test MCP tool directly** to see raw response:
 
-   ```
+   ```text
    User: Call meta_get_insights and show me the raw response JSON
    ```
 
@@ -665,25 +665,25 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 
 ### Testing Patterns
 
-**Pattern 1: Data Structure Discovery**
+#### Pattern 1: Data Structure Discovery
 
-```
+```text
 User: Call ga4_run_report for last 7 days and show me ALL available fields
 ```
 
 Use this to understand what data is actually returned before writing agent prompts.
 
-**Pattern 2: Edge Case Testing**
+#### Pattern 2: Edge Case Testing
 
-```
+```text
 User: Call meta_get_insights for a date range with no data. How does it handle empty results?
 ```
 
 Helps you write better error handling in agent prompts.
 
-**Pattern 3: Workflow Simulation**
+#### Pattern 3: Workflow Simulation
 
-```
+```text
 User: Simulate the GA4 analyst workflow:
 1. Fetch data
 2. Persist to Dapr
@@ -693,9 +693,9 @@ User: Simulate the GA4 analyst workflow:
 
 Tests the full data flow before deploying to production.
 
-**Pattern 4: Comparative Testing**
+#### Pattern 4: Comparative Testing
 
-```
+```text
 User: Call meta_get_insights at campaign level and ad level for the same date range. What fields differ?
 ```
 
@@ -705,7 +705,7 @@ Helps understand platform API nuances.
 
 **✅ Recommended:**
 
-```
+```text
 1. Test MCP tool in Claude Code CLI (learn data structure)
 2. Write agent prompt with accurate field references
 3. Test agent prompt in Claude Code CLI (if possible)
@@ -716,7 +716,7 @@ Helps understand platform API nuances.
 
 **❌ Anti-pattern:**
 
-```
+```text
 1. Write agent prompt based on assumptions
 2. Deploy to cc-svc
 3. Test fails - missing field
@@ -758,7 +758,7 @@ Claude Code CLI testing transforms MCP development from a slow, iterative proces
 
 The workflow is simple:
 
-```
+```text
 Start MCP → Test in CLI → Learn → Refine → Deploy → Success
 ```
 

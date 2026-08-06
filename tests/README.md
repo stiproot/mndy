@@ -105,7 +105,7 @@ cd apps/shopify-mcp && bun run start
 
 ## Test Structure
 
-```
+```text
 tests/
 ├── .env.template          # Environment template
 ├── .env                   # Your local config (git-ignored)

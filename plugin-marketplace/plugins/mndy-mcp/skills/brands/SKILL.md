@@ -79,7 +79,7 @@ Shape:
 
 ## Switching mid-session
 
-If the user says "switch to <brand>", re-resolve from the registry and apply the new IDs
+If the user says "switch to `<brand>`", re-resolve from the registry and apply the new IDs
 going forward. Currency/timezone in the entry are hints for interpreting and formatting
 results (e.g. report AOV in the brand's `currency`).
 

@@ -8,8 +8,9 @@ only the MCP usage surface: the wiring and the skills. No application infrastruc
 
 One plugin, **`mndy-mcp`**, which bundles:
 
-- **`.mcp.json`** — registers five mndy MCP servers with Claude Code over HTTP:
-  `mndy-github-issues`, `mndy-ga4`, `mndy-meta-ads`, `mndy-shopify`, `mndy-dapr`.
+- **`.mcp.json`** — registers six mndy MCP servers with Claude Code over HTTP:
+  `mndy-ga4`, `mndy-meta-ads`, `mndy-google-ads`, `mndy-shopify`, `mndy-github-issues`,
+  `mndy-dapr`.
 - **Skills** — one orientation skill (`mndy-mcps`) plus one per server, documenting each
   server's tools, parameters, and usage so the agent knows what to call and how.
 - **Operational skills** — `brands` (target a specific brand/account per session without
@@ -31,9 +32,11 @@ claude plugin install mndy-mcp@mndy
 
 1. Start the server(s) you need from the mndy repo root, e.g. `make run-github-issues-mcp`.
    Each server reads credentials from `src/<name>-mcp/.env` (copy from `.env.template`).
-   - **Analytics (GA4, Meta Ads, Shopify) need no infrastructure.** Start all three with a
-     single target: `make run-analytics-mcps`. They're plain HTTP processes — no Dapr, no
-     docker-compose. Only `mndy-dapr` requires a sidecar + `make docker-compose-infra`.
+   - **The analytics servers (GA4, Meta Ads, Google Ads, Shopify) need no infrastructure.**
+     Start them all with one target: `make run-analytics-mcps`. They're plain HTTP
+     processes — no Dapr, no docker-compose. Only `mndy-dapr` requires a sidecar +
+     `make docker-compose-infra`; the authoritative table is in the mndy README under
+     "Which servers need infrastructure".
 2. In a Claude Code session with the plugin installed, ask for the task — the agent picks
    up the matching skill and calls the server's tools.
 
@@ -59,7 +62,7 @@ every property/ad account they've been granted.
 serves exactly one store. To analyse another store, repoint `apps/shopify-mcp/.env` and
 restart, or run one shopify-mcp per store on separate ports.
 
-By default the plugin connects to the servers on `localhost` (ports 3003/3004/3005/3006/3009).
+By default the plugin connects to the servers on `localhost` (ports 3003/3004/3005/3006/3009/3010).
 To target Docker or a remote host, set the override env vars before launching Claude Code:
 `MNDY_GITHUB_ISSUES_MCP_URL`, `MNDY_GA4_MCP_URL`, `MNDY_META_MCP_URL`,
 `MNDY_SHOPIFY_MCP_URL`, `MNDY_DAPR_MCP_URL`.

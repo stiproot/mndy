@@ -136,7 +136,7 @@ When enabled:
 
 ## Architecture
 
-```
+```text
 apps/ui-api/
 ├── src/
 │   ├── index.ts                    # Express app & route definitions
