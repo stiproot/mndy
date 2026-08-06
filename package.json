@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "lint": "node scripts/check-ports.mjs && node scripts/check-hex-lint.mjs && node scripts/check-mcp-parity.mjs && bun run lint:md && turbo lint",
+    "lint": "node scripts/check-ports.mjs && node scripts/check-hex-lint.mjs && node scripts/check-mcp-parity.mjs && node scripts/check-secrets.mjs && bun run lint:md && turbo lint",
     "test": "turbo test",
     "check-ports": "node scripts/check-ports.mjs",
     "check-hex-lint": "node scripts/check-hex-lint.mjs",
@@ -25,7 +25,8 @@
     "test:integration:shopify": "vitest run tests/integration/shopify-mcp/",
     "test:integration:marketing": "vitest run tests/integration/ga4-mcp/ tests/integration/meta-ads-mcp/ tests/integration/shopify-mcp/",
     "insights": "bun run --cwd scripts src/contributor-insights.ts",
-    "check-mcp-parity": "node scripts/check-mcp-parity.mjs"
+    "check-mcp-parity": "node scripts/check-mcp-parity.mjs",
+    "check-secrets": "node scripts/check-secrets.mjs"
   },
   "devDependencies": {
     "@stiproot/code-comprehension": "github:stiproot/code-comprehension",
