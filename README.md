@@ -123,6 +123,12 @@ one store.
 
 ---
 
+## How it works
+
+[docs/how-it-works.md](docs/how-it-works.md) walks the whole flow — which AI primitives are
+in play, what "registration" means at build, install and connect time, and the path from a
+question to a number.
+
 ## Which servers need infrastructure
 
 **This table is the single source of truth.** Every other doc links here rather than

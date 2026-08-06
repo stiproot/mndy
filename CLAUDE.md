@@ -4,6 +4,10 @@ Project analytics platform for Azure DevOps integration — **and** a set of sta
 analytics MCP servers. Those are two different modes of using this repo, and conflating
 them is the most common mistake here.
 
+See [docs/how-it-works.md](./docs/how-it-works.md) for the end-to-end picture: the AI
+primitives (tools, prompts, instructions, skills), the three registration lifecycles, and
+the path a question takes through the layers.
+
 ## Two modes
 
 | | Mode 1 — Analytics MCP | Mode 2 — Full platform |
