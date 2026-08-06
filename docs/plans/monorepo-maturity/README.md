@@ -49,7 +49,7 @@ If you find yourself writing business logic inside `apps/`, it is in the wrong p
 | --- | --- | --- |
 | 01 | [Plugin consumption](./01-plugin-consumption.md) | Complete |
 | 02 | [Monorepo restructure](./02-monorepo-restructure.md) | Complete |
-| 03 | [MCP servers onto Effect + packages](./03-mcp-effect-refactor.md) | Planning |
+| 03 | [MCP servers onto Effect + packages](./03-mcp-effect-refactor.md) | Complete |
 | 04 | [Analytics-mode doc hardening](./04-analytics-mode-docs.md) | Planning |
 | 05 | [Google Ads MCP](./05-google-ads-mcp.md) | Planning |
 

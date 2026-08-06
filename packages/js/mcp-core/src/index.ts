@@ -17,6 +17,10 @@ export type {
 // Server
 export { createMcpApp } from "./server.js";
 
+// Runtime — one per process, shared by every tool call
+export { createServerRuntime } from "./runtime.js";
+export type { ServerRuntime, ToolRunner } from "./runtime.js";
+
 // Session
 export { InMemorySessionStore, createSessionStore } from "./session.js";
 

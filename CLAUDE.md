@@ -223,11 +223,17 @@ Each service has its own linting configuration:
 
 **Status:** Active migration in progress
 
-**Services being migrated (in order):**
+| Component | State |
+| --- | --- |
+| `packages/js/analytics-core` | Done — pure domain, 31 tests |
+| `packages/js/{ga4,meta-ads,shopify,github}-core` | Done — domain + adapters, hex layered |
+| `apps/{ga4,meta-ads,shopify,github-issues}-mcp` | Done — containers on the shared runtime |
+| `apps/dapr-mcp` | Partial — shared runtime + presentation layer; logic not yet extracted |
+| `apps/markdown-mcp` | Not started — its service uses try/catch inside `Effect.gen` and needs a real rewrite, not a move. It registers no tools today. |
+| `apps/ui-api` | Not started (highest complexity) — see `docs/plans/effect-ui-api.md` |
 
-1. `apps/github-issues-mcp/` - **Completed** (Effect Services, Schema, Config)
-2. `packages/js/mcp-core/` - Pending
-3. `apps/ui-api/` - Pending (highest complexity)
+`mcp-core` stays the framework rather than becoming a domain package; it gained
+`createServerRuntime` and keeps its zod re-export for the presentation layer.
 
 **Standards:** See `docs/guides/effect-ts-standards.md` for comprehensive patterns
 

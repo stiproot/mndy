@@ -12,21 +12,78 @@ MCP servers expose platform-specific tools to Claude via HTTP. This project foll
 
 ### Directory Structure
 
+**The logic lives in a package; the server is a container.** See CLAUDE.md, "Where code
+lives". A server that holds its own platform client cannot be reused by a worker, a second
+server, or a test without dragging an HTTP process along.
+
 ```
-src/{name}-mcp/
+packages/js/{name}-core/          the reusable machinery
 ├── src/
-│   ├── index.ts                 # Effect.gen bootstrap, server setup
-│   ├── types.ts                 # Errors, Config, Schemas
-│   ├── services/
-│   │   └── {name}.service.ts    # Effect.Service with dependencies
-│   └── tools/
-│       ├── {tool-name}.ts       # Tool effect + registration
-│       └── index.ts             # Re-exports all tools
-├── package.json
-├── tsconfig.json
+│   ├── domain/
+│   │   ├── models.ts             shapes (plain types, or Schema for API responses)
+│   │   ├── errors.ts             Data.TaggedError per failure mode
+│   │   └── ports.ts              the interface callers depend on
+│   ├── infrastructure/
+│   │   └── {name}.client.ts      Effect.Service over the vendor SDK + its Config
+│   └── index.ts
+└── package.json                  lint: depcruise --config ../../../.dependency-cruiser.cjs src
+
+apps/{name}-mcp/                  the container
+├── src/
+│   ├── index.ts                  composition root: config → runtime → register → listen
+│   ├── config.ts                 ServerConfig only (port, logLevel)
+│   ├── runtime.ts                the app's ToolRunner type alias
+│   └── presentation/tools/
+│       └── {tool-name}.ts        zod schema + tool effect + registration
 ├── .env.template
 └── README.md
 ```
+
+Boundaries are machine-checked by `.dependency-cruiser.cjs`, and `scripts/check-hex-lint.mjs`
+fails any package with these layers whose `lint` script does not run depcruise.
+
+## Schemas: zod vs Effect Schema
+
+**Tool inputs are zod. Everything else is Effect Schema or a plain type.**
+
+This is not a preference — the MCP SDK's `registerTool` accepts only a zod raw shape or a
+zod type (`AnySchema = z3.ZodTypeAny | z4.$ZodType`). There is no JSON Schema path, so an
+Effect Schema cannot describe a tool's input to the protocol.
+
+zod is therefore a property of the **inbound adapter**, and lives only in
+`apps/*/src/presentation/tools/`. It must not appear in a `domain/` or `infrastructure/`
+module.
+
+The rule this replaces ("never use zod") was unachievable, and the workaround was worse than
+either option: every analytics server declared its tool input **twice** — once in zod for
+the SDK, once in Effect Schema in `types.ts` — and the Effect copy was dead code that no
+longer matched. One shape, one declaration.
+
+Use Effect `Schema` where runtime validation genuinely earns its keep: decoding a vendor
+API's response, or reading a config file off disk.
+
+## The shared runtime
+
+Build the service layer **once**, at the composition root:
+
+```typescript
+const runtime = createServerRuntime(MyService.Default);   // from mcp-core
+registerMyTool(server, runtime.run);                       // pass `run` to each tool
+```
+
+and have each tool take it:
+
+```typescript
+export function registerMyTool(server: McpServer, run: ToolRunner): void {
+  server.registerTool("my_tool", { ...config }, (args) => run(myToolEffect(args)));
+}
+```
+
+Never `Effect.runPromise(effect.pipe(Effect.provide(Service.Default)))` inside a handler:
+`runPromise` creates a fresh runtime and `provide` builds the layer as part of executing it,
+so **every request constructs a new platform client**, discarding connection pools and
+re-running auth. `createServerRuntime` also gives the process a real shutdown path via
+`dispose()`.
 
 ## Core Patterns
 
@@ -414,7 +471,9 @@ Effect.tryPromise({
 - ❌ Use raw Promises in business logic (use Effect)
 - ❌ Forget timeouts on external calls
 - ❌ Return errors via throw (use Effect error channel)
-- ❌ Use Zod (use Effect Schema for consistency)
+- ❌ Use zod anywhere except `presentation/` (see "Schemas: zod vs Effect Schema")
+- ❌ Call `Effect.runPromise(... Effect.provide(Service.Default))` in a tool handler — that
+  rebuilds the service on every single request. Use the shared runtime.
 - ❌ Skip logging in tools
 - ❌ Use camelCase for tool names (use snake_case)
 - ❌ Return malformed ToolResult (missing `content` array)

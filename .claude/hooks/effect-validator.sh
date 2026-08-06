@@ -27,11 +27,15 @@ if [[ -z "$NEW_CONTENT" ]]; then
   exit 0
 fi
 
-# Anti-pattern 1: try-catch inside Effect.gen
-# This is a critical anti-pattern that bypasses Effect's error handling
-if echo "$NEW_CONTENT" | grep -qE 'Effect\.gen.*function\*.*\{' && echo "$NEW_CONTENT" | grep -q 'try.*{'; then
-  # Check if try-catch appears after Effect.gen on same or nearby lines
-  if echo "$NEW_CONTENT" | grep -qE 'yield\*.*try|try.*yield\*'; then
+# Anti-pattern 1: a JavaScript try-catch STATEMENT inside Effect.gen
+# This bypasses Effect's error channel entirely.
+#
+# `Effect.try` and `Effect.tryPromise` are NOT this — they are the correct way to lift a
+# throwing call into the error channel, and their `try:` / `catch:` object keys used to
+# trip this check. Match only a genuine `try {` statement: `try` as a whole word, not
+# preceded by a dot (Effect.try) and not followed by a colon (the `try:` property key).
+if echo "$NEW_CONTENT" | grep -qE 'Effect\.gen.*function\*.*\{'; then
+  if echo "$NEW_CONTENT" | grep -qE '(^|[^.[:alnum:]_])try[[:space:]]*\{'; then
     echo "BLOCKED: Don't use try-catch inside Effect.gen" >&2
     echo "" >&2
     echo "Instead of:" >&2

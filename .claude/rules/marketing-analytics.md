@@ -65,31 +65,40 @@ Standard metric names across all platforms:
 
 ## Analytics Calculations
 
-### Core KPIs
+### Core KPIs — do not re-implement these
+
+**Import them from `analytics-core`.** They used to live here as prose to be re-typed at
+each call site, which is how two implementations of `roas` end up disagreeing.
+
 ```typescript
-// Cost per acquisition
-const cpa = spend / conversions;
-
-// Return on ad spend
-const roas = revenue / spend;
-
-// Click-through rate
-const ctr = (clicks / impressions) * 100;
-
-// Conversion rate
-const cvr = (conversions / clicks) * 100;
-
-// Average order value
-const aov = revenue / orders;
+import { deriveKpis, cpa, roas, ctr, cvr, aov, cpc, cpm } from "analytics-core";
 ```
 
+Each returns `undefined` — never `NaN` or `Infinity` — when an input is missing or a
+denominator is zero. **Preserve that distinction.** A report printing `ROAS 0.00` because
+spend was zero is making a claim it cannot support; "not computable" and "zero" are
+different answers. `packages/js/analytics-core/src/domain/kpis.test.ts` pins this.
+
+### Metric normalization
+
+Platform metric names map onto one canonical vocabulary via `normalizeMetrics(platform,
+raw)` and `sumMetrics`. Do not hand-roll a totals loop in a tool — the table below is
+implemented in `analytics-core/src/domain/metrics.ts`, including Google Ads' micros
+conversion.
+
 ### Anomaly Detection Thresholds
+
+Implemented in `analytics-core/src/domain/anomalies.ts` (`detectAnomalies`,
+`detectCreativeFatigue`); this table is the reference, not a second source of truth.
+
 | Metric | Warning | Critical |
 |--------|---------|----------|
 | ROAS drop | -20% vs 7-day avg | -40% |
 | CPA spike | +30% vs 7-day avg | +50% |
 | CTR drop | -25% vs 7-day avg | -40% |
 | Creative fatigue | CTR ↓ + CPC ↑ + Freq > 3.5 | Freq > 5 |
+
+Note that "drop" and "spike" are directional: ROAS rising is not a ROAS anomaly.
 
 ## Agent Patterns
 

@@ -1,45 +1,43 @@
+/**
+ * Composition root for the Meta Ads MCP server.
+ */
+
 import "dotenv/config";
 import { Effect } from "effect";
-import { createMcpApp, McpServer, log, setLogLevel, type LogLevel } from "mcp-core";
-import { registerGetInsightsTool } from "./tools/get-insights.js";
-import { registerGetCampaignsTool } from "./tools/get-campaigns.js";
-import { ServerConfig } from "./types.js";
-import { MetaAdsClient } from "./services/meta.js";
+import {
+  createMcpApp,
+  createServerRuntime,
+  log,
+  McpServer,
+  setLogLevel,
+  type LogLevel,
+} from "mcp-core";
+import { MetaAdsClient } from "meta-ads-core";
+import { ServerConfig } from "./config.js";
+import { registerGetCampaignsTool } from "./presentation/tools/get-campaigns.js";
+import { registerGetInsightsTool } from "./presentation/tools/get-insights.js";
 
 const SERVER_NAME = "meta-ads-mcp";
 const SERVER_VERSION = "0.1.0";
 
-function createServer(): McpServer {
-  const server = new McpServer({
-    name: SERVER_NAME,
-    version: SERVER_VERSION,
-  });
-
-  registerGetInsightsTool(server);
-  registerGetCampaignsTool(server);
-
-  return server;
-}
-
-/**
- * Main application startup effect
- */
 const main = Effect.gen(function* () {
   const config = yield* ServerConfig;
-  const client = yield* MetaAdsClient;
-
   setLogLevel(config.logLevel as LogLevel);
 
-  if (!client.hasAccessToken()) {
-    yield* Effect.log(
-      "META_ACCESS_TOKEN not set - API calls will fail. " +
-        "Generate a token at developers.facebook.com."
+  const runtime = createServerRuntime(MetaAdsClient.Default);
+  const client = yield* Effect.promise(() => runtime.runStartup(MetaAdsClient));
+
+  if (!client.hasAccessToken) {
+    log(
+      "warning",
+      "META_ACCESS_TOKEN is not set — every Meta call will fail at authentication. " +
+        "Generate a token at developers.facebook.com, or run `make refresh-meta-token`.",
     );
   }
 
-  yield* Effect.log(`Using Ad Account: ${client.getDefaultAdAccountId()}`);
+  log("info", `Default Meta ad account: ${client.defaultAdAccountId}`);
 
-  const { start } = createMcpApp(
+  const { start, stop } = createMcpApp(
     {
       name: SERVER_NAME,
       version: SERVER_VERSION,
@@ -47,16 +45,32 @@ const main = Effect.gen(function* () {
       endpoint: "/mcp",
       allowedHosts: ["localhost", "127.0.0.1", "meta-ads-mcp"],
     },
-    createServer
+    () => {
+      const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION });
+      registerGetInsightsTool(server, runtime.run);
+      registerGetCampaignsTool(server, runtime.run);
+      return server;
+    },
   );
+
+  const shutdown = (signal: string) => {
+    log("info", `${signal} received, shutting down`);
+    void stop()
+      .then(() => runtime.dispose())
+      .then(() => process.exit(0))
+      .catch(() => process.exit(1));
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
 
   yield* Effect.promise(() => start());
 }).pipe(
-  Effect.provide(MetaAdsClient.Default),
-  Effect.tapError((error) => Effect.sync(() => log("error", "Failed to start server", error)))
+  Effect.tapError((error) =>
+    Effect.sync(() => log("error", "Failed to start server", error)),
+  ),
 );
 
-// Execute the main effect
 Effect.runPromise(main).catch(() => {
   process.exit(1);
 });

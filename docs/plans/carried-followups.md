@@ -51,6 +51,23 @@ From [monorepo-maturity/02](./monorepo-maturity/02-monorepo-restructure.md). Eac
 `packages/py/mndy-framework/install.sh` is run by hand. Add the dependency so the workspace
 is self-sufficient, or document the manual step as deliberate.
 
+### `markdown-mcp` needs a real Effect rewrite (and some tools)
+
+From [monorepo-maturity/03](./monorepo-maturity/03-mcp-effect-refactor.md). Its
+`markdown.service.ts` uses JS try/catch inside `Effect.gen` and `yield* Effect.fail` without
+returning, so extraction was attempted and reverted — it needs rewriting, not relocating.
+It also registers **no tools**: `tools/index.ts` is a TODO stub listing five intended tools.
+Decide whether this server is wanted at all before investing in it; it is currently a
+running process that exposes nothing.
+
+### `dapr-mcp` logic still lives in the app
+
+From [monorepo-maturity/03](./monorepo-maturity/03-mcp-effect-refactor.md). It received the
+shared runtime and the `presentation/` layer, but `data-cache.service.ts` and its 397-line
+`types.ts` were not extracted to a package. Its tools are cache plumbing rather than a
+reusable domain, so the payoff is lower — but the layout is now inconsistent with the four
+analytics servers. Fold it into the same shape when next touched.
+
 ### `ui-api` does not compile
 
 From [monorepo-maturity/02](./monorepo-maturity/02-monorepo-restructure.md). `turbo build`

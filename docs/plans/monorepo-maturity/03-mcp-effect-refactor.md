@@ -1,6 +1,6 @@
 # 03 — MCP servers onto Effect + packages
 
-Status: Planning — move MCP logic out of the servers into `packages/js/*-core`, on Effect throughout.
+Status: Complete — five packages carry the logic; four servers are containers on a shared runtime.
 Established: 2026-08-06
 
 Part of [monorepo-maturity](./README.md). The packages-hold-the-logic principle is stated
@@ -81,3 +81,94 @@ observability.
 - **Don't let the extraction become a rewrite.** Move logic first, preserving behaviour;
   improve it after the tests still pass. The integration tests under `tests/integration/`
   are the safety net and must keep passing at every step.
+
+## What was done
+
+**Five new packages under `packages/js/`:**
+
+| Package | Contents |
+| --- | --- |
+| `analytics-core` | The pure cross-platform domain: canonical metric vocabulary, KPI math, anomaly thresholds, brand registry, money/timezone helpers, shared `TimeoutError`/`ConfigError`. 31 tests. |
+| `ga4-core` | GA4 domain + Data API adapter |
+| `meta-ads-core` | Meta domain + Marketing API adapter, 5 tests |
+| `shopify-core` | Shopify domain + Admin API adapter |
+| `github-core` | GitHub issues domain + REST adapter |
+
+**Four servers reduced to containers** — `ga4-mcp`, `meta-ads-mcp`, `shopify-mcp`,
+`github-issues-mcp` now hold only `config.ts`, `runtime.ts`, `presentation/tools/*` and a
+composition root. No vendor SDK appears in any app's dependencies.
+
+`mcp-core` gained `createServerRuntime`. Every package with hex layers runs depcruise, and
+`check-hex-lint.mjs` enforces that.
+
+## Findings
+
+**1. Every tool call was building a new platform client.** The registration idiom was
+
+```typescript
+(args) => Effect.runPromise(toolEffect(args).pipe(Effect.provide(Service.Default)))
+```
+
+`Effect.provide` builds the layer while *executing* the effect, and `runPromise` makes a
+fresh runtime per call — so every request constructed a new `BetaAnalyticsDataClient`, a new
+Octokit, a new Shopify session, discarding pools and redoing auth. `ManagedRuntime`, built
+once at the composition root, fixes it and adds a real shutdown path (`dispose()` runs layer
+finalizers; `runPromise` never did). This is now `createServerRuntime` in `mcp-core` and is
+a documented anti-pattern in the rules.
+
+**2. The "never use zod" rule was unachievable, and the workaround was worse.** The MCP SDK
+accepts only zod for `inputSchema` — `AnySchema = z3.ZodTypeAny | z4.$ZodType`, no JSON
+Schema path. So each analytics server declared its tool input **twice**: a zod shape the SDK
+used, and an Effect Schema in `types.ts` that nothing used and that had already drifted. The
+rule now says what is actually true: zod is an inbound-adapter concern confined to
+`presentation/`, Effect Schema is for decoding vendor responses and config files.
+
+**3. Meta's insight totals printed `$` regardless of account currency.** The hand-rolled
+totals loop in `get-insights.ts` prefixed the spend figure with a literal `$` — wrong for every ZAR
+account, which is most of them. Replaced by `analytics-core`'s `normalizeMetrics` +
+`sumMetrics` + `ctr`, and the symbol is gone: currency belongs to the ad account, not the
+formatter.
+
+**4. The Effect validator hook blocked correct code.** `.claude/hooks/effect-validator.sh`
+matched `yield\*.*try`, which fires on `Effect.tryPromise({ try: …, catch: … })` — the
+*correct* idiom — not just on a JS `try {` statement. It would have blocked most of this
+refactor. Tightened to match `try` only as a statement keyword, and verified both ways
+(correct code passes, a real try/catch inside `Effect.gen` still blocks).
+
+**5. `apps/ui-api` shipped npm's default failing test script** (`echo "Error: no test
+specified" && exit 1`), which failed `turbo test` for the whole workspace. Removed, same as
+the phantom lint scripts in part 02.
+
+## Deliberately not done
+
+**`apps/markdown-mcp`.** Extraction was started and **reverted**. Its service uses JS
+try/catch inside `Effect.gen` and `yield* Effect.fail` without returning — it needs a real
+Effect rewrite, not a relocation, and a half-migrated file is worse than an unmigrated one.
+It also registers **no tools at all** today (`tools/index.ts` is a TODO stub), so it has no
+users to protect and no runtime bug to fix.
+
+**`apps/dapr-mcp` logic extraction.** It got the shared runtime and the `presentation/`
+layer — the parts that were actually buggy — but its `data-cache.service.ts` and 397-line
+`types.ts` still live in the app. Its eight tools are Dapr-cache plumbing rather than a
+reusable domain, so the payoff is smaller than for the analytics platforms; it should follow
+the same shape when someone next touches it.
+
+Both are recorded in [carried-followups](../carried-followups.md).
+
+## Verification
+
+| Check | Result |
+| --- | --- |
+| `bun run lint` (guards + 20 turbo tasks) | passes |
+| `bun run test` (11 tasks, 36 tests) | passes |
+| `bun run build` | 15/20 — only the pre-existing `apps/ui-api` failure |
+| depcruise boundary guard | proven to fire (a deliberate domain→infrastructure import was rejected, then removed) |
+
+## Learnings
+
+- Moving a file is safe; moving a file *and* rewriting its idioms in one step is not. The
+  Shopify and GitHub clients moved wholesale with only import rewrites and built first try;
+  markdown's attempted move-plus-rewrite produced a mangled file and had to be reverted.
+- A lint guard nobody has tested against correct code is a liability. Two of the three
+  guards encountered here (the Effect hook, the phantom lint scripts) were wrong in ways
+  that had gone unnoticed because nothing exercised them.
