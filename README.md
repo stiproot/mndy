@@ -13,9 +13,9 @@ most people want the first, and it requires none of the infrastructure the secon
 
 ### Mode 1 — Analytics MCP servers (no infrastructure)
 
-Start two or three plain HTTP processes, point Claude Code at them, and ask questions about
-your GA4, Meta Ads, Google Ads and Shopify data. **No Dapr, no MongoDB, no RabbitMQ, no
-docker-compose, no Python.** Each server needs only its own `.env` and a free port.
+Ask Claude about your GA4, Meta Ads, Google Ads and Shopify data. **No Dapr, no MongoDB, no
+RabbitMQ, no docker-compose, no Python.** Each server is a plain process needing only its
+own credentials.
 
 This is the mode most users want. It is documented end-to-end in
 **[Analytics MCP mode](#analytics-mcp-mode)** below — go there and skip the rest.
@@ -36,7 +36,33 @@ the single source of truth, and everything else links to it.
 
 Clone to first tool call. Nothing here starts a database or a sidecar.
 
-### 1. Install dependencies
+### Claude Desktop — one command
+
+Claude Desktop launches the servers itself, so there is nothing to start and nothing to
+restart after a reboot.
+
+```bash
+git clone https://github.com/stiproot/mndy.git
+cd mndy
+bun install
+make install-desktop
+```
+
+It asks which platforms you use, takes the credentials, writes them to each server's `.env`,
+and merges the entries into `claude_desktop_config.json` — **your existing MCP servers in
+that file are preserved**, and it takes a timestamped backup first. Quit Claude Desktop
+completely, reopen it, and ask:
+
+> "How did our ads perform last week?"
+
+Re-run it any time credentials change. `make install-desktop --yes` skips the prompts and
+uses whatever is already in the `.env` files.
+
+Each server ships its own usage guidance to Claude at connect time, plus ready-made prompts
+("Meta Ads: performance review", "Google Ads: find wasted spend"), so there is nothing extra
+to install for it to know how to use them.
+
+### Claude Code — 1. Install dependencies
 
 ```bash
 git clone https://github.com/stiproot/mndy.git
@@ -44,7 +70,7 @@ cd mndy
 bun install          # Node only — `make install` also syncs Python, which Mode 1 does not need
 ```
 
-### 2. Configure the servers you want
+### Claude Code — 2. Configure the servers you want
 
 Each server reads its own `.env`. Copy the template and fill in credentials for whichever
 platforms you use — you do not need all of them:
@@ -59,7 +85,7 @@ cp apps/google-ads-mcp/.env.template apps/google-ads-mcp/.env
 Per-platform credential setup lives in each server's README — Google Ads has the most
 involved setup, so start with [its README](apps/google-ads-mcp/README.md) if you need it.
 
-### 3. Start them
+### Claude Code — 3. Start them
 
 ```bash
 make run-analytics-mcps    # GA4 3003, Meta 3004, Shopify 3005, Google Ads 3010
@@ -69,7 +95,7 @@ Ctrl-C stops all of them. To run just one: `make run-ga4-mcp` (and so on).
 
 Check any of them: `curl -s http://localhost:3003/health`.
 
-### 4. Connect Claude Code
+### Claude Code — 4. Connect
 
 ```bash
 claude plugin marketplace add ./plugin-marketplace
@@ -80,7 +106,7 @@ The plugin registers the servers over HTTP and ships a skill per server, so the 
 which tool to reach for. **No credentials are configured on the Claude side** — each server
 process holds its own.
 
-### 5. Ask
+### Claude Code — 5. Ask
 
 > "What was our Meta ROAS last week compared to the week before?"
 

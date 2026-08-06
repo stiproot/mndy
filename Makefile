@@ -9,7 +9,7 @@ DOCKER ?= podman
 .PHONY: install install-node install-python \
         dev serve-ui serve-vis serve-azdo run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
         run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp run-google-ads-mcp run-markdown-mcp run-dapr-mcp run-analytics-mcps run-dapr-actor-svc \
-        start-analytics-mcps stop-analytics-mcps restart-analytics-mcps status-analytics-mcps logs-analytics-mcps build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
+        start-analytics-mcps stop-analytics-mcps restart-analytics-mcps status-analytics-mcps logs-analytics-mcps install-desktop build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
         refresh-meta-token \
         build build-ui build-vis build-azdo build-ui-api \
         lint lint-guards lint-md lint-md-fix lint-python lint-node \
@@ -189,6 +189,9 @@ restart-analytics-mcps: build-mcp ## Rebuild and restart the analytics MCP serve
 	@$(MCP_LIFECYCLE) restart $(ANALYTICS_MCPS)
 	@echo ""
 	@echo "Restarted. Reconnect in Claude Code with /mcp — no need to restart the session."
+
+install-desktop: build-mcp ## Wire the analytics MCP servers into Claude Desktop (stdio; no terminal needed afterwards)
+	@node scripts/install-desktop.mjs
 
 status-analytics-mcps: ## Show whether each analytics MCP server is up, and on which port
 	@$(MCP_LIFECYCLE) status $(ANALYTICS_MCPS)

@@ -51,28 +51,35 @@ export function formatLogMessage(level: LogLevel, message: string): string {
 }
 
 /**
- * Log a message at the specified level
+ * Log a message at the specified level.
+ *
+ * **Everything goes to stderr, deliberately.** Under the stdio transport, stdout IS the
+ * JSON-RPC channel between this server and its client — a single `console.log` there
+ * corrupts the message stream and drops the connection. Routing by level (info to stdout,
+ * error to stderr) would make that a latent trap: an HTTP-only server gains a log line
+ * today and breaks the day someone runs it over stdio. One destination, no trap.
+ *
+ * stderr is the conventional home for server diagnostics regardless, and the detached
+ * runner already captures it (`> log 2>&1`).
  */
 export function log(level: LogLevel, message: string, data?: unknown): void {
   if (!shouldLog(level)) return;
 
   const formatted = formatLogMessage(level, message);
+  const suffix = data !== undefined ? ` ${safeStringify(data)}` : "";
 
-  switch (level) {
-    case "debug":
-    case "info":
-    case "notice":
-      console.log(formatted, data !== undefined ? data : "");
-      break;
-    case "warning":
-      console.warn(formatted, data !== undefined ? data : "");
-      break;
-    case "error":
-    case "critical":
-    case "alert":
-    case "emergency":
-      console.error(formatted, data !== undefined ? data : "");
-      break;
+  process.stderr.write(`${formatted}${suffix}\n`);
+}
+
+/** Serialize log context without throwing on cycles or BigInt. */
+function safeStringify(data: unknown): string {
+  if (typeof data === "string") return data;
+  try {
+    return JSON.stringify(data, (_key, value) =>
+      typeof value === "bigint" ? value.toString() : value,
+    ) ?? String(data);
+  } catch {
+    return String(data);
   }
 }
 

@@ -21,6 +21,10 @@ export { createMcpApp } from "./server.js";
 export { createServerRuntime } from "./runtime.js";
 export type { ServerRuntime, ToolRunner } from "./runtime.js";
 
+// Transport — stdio (Claude Desktop launches the process) or http (dev loop, Docker)
+export { resolveTransport, serveMcp } from "./serve.js";
+export type { ServeResult, TransportKind } from "./serve.js";
+
 // Session
 export { InMemorySessionStore, createSessionStore } from "./session.js";
 

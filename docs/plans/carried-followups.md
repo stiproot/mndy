@@ -9,6 +9,14 @@ context is one link away.
 
 ## Open
 
+### Publish the analytics servers as an npx package
+
+From [desktop-consumability](./desktop-consumability.md). Desktop install is now one command,
+but it still needs git, bun and a clone. A published package would make the Desktop config
+`npx -y @mndy/analytics-mcp` with no repo and no build step — materially easier for anyone
+outside the team. Deferred because it is a real packaging and release effort; revisit when
+this is handed to people who will not clone a monorepo.
+
 ### Frontend Docker images cannot build
 
 From [monorepo-maturity/02](./impl/monorepo-maturity/02-monorepo-restructure.md). `apps/ui`,

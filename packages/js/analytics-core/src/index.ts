@@ -56,6 +56,12 @@ export {
 export { ConfigError, TimeoutError } from "./domain/errors.js";
 
 export {
+  BRAND_TARGETING,
+  REPORTING_SEMANTICS,
+  buildInstructions,
+} from "./domain/guidance.js";
+
+export {
   CurrencyMismatchError,
   DEFAULT_TIMEZONE,
   sumMoney,

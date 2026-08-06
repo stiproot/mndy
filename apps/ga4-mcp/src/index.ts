@@ -2,23 +2,25 @@
  * Composition root for the GA4 MCP server.
  *
  * This file is the ONLY place that knows how the pieces fit: it reads config, builds the
- * runtime from `ga4-core`'s layer, registers the inbound adapters, and starts the HTTP
- * server. No business logic — see CLAUDE.md, "Where code lives".
+ * runtime from `ga4-core`'s layer, registers the inbound adapters, and starts the server on
+ * whichever transport the deployment calls for. No business logic — see CLAUDE.md, "Where
+ * code lives".
  */
 
 import "dotenv/config";
 import { Effect } from "effect";
 import {
-  createMcpApp,
   createServerRuntime,
   log,
   McpServer,
+  serveMcp,
   setLogLevel,
   type LogLevel,
 } from "mcp-core";
 import { GA4Client } from "ga4-core";
 import { ServerConfig } from "./config.js";
 import { registerRunReportTool } from "./presentation/tools/run-report.js";
+import { INSTRUCTIONS, registerPrompts } from "./presentation/steering.js";
 
 const SERVER_NAME = "ga4-mcp";
 const SERVER_VERSION = "0.1.0";
@@ -43,19 +45,25 @@ const main = Effect.gen(function* () {
 
   log("info", `Default GA4 property: ${client.defaultPropertyId}`);
 
-  const { start, stop } = createMcpApp(
-    {
-      name: SERVER_NAME,
-      version: SERVER_VERSION,
-      port: config.port,
-      endpoint: "/mcp",
-      allowedHosts: ["localhost", "127.0.0.1", "ga4-mcp"],
-    },
-    () => {
-      const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION });
-      registerRunReportTool(server, runtime.run);
-      return server;
-    },
+  const { transport, stop } = yield* Effect.promise(() =>
+    serveMcp(
+      {
+        name: SERVER_NAME,
+        version: SERVER_VERSION,
+        port: config.port,
+        endpoint: "/mcp",
+        allowedHosts: ["localhost", "127.0.0.1", "ga4-mcp"],
+      },
+      () => {
+        const server = new McpServer(
+          { name: SERVER_NAME, version: SERVER_VERSION },
+          { instructions: INSTRUCTIONS },
+        );
+        registerRunReportTool(server, runtime.run);
+        registerPrompts(server);
+        return server;
+      },
+    ),
   );
 
   const shutdown = (signal: string) => {
@@ -69,7 +77,7 @@ const main = Effect.gen(function* () {
   process.on("SIGINT", () => shutdown("SIGINT"));
   process.on("SIGTERM", () => shutdown("SIGTERM"));
 
-  yield* Effect.promise(() => start());
+  log("debug", `${SERVER_NAME} serving over ${transport}`);
 }).pipe(
   Effect.tapError((error) =>
     Effect.sync(() => log("error", "Failed to start server", error)),

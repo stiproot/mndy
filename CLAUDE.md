@@ -22,6 +22,34 @@ suffices.
 The one exception is `dapr-mcp`, which is a Mode 2 component. The authoritative table is
 [README.md § Which servers need infrastructure](./README.md#which-servers-need-infrastructure).
 
+## Transports
+
+Every MCP server speaks two, chosen at deploy time by `MCP_TRANSPORT` — no code change:
+
+| Transport | Who uses it | Why |
+| --- | --- | --- |
+| `stdio` | **Claude Desktop** | Desktop spawns the process and talks over its pipes — no port, no lifecycle, nothing for the user to start |
+| `http` | Claude Code, Docker | several clients can share one server, and it can be restarted under a live session |
+
+Unset, it infers: no TTY and no `PORT` means a client spawned us, so stdio.
+
+**Under stdio, stdout is the JSON-RPC channel.** `mcp-core`'s `log()` therefore writes
+everything to **stderr** — not by level, unconditionally. Routing info to stdout would make
+this a latent trap: an HTTP-only server gains a log line today and corrupts the protocol the
+day someone runs it over stdio. Never `console.log` in a server or a package it depends on.
+
+## Steering ships inside the servers
+
+Each analytics server sends `instructions` at initialize and registers prompt starters
+(`src/presentation/steering.ts`). This reaches **every** MCP client with nothing installed,
+so the load-bearing rules live there: null KPIs mean "not computable", money is in the
+account's currency, Shopify is one store per server.
+
+The cross-cutting text is `analytics-core`'s `buildInstructions` / `REPORTING_SEMANTICS` —
+it documents the KPI module's own contract, so it lives beside it. Keep `instructions`
+short; it is sent on every connect. Long-form workflow guidance belongs in the `analytics`
+skill.
+
 ## Iterating on an MCP server
 
 You do **not** need to restart Claude to pick up a code change. Verified loop:

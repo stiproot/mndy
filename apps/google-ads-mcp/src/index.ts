@@ -5,15 +5,16 @@
 import "dotenv/config";
 import { Effect } from "effect";
 import {
-  createMcpApp,
   createServerRuntime,
   log,
   McpServer,
+  serveMcp,
   setLogLevel,
   type LogLevel,
 } from "mcp-core";
 import { GoogleAdsClient } from "google-ads-core";
 import { ServerConfig } from "./config.js";
+import { INSTRUCTIONS, registerPrompts } from "./presentation/steering.js";
 import { registerGetCampaignsTool } from "./presentation/tools/get-campaigns.js";
 import { registerGetPerformanceTool } from "./presentation/tools/get-performance.js";
 
@@ -29,7 +30,8 @@ const main = Effect.gen(function* () {
 
   log("info", `Default Google Ads customer: ${client.defaultCustomerId}`);
 
-  const { start, stop } = createMcpApp(
+  const { transport, stop } = yield* Effect.promise(() =>
+    serveMcp(
     {
       name: SERVER_NAME,
       version: SERVER_VERSION,
@@ -38,11 +40,16 @@ const main = Effect.gen(function* () {
       allowedHosts: ["localhost", "127.0.0.1", "google-ads-mcp"],
     },
     () => {
-      const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION });
+      const server = new McpServer(
+          { name: SERVER_NAME, version: SERVER_VERSION },
+          { instructions: INSTRUCTIONS },
+        );
       registerGetPerformanceTool(server, runtime.run);
       registerGetCampaignsTool(server, runtime.run);
+      registerPrompts(server);
       return server;
     },
+    ),
   );
 
   const shutdown = (signal: string) => {
@@ -56,7 +63,7 @@ const main = Effect.gen(function* () {
   process.on("SIGINT", () => shutdown("SIGINT"));
   process.on("SIGTERM", () => shutdown("SIGTERM"));
 
-  yield* Effect.promise(() => start());
+  log("debug", `${SERVER_NAME} serving over ${transport}`);
 }).pipe(
   Effect.tapError((error) =>
     Effect.sync(() => log("error", "Failed to start server", error)),

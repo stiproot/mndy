@@ -1,6 +1,8 @@
 {
   "name": "mndy-mcp",
-  "description": "Wires the mndy MCP servers into Claude Code and teaches an agent how to use them. Bundles a .mcp.json that registers the GitHub Issues, GA4, Meta Ads, Shopify, and Dapr cache MCP servers over HTTP, plus a skill per server documenting its tools, parameters, and usage. Also ships operational skills: 'brands' for switching which brand/account the analytics tools target per session without restarting servers, and 'meta-token' for verifying and refreshing the Meta access token. Use the mndy MCP servers directly from a shell agent or as part of the full mndy solution.",
-  "version": "0.1.0",
-  "author": { "name": "stiproot" }
+  "description": "Marketing and ecommerce analytics for Claude, plus the mndy MCP servers. Ships an 'analytics' skill covering which server answers which question, working across GA4, Meta Ads, Google Ads and Shopify at once, per-brand account targeting, and reporting numbers honestly (null KPIs are not zero; money is in the account's own currency). Bundles a .mcp.json registering the servers over HTTP for Claude Code, a skill per server documenting its tools, and operational skills: 'brands' for switching brand per session without restarting, and 'meta-token' for refreshing the Meta access token. Claude Desktop users should run `make install-desktop` in the mndy repo instead, which wires the servers over stdio.",
+  "version": "0.2.0",
+  "author": {
+    "name": "stiproot"
+  }
 }

@@ -11,6 +11,10 @@ One plugin, **`mndy-mcp`**, which bundles:
 - **`.mcp.json`** — registers six mndy MCP servers with Claude Code over HTTP:
   `mndy-ga4`, `mndy-meta-ads`, `mndy-google-ads`, `mndy-shopify`, `mndy-github-issues`,
   `mndy-dapr`.
+- **`analytics`** — the skill most users want: which server answers which question, working
+  across platforms at once, per-brand targeting, and the reporting rules that stop a
+  confidently wrong number (null KPIs are not zero, money is in the account's own currency,
+  Shopify is the source of truth for revenue).
 - **Skills** — one orientation skill (`mndy-mcps`) plus one per server, documenting each
   server's tools, parameters, and usage so the agent knows what to call and how.
 - **Operational skills** — `brands` (target a specific brand/account per session without
@@ -18,6 +22,13 @@ One plugin, **`mndy-mcp`**, which bundles:
 
 The MCP servers themselves live in the mndy repo under `src/*-mcp/` and are run from there
 (`make run-<name>-mcp`). This plugin is the client-side wiring and know-how only.
+
+## Claude Desktop
+
+This marketplace is for **Claude Code**. Desktop users do not need it: run
+`make install-desktop` in the mndy repo, which wires the analytics servers into
+`claude_desktop_config.json` over stdio. Desktop then launches them itself, and each server
+ships its own usage guidance and prompt starters — no plugin required.
 
 ## Install
 
