@@ -40,61 +40,86 @@ src/$NAME-mcp/
 └── README.md
 ```
 
+**The logic does not live here.** `apps/$NAME-mcp` is a container; its domain, ports and
+vendor adapter belong in `packages/js/$NAME-core` (see CLAUDE.md, "Where code lives"). The
+app holds `config.ts`, `runtime.ts`, `presentation/tools/*` and `presentation/steering.ts`.
+
 ## Template: index.ts
+
+The composition root. It wires config, runtime, tools and steering — and nothing else.
 
 ```typescript
 import "dotenv/config";
 import { Effect } from "effect";
-import { createMcpApp, McpServer, log, setLogLevel, type LogLevel } from "mcp-core";
-import * as tools from "./tools/index.js";
-import { ServerConfig } from "./types.js";
-import { $SERVICE_CLASS } from "./services/$SERVICE_FILE.js";
+import {
+  createServerRuntime, log, McpServer, serveMcp, setLogLevel, type LogLevel,
+} from "mcp-core";
+import { $SERVICE_CLASS } from "$NAME-core";
+import { ServerConfig } from "./config.js";
+import { registerTools } from "./presentation/tools/index.js";
+import { INSTRUCTIONS, registerPrompts } from "./presentation/steering.js";
 
 const SERVER_NAME = "$NAME-mcp";
-const SERVER_VERSION = "1.0.0";
+const SERVER_VERSION = "0.1.0";
 
-function createServer(): McpServer {
-  const server = new McpServer({
-    name: SERVER_NAME,
-    version: SERVER_VERSION,
-  });
-
-  tools.registerTools(server);
-
-  return server;
-}
-
-/**
- * Main application startup effect
- */
 const main = Effect.gen(function* () {
   const config = yield* ServerConfig;
-  const service = yield* $SERVICE_CLASS;
-
   setLogLevel(config.logLevel as LogLevel);
 
-  const { start } = createMcpApp(
-    {
-      name: SERVER_NAME,
-      version: SERVER_VERSION,
-      port: config.port,
-      endpoint: "/mcp",
-      allowedHosts: ["localhost", "127.0.0.1"],
-    },
-    createServer
+  // Built ONCE. Never provide the layer per tool call — that rebuilds the platform
+  // client, and its auth handshake, on every request.
+  const runtime = createServerRuntime($SERVICE_CLASS.Default);
+
+  // serveMcp picks stdio (Claude Desktop spawns the process) or http (Claude Code,
+  // Docker) from MCP_TRANSPORT. One binary, both clients.
+  const { transport, stop } = yield* Effect.promise(() =>
+    serveMcp(
+      {
+        name: SERVER_NAME,
+        version: SERVER_VERSION,
+        port: config.port,
+        endpoint: "/mcp",
+        allowedHosts: ["localhost", "127.0.0.1", SERVER_NAME],
+      },
+      () => {
+        const server = new McpServer(
+          { name: SERVER_NAME, version: SERVER_VERSION },
+          { instructions: INSTRUCTIONS },
+        );
+        registerTools(server, runtime.run);
+        registerPrompts(server);
+        return server;
+      },
+    ),
   );
 
-  yield* Effect.promise(() => start());
+  const shutdown = (signal: string) => {
+    log("info", `${signal} received, shutting down`);
+    void stop()
+      .then(() => runtime.dispose())
+      .then(() => process.exit(0))
+      .catch(() => process.exit(1));
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+
+  log("debug", `${SERVER_NAME} serving over ${transport}`);
 }).pipe(
-  Effect.provide($SERVICE_CLASS.Default),
-  Effect.tapError((error) => Effect.sync(() => log("error", "Failed to start server", error)))
+  Effect.tapError((error) =>
+    Effect.sync(() => log("error", "Failed to start server", error)),
+  ),
 );
 
-// Execute the main effect
 Effect.runPromise(main).catch(() => {
   process.exit(1);
 });
 ```
+
+> **Never `console.log` anywhere in a server or its packages.** Under the stdio transport
+> stdout carries the JSON-RPC messages; a single stray write corrupts the stream and drops
+> the connection. Use `log()` from mcp-core, which writes to stderr.
+
 
 ## Template: types.ts
 
@@ -190,7 +215,7 @@ export function registerTools(server: McpServer): void {
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "bun dist/index.js",
     "lint": "eslint src",
     "type-check": "tsc --noEmit"
   },

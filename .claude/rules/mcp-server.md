@@ -193,57 +193,99 @@ interface ToolResult {
 
 ### 4. Server Setup Pattern
 
-Use `createMcpApp` from mcp-core:
+The composition root uses `serveMcp` — **not** `createMcpApp` directly. `serveMcp` picks the
+transport, so one binary serves Claude Desktop (stdio, which Desktop spawns itself) and
+Claude Code (http) with no code difference.
 
 ```typescript
-// src/index.ts
+// src/index.ts — the composition root. No business logic lives here.
+import "dotenv/config";
 import { Effect } from "effect";
-import { createMcpApp, createLogger } from "mcp-core";
-import { ServerConfig } from "./types.js";
-import { MyService } from "./services/my.service.js";
-import * as tools from "./tools/index.js";
+import {
+  createServerRuntime, log, McpServer, serveMcp, setLogLevel, type LogLevel,
+} from "mcp-core";
+import { MyClient } from "my-core";
+import { ServerConfig } from "./config.js";
+import { registerMyTool } from "./presentation/tools/my-tool.js";
+import { INSTRUCTIONS, registerPrompts } from "./presentation/steering.js";
 
-const logger = createLogger("my-mcp");
+const SERVER_NAME = "my-mcp";
+const SERVER_VERSION = "0.1.0";
 
 const main = Effect.gen(function* () {
   const config = yield* ServerConfig;
+  setLogLevel(config.logLevel as LogLevel);
 
-  logger.info("Starting My MCP Server", { port: config.port });
+  // Built ONCE — every tool call runs against this runtime.
+  const runtime = createServerRuntime(MyClient.Default);
 
-  const mcpApp = createMcpApp(
-    { name: "my-mcp", version: "1.0.0" },
-    (server) => {
-      tools.registerTools(server);
-    }
+  const { transport, stop } = yield* Effect.promise(() =>
+    serveMcp(
+      { name: SERVER_NAME, version: SERVER_VERSION, port: config.port, endpoint: "/mcp" },
+      () => {
+        const server = new McpServer(
+          { name: SERVER_NAME, version: SERVER_VERSION },
+          { instructions: INSTRUCTIONS },   // steering that reaches EVERY client
+        );
+        registerMyTool(server, runtime.run);
+        registerPrompts(server);
+        return server;
+      },
+    ),
   );
 
-  const { start, stop } = mcpApp;
+  const shutdown = (signal: string) => {
+    log("info", `${signal} received, shutting down`);
+    void stop().then(() => runtime.dispose()).then(() => process.exit(0));
+  };
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
 
-  process.on("SIGINT", () => {
-    logger.info("Shutting down...");
-    Effect.runPromise(stop()).then(() => process.exit(0));
-  });
-
-  yield* Effect.promise(() => start(config.port));
-
-  logger.info("My MCP Server running", { port: config.port });
+  log("debug", `${SERVER_NAME} serving over ${transport}`);
 }).pipe(
-  Effect.provide(MyService.Default),
-  Effect.tapError((error) =>
-    Effect.sync(() => logger.error("Server failed", error))
-  )
+  Effect.tapError((error) => Effect.sync(() => log("error", "Failed to start", error))),
 );
 
 Effect.runPromise(main).catch(() => process.exit(1));
 ```
 
-**Key Points:**
-- Use Effect.gen for async startup
-- Provide services at top level
-- Handle SIGINT for graceful shutdown
-- Error handling with tapError
+**Key points:**
+- `serveMcp`, not `createMcpApp` — the latter is HTTP-only and is what `serveMcp` calls.
+- The runtime is built once, outside the server factory.
+- `instructions` is not optional garnish: it is the only steering guaranteed to reach a
+  client, so it carries the rules that prevent a wrong answer.
+- **Never `console.log`.** Under stdio, stdout is the JSON-RPC channel; `log()` writes to
+  stderr for exactly this reason.
 
-### 5. Service Pattern
+### 5. Steering: instructions and prompts
+
+Every server ships `src/presentation/steering.ts`:
+
+```typescript
+import { buildInstructions } from "analytics-core";   // or write the text directly
+import { z, type McpServer } from "mcp-core";
+
+export const INSTRUCTIONS = buildInstructions(
+  `What this server covers — and, just as important, what it does not, so the model does
+not try to answer a question this data cannot support.`,
+  [`Any server-specific rule: units, required parameters, terminal errors.`],
+);
+
+export function registerPrompts(server: McpServer): void {
+  server.registerPrompt(
+    "my_review",
+    { title: "…", description: "…", argsSchema: { period: z.string().optional() } },
+    ({ period }) => ({ messages: [{ role: "user" as const, content: { type: "text" as const,
+      text: `A COMPLETE request, not a fragment — say what to fetch, what to compare it
+against, and what shape the answer should take.` } }] }),
+  );
+}
+```
+
+Keep `INSTRUCTIONS` short: it is sent on every connect and competes for context. Long-form
+workflow guidance belongs in a skill.
+
+### 6. Service Pattern
 
 Use Effect.Service for all business logic:
 
@@ -299,7 +341,7 @@ export class MyService extends Effect.Service<MyService>()("MyService", {
 - Observability via withSpan
 - Logging at debug/info/error levels
 
-### 6. Configuration
+### 7. Configuration
 
 Use Effect Config module (never `process.env` directly):
 
@@ -325,7 +367,7 @@ export const MyConfig = Config.all({
 - Use `Config.secret` for sensitive values
 - Provide sensible defaults with `.pipe(Config.withDefault(...))`
 
-### 7. Error Handling
+### 8. Error Handling
 
 Define tagged errors per domain:
 
@@ -369,7 +411,7 @@ Effect.catchTag("MyApiError", (error) =>
 )
 ```
 
-### 8. Logging
+### 9. Logging
 
 Use `createLogger` from mcp-core:
 
@@ -390,7 +432,7 @@ logger.error("Failure", errorObj);
 - Error for failures (before returning error ToolResult)
 - Always include context objects
 
-### 9. Schema Conventions
+### 10. Schema Conventions
 
 Use Effect Schema with annotations:
 
@@ -421,7 +463,7 @@ export type Data = Schema.Schema.Type<typeof DataSchema>;
 - Better tool selection and parameter filling
 - Self-documenting code
 
-### 10. Resilience Patterns
+### 11. Resilience Patterns
 
 All external API calls must include:
 
@@ -498,7 +540,7 @@ export * from "./tool2.js";
 
 ## Session Management
 
-Session management is handled by mcp-core's `createMcpApp`. You don't need to implement session logic in individual MCP servers.
+Session management is handled by mcp-core (`createMcpApp`, which `serveMcp` calls for the http transport). You don't need to implement session logic in individual MCP servers.
 
 **Endpoints provided by mcp-core:**
 - `POST /` - Send message to session

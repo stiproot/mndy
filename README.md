@@ -189,6 +189,10 @@ Each server is a thin container; its domain and platform adapter live in a packa
 see [the table above](#which-servers-need-infrastructure).
 
 - `packages/js/mcp-core/` - the MCP server framework every server is built on
+- `packages/js/analytics-core/` - the shared analytics domain: KPI maths, metric
+  normalization, anomaly thresholds, brand registry, and the steering shipped to clients
+- `packages/js/{ga4,meta-ads,shopify,google-ads,github}-core/` - one per platform: domain,
+  ports and the vendor adapter
 - `apps/ga4-mcp/` - Google Analytics 4. [Details](apps/ga4-mcp/README.md)
 - `apps/meta-ads-mcp/` - Meta (Facebook/Instagram) Ads. [Details](apps/meta-ads-mcp/README.md)
 - `apps/shopify-mcp/` - Shopify Admin API. [Details](apps/shopify-mcp/README.md)
@@ -210,7 +214,8 @@ see [the table above](#which-servers-need-infrastructure).
 - **Docker** - Containerization for all services
 - **Zipkin** - Distributed tracing
 
-For detailed architecture diagrams, see [docs/architecture.html](docs/architecture.html).
+For the end-to-end picture see [docs/how-it-works.md](docs/how-it-works.md); for generated
+code diagrams, [docs/diagrams/](docs/diagrams/).
 
 ## Quick Start (full platform)
 
@@ -676,7 +681,8 @@ mndy/
 │       ├── meta-ads-mcp/        # Meta Ads MCP tests
 │       └── shopify-mcp/         # Shopify MCP tests
 ├── docs/                        # Documentation
-│   ├── architecture.html        # Architecture diagram
+│   ├── how-it-works.md         # Primitives, registration, request flow
+│   ├── diagrams/               # Generated (checked) code diagrams
 │   └── raw.md                   # Project vision & concepts
 ├── test/                        # Test harness (legacy)
 ├── tools/                       # Utility scripts
@@ -693,16 +699,16 @@ mndy/
 
 ```bash
 cd src/ui
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 **UI API Development:**
 
 ```bash
 cd apps/ui-api
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 **Python Workers:**
@@ -799,8 +805,8 @@ mndy promotes positive team behaviors by:
 
 ## Documentation
 
-- [Architecture Overview](docs/architecture.html) - System architecture and component interactions
-- [Project Vision & Concepts](docs/raw.md) - Detailed vision, benefits, and core concepts
+- [How it works](docs/how-it-works.md) - AI primitives, registration lifecycles, and the flow of a question
+- [Generated diagrams](docs/diagrams/) - class and component diagrams, checked against the source
 - [Makefile Commands](Makefile) - All available build and run commands
 
 ## Contributing

@@ -85,7 +85,7 @@ agent is connected:
 
 These are `scripts/mcp-lifecycle.sh`. It identifies a server by the **working directory**
 of its process (`/proc/<pid>/cwd`), not its command line — every server runs as
-`node dist/index.js`, so the command line cannot tell them apart, and an orphan that
+`bun dist/index.js`, so the command line cannot tell them apart, and an orphan that
 survived a `pkill` will keep holding its port while the next start dies on `EADDRINUSE`.
 A server with no `.env` is skipped with a message rather than started and left to crash.
 
@@ -150,6 +150,24 @@ test without dragging a server along.
 
 Business logic inside `apps/` is in the wrong place. The boundaries are machine-checked by
 `.dependency-cruiser.cjs`; see the `hex-arch` skill for the layering rules.
+
+## The guards
+
+`bun run lint` (also `make lint`) runs six structural guards before anything else. Each
+exists because the thing it checks actually went wrong:
+
+| Guard | Fails when |
+| --- | --- |
+| `check-workspaces` | a `package.json`/`pyproject.toml` belongs to no workspace, or a non-bun lockfile exists |
+| `check-ports` | two apps declare the same `PORT` in their `.env.template` |
+| `check-hex-lint` | a package has `domain/` or `presentation/` but its `lint` does not run depcruise |
+| `check-mcp-parity` | an MCP server lacks a README, `.env.template`, make target or README-table row — or is documented as infra-free while depending on Dapr |
+| `check-secrets` | a real credential (matched by provider token shape, ignoring placeholders) is in a tracked file |
+| `check-docker-workspace` | an image does not COPY and build a workspace package its app depends on |
+
+Then markdown lint, the diagram drift check, and `turbo lint` (which runs dependency-cruiser
+per package). **A guard that has never passed is not a guard** — if you add one, get it to
+zero in the same change, and verify it fails on a deliberate violation.
 
 ## Diagrams
 

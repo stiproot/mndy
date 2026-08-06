@@ -100,8 +100,8 @@ Example pattern:
 ```markdown
 ## Services
 
-- `src/service-a/` - Description. [Details](src/service-a/README.md)
-- `src/service-b/` - Description. [Details](src/service-b/README.md)
+- `apps/service-a/` - Description. `[Details](apps/service-a/README.md)`
+- `apps/service-b/` - Description. `[Details](apps/service-b/README.md)`
 ```
 
 ## Guidelines

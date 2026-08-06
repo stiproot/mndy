@@ -15,7 +15,7 @@ Vue 3 + Quasar frontend application for project analytics and Azure DevOps integ
 
 ### Prerequisites
 
-- Node.js 18+
+- Bun 1.3+
 - Bun package manager
 - Running ui-api backend service
 

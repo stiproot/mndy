@@ -3,7 +3,7 @@
 #
 # Why this is a script rather than Makefile recipes: correctly stopping a server means
 # finding the process even when its pidfile is stale or missing. `bun run --cwd apps/X
-# start` execs `node dist/index.js`, so the command line alone cannot tell one server from
+# start` execs `bun dist/index.js`, so the command line alone cannot tell one server from
 # another — every one of them looks identical. What *is* unique is the working directory,
 # which this reads from /proc/<pid>/cwd. Without that, a crashed-and-orphaned server keeps
 # holding its port while the next `start` dies with EADDRINUSE and `status` cheerfully

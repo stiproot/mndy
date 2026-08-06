@@ -14,7 +14,7 @@ Express.js API gateway providing backend services for the mndy frontend applicat
 
 ### Prerequisites
 
-- Node.js 18+ and Bun
+- Bun 1.3+
 - Dapr CLI installed and initialized
 - Azure DevOps Personal Access Token (PAT)
 - Okta application credentials (optional for dev mode)

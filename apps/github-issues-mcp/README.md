@@ -21,7 +21,7 @@ this app is the container (config, tool schemas, composition root).
 
 ### Prerequisites
 
-- Node.js 20+
+- Bun 1.3+
 - bun (package manager)
 - GitHub Personal Access Token (optional, for private repos)
 

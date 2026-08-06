@@ -218,7 +218,7 @@ curl -N http://localhost:3002/contributor-insights?stream=true \
 
 ## Related Documentation
 
-- [cc-core Agent SDK](../cc-core/README.md)
+- [cc-core Agent SDK](../../packages/js/cc-core/)
 - [github-issues-mcp](../github-issues-mcp/README.md)
 - [Effect-TS Standards](../../docs/guides/effect-ts-standards.md)
 - [MCP Specification](https://modelcontextprotocol.io/)

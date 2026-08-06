@@ -159,7 +159,7 @@ const markdown = yield* markdownService.generateTable(table);
 
 ## Related
 
-- [mcp-core](../mcp-core/README.md) - Shared MCP server library
+- [mcp-core](../../packages/js/mcp-core/) - Shared MCP server library
 - [MCP Specification](https://modelcontextprotocol.io/)
 - [Effect-TS](https://effect.website/) - Effect-based architecture
 

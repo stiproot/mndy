@@ -10,4 +10,4 @@ paths:
 - ES modules (import/export), not CommonJS
 - Destructure imports when possible
 - Linting: prettier + eslint (see package.json)
-- Run `npm run lint` before committing
+- Run `bun run lint` before committing (bun is the only package manager here)
