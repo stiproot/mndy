@@ -157,8 +157,16 @@ Diagrams live in `docs/diagrams/` and are of two kinds:
 
 - **Generated** — class, component and sequence diagrams extracted from the source by
   `gen-code-diagram` (the `code-comprehension` plugin, also a root devDependency so CI can
-  run it). These are checked, not hand-edited: `gen-code-diagram --check --dir docs/diagrams`
-  fails the build when a diagram has drifted from the code it describes.
+  run it). These are checked, not hand-edited: `bun run lint` runs
+  `gen-code-diagram --check --dir docs/diagrams` and fails when a diagram has drifted from
+  the code it describes. Regenerate with `bun run diagrams`.
+
+  A managed doc is prose plus a `<!-- gen:c4-code {…} -->` manifest and a ```` ```mermaid ````
+  fence the tool rewrites. The manifest curates *what to show* (grouping, notes, relations
+  as `[from, to, arrow, label]`); the members come from the AST. Supported entry kinds are
+  `interface`, `union`, `const`, `schema`, `module` (which requires a `functions` list) and
+  `external` — there is no `class` kind, so represent a service through the port it
+  implements, which is the truer seam anyway.
 - **Authored** — C4 context/container/component views written by hand via the
   `c4-mermaid-plugin` skills, for architecture that no extractor can infer.
 
