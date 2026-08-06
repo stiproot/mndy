@@ -84,6 +84,7 @@ This cycle takes minutes and provides immediate feedback.
    - `src/github-issues-mcp/.env`
 
 2. **Dependencies installed**:
+
    ```bash
    make install-node  # Install all Node.js dependencies
    ```
@@ -206,12 +207,14 @@ The plugin also ships one usage skill per server. See `plugin-marketplace/README
 ### Transport Options
 
 **HTTP Transport** (recommended):
+
 - ✅ Servers run independently
 - ✅ Easy debugging (separate logs)
 - ✅ Matches production architecture (cc-svc uses HTTP)
 - ✅ No credential duplication needed
 
 **stdio Transport** (not recommended):
+
 - ❌ Requires duplicating `.env` vars into `mcp.json`
 - ❌ Harder to debug (no separate logs)
 - ❌ Doesn't match production setup
@@ -231,6 +234,7 @@ User: Use ga4_run_report to get sessions and conversions for the last 7 days
 ```
 
 **Expected response:**
+
 - Dimensions: date
 - Metrics: sessions, conversions, totalRevenue
 - Date range: Last 7 days
@@ -242,11 +246,13 @@ User: Use ga4_run_report to get sessions by traffic source for yesterday
 ```
 
 **Expected response:**
+
 - Dimensions: sessionSource
 - Metrics: sessions
 - Date range: Yesterday
 
 **Common issues:**
+
 - Missing `GA4_PROPERTY_ID` in `.env` → Error: "Property ID not configured"
 - Invalid service account → Error: "Authentication failed"
 - Data delay → GA4 has 24-48 hour processing delay for some metrics
@@ -264,6 +270,7 @@ User: Use meta_get_insights to get spend and ROAS for the last 7 days at campaig
 ```
 
 **Expected response:**
+
 - Level: campaign
 - Fields: spend, impressions, clicks, purchase_roas
 - Date range: Last 7 days
@@ -275,9 +282,11 @@ User: Use meta_get_campaigns to list all active campaigns
 ```
 
 **Expected response:**
+
 - Array of campaigns with id, name, status, objective
 
 **Common issues:**
+
 - Token expired → Error: "OAuthException"
 - Invalid ad account → Error: "Account not found"
 - Rate limit hit → Error: "Application request limit reached"
@@ -295,6 +304,7 @@ User: Use shopify_get_orders to get orders from the last 30 days
 ```
 
 **Expected response:**
+
 - Array of orders with id, created_at, total_price, customer info
 
 **Test 2: Analytics summary**
@@ -304,6 +314,7 @@ User: Use shopify_get_analytics to calculate revenue and AOV for last month
 ```
 
 **Expected response:**
+
 - Total orders count
 - Total revenue
 - Average order value
@@ -311,6 +322,7 @@ User: Use shopify_get_analytics to calculate revenue and AOV for last month
 - New vs returning customers
 
 **Common issues:**
+
 - Invalid access token → Error: "Unauthorized"
 - Store URL incorrect → Error: "Shop not found"
 - Rate limit → Automatic retry with exponential backoff
@@ -320,6 +332,7 @@ User: Use shopify_get_analytics to calculate revenue and AOV for last month
 ### Dapr MCP
 
 **Available tools:**
+
 - `submit_ga4_data` - Persist GA4 data
 - `submit_shopify_data` - Persist Shopify data
 - `submit_meta_data` - Persist Meta data
@@ -344,6 +357,7 @@ Then use get_cached_data to retrieve it with source="ga4" and actorId="test-2026
 ```
 
 **Expected response:**
+
 - Submit returns success confirmation
 - Get returns the exact data plus timestamp
 
@@ -360,6 +374,7 @@ User: Simulate the brand insights workflow:
 ```
 
 **Common issues:**
+
 - Dapr sidecar not running → Error: "Connection refused"
 - Actor not found → Returns null (not an error)
 - Invalid data format → Error: "Validation failed"
@@ -403,6 +418,7 @@ User: Use github_list_issues to get open issues for this repo
 ### When to Use This Workflow
 
 **✅ Use Claude Code CLI testing when:**
+
 - Building a new MCP tool
 - Debugging MCP tool responses
 - Validating API integrations
@@ -410,6 +426,7 @@ User: Use github_list_issues to get open issues for this repo
 - Testing edge cases (errors, rate limits, empty results)
 
 **❌ Skip to full stack testing when:**
+
 - MCP tools are stable and verified
 - Testing agent orchestration logic
 - Testing multi-agent workflows
@@ -466,6 +483,7 @@ You want the Meta Analyst agent to detect when ad creatives are fatigued (high f
 ### Key Learnings from CLI Testing
 
 By testing the MCP directly, you discovered:
+
 1. Frequency is only available at ad level (not campaign/adset)
 2. The exact field name: `frequency` (not `freq` or `ad_frequency`)
 3. Typical values range from 1.5 to 5.0
@@ -480,25 +498,30 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 ### MCP Tools Not Appearing in Claude Code
 
 **Symptoms:**
+
 - Claude says "I don't have access to ga4_run_report"
 - No MCP tools visible
 
 **Solutions:**
 
 1. **Verify the plugin is enabled and its config parses**:
+
    ```bash
    jq . .claude/settings.json                                   # enabledPlugins has "mndy-mcp@mndy": true
    jq . plugin-marketplace/plugins/mndy-mcp/.mcp.json           # server list parses without errors
    ```
+
    If Claude never prompted to install the plugin, re-trust the folder (`/permissions` or
    reopen the repo) and accept the install prompt.
 
 2. **Check MCP servers are running**:
+
    ```bash
    curl http://localhost:3003/health  # Should return {"status": "ok"}
    ```
 
 3. **Restart Claude Code CLI**:
+
    ```bash
    exit
    claude
@@ -511,12 +534,14 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 ### Tool Calls Fail with API Errors
 
 **Symptoms:**
+
 - Tool call succeeds but returns API error
 - Example: "Meta API: Invalid OAuth access token"
 
 **Solutions:**
 
 1. **Check credentials in `.env` files**:
+
    ```bash
    # Verify credentials are set
    grep META_ACCESS_TOKEN src/meta-ads-mcp/.env
@@ -528,12 +553,14 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
    - Shopify tokens don't expire but can be revoked if app is uninstalled
 
 3. **Check MCP server logs** for detailed errors:
+
    ```bash
    # Logs appear in terminal where MCP server is running
    # Look for API error codes, rate limit messages, etc.
    ```
 
 4. **Test API credentials directly** (outside MCP):
+
    ```bash
    # Example: Test Meta token
    curl "https://graph.facebook.com/v18.0/me?access_token=YOUR_TOKEN"
@@ -544,6 +571,7 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 ### Rate Limit Errors
 
 **Symptoms:**
+
 - Error: "Rate limit exceeded"
 - Error: "Too many requests"
 
@@ -562,17 +590,20 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 ### Dapr MCP Connection Failures
 
 **Symptoms:**
+
 - Error: "Connection refused on port 3500"
 - Error: "Dapr sidecar not found"
 
 **Solutions:**
 
 1. **Start Dapr infrastructure**:
+
    ```bash
    make docker-compose-infra
    ```
 
 2. **Verify Dapr sidecar is running**:
+
    ```bash
    curl http://localhost:3500/v1.0/healthz  # Should return OK
    ```
@@ -584,12 +615,14 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 ### Data Quality Issues
 
 **Symptoms:**
+
 - Tool returns data but it's incomplete or incorrect
 - Missing expected fields
 
 **Solutions:**
 
 1. **Test MCP tool directly** to see raw response:
+
    ```
    User: Call meta_get_insights and show me the raw response JSON
    ```
@@ -697,6 +730,7 @@ Helps understand platform API nuances.
 ### Security
 
 **✅ Good practices:**
+
 - Keep credentials in `.env` files (never in `mcp.json`)
 - Use `.gitignore` to exclude `.env` files
 - Use localhost-only binding for MCP servers
@@ -704,6 +738,7 @@ Helps understand platform API nuances.
 - Use System User tokens for Meta (never expire)
 
 **❌ Bad practices:**
+
 - Hardcoding credentials in MCP code
 - Committing `.env` files to git
 - Exposing MCP servers to public internet

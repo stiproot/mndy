@@ -171,6 +171,7 @@ The test environment variable isn't set. Check your `.env` file has the required
 ### Authentication errors
 
 Your API credentials may be invalid or expired:
+
 - **GA4**: Service account may not have GA4 property access
 - **Meta**: Access token may have expired (use System User tokens)
 - **Shopify**: Access token may have been revoked

@@ -79,6 +79,7 @@ window.envconfig = {
 **WARNING**: This should **NEVER** be used in production. It is designed for local development only.
 
 When enabled:
+
 - Login uses browser fingerprint instead of Okta redirect
 - No Okta configuration required
 - Login page shows Development Mode badge
@@ -146,6 +147,7 @@ bun run lint
 **Symptom**: Browser console shows CORS policy errors
 
 **Solution**:
+
 - Verify `VUE_APP_UI_API_BASE_URL` matches actual backend URL
 - Ensure ui-api has CORS enabled (it does by default)
 - Check backend is running and accessible
@@ -155,6 +157,7 @@ bun run lint
 **Symptom**: Redirect to Okta fails or returns error
 
 **Solution**:
+
 - Verify `VUE_APP_OKTA_CLIENT_ID` and `VUE_APP_OKTA_ISSUER` match Okta app configuration
 - Check Okta redirect URI includes `http://localhost:8080/authorization-code/callback`
 - Ensure backend has matching Okta configuration
@@ -165,6 +168,7 @@ bun run lint
 **Symptom**: Failed to fetch data from backend
 
 **Solution**:
+
 - Verify ui-api is running (`make run-ui-api`)
 - Check `VUE_APP_UI_API_BASE_URL` in `envconfig.js`
 - Inspect Network tab in browser DevTools for actual error
@@ -175,6 +179,7 @@ bun run lint
 **Symptom**: Still redirecting to Okta with `VUE_APP_IGNORE_AUTH=true`
 
 **Solution**:
+
 - Verify `envconfig.js` has the setting (not a .env file)
 - Hard refresh browser to clear cache
 - Check backend also has `IGNORE_AUTH=true` in `.env`

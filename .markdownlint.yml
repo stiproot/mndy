@@ -1,0 +1,12 @@
+default: true
+
+# Prose docs wrap for readability, not to a hard column. 250 is a runaway guard,
+# not a style rule — matches the house style used across the sibling plugin repos.
+MD013:
+  line_length: 250
+
+MD046:
+  style: fenced
+
+MD007:
+  indent: 2

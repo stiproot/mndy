@@ -184,10 +184,12 @@ src/cc-svc/src/
 The brand insights service provides unified analytics across GA4, Meta Ads, and Shopify:
 
 **Endpoints:**
+
 - `POST /cc-svc/brand-insights/collect` - Collect data from analytics sources
 - `POST /cc-svc/brand-insights/analyze` - Generate brand health report
 
 **Features:**
+
 - Multi-source data collection (GA4, Meta, Shopify) running in parallel
 - Automatic data normalization and KPI calculation
 - Brand health scoring (0-100)
@@ -196,6 +198,7 @@ The brand insights service provides unified analytics across GA4, Meta Ads, and 
 - Persistent storage via Dapr actors
 
 **Agents:**
+
 - **GA4 Analyst**: Analyzes website traffic, conversions, user behavior
 - **Shopify Analyst**: Analyzes e-commerce sales, orders, products
 - **Meta Analyst**: Analyzes ad spend, ROAS, campaigns, CTR, CPA
@@ -268,6 +271,7 @@ bun run vitest run tests/integration/cc-svc/brand-insights-e2e.test.ts
 ```
 
 The E2E test validates:
+
 - Data collection from GA4, Shopify, and Meta
 - Parallel analyst execution
 - Brand orchestrator synthesis
@@ -275,10 +279,11 @@ The E2E test validates:
 - Report generation with insights
 
 **Note:** Before running tests, copy `tests/.env.template` to `tests/.env` and configure the required credentials:
+
 - `GA4_MCP_URL`, `GA4_TEST_PROPERTY_ID`
 - `META_MCP_URL`, `META_TEST_AD_ACCOUNT_ID`
 - `SHOPIFY_MCP_URL`, `SHOPIFY_TEST_STORE_URL`
-- `CC_SVC_URL` (default: http://localhost:3002)
+- `CC_SVC_URL` (default: <http://localhost:3002>)
 
 ## Related Documents
 

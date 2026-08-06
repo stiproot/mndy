@@ -24,6 +24,7 @@ Reads orders and computes store analytics from the Shopify Admin API. Server run
 ## Tools
 
 ### `shopify_get_analytics` — summary over a date range
+
 Computes revenue, order counts, AOV, and customer metrics.
 
 | Param | Type | Required | Notes |
@@ -32,6 +33,7 @@ Computes revenue, order counts, AOV, and customer metrics.
 | end_date | string | **yes** | `YYYY-MM-DD` |
 
 ### `shopify_get_orders` — list orders
+
 | Param | Type | Required | Notes |
 |---|---|---|---|
 | limit | number | no | 1–250 (default 50) |
@@ -45,16 +47,19 @@ Computes revenue, order counts, AOV, and customer metrics.
 ## Examples
 
 Store analytics for March 2025:
+
 ```json
 { "start_date": "2025-03-01", "end_date": "2025-03-31" }
 ```
 
 Recent paid, unfulfilled orders:
+
 ```json
 { "status": "open", "financial_status": "paid", "fulfillment_status": "unfulfilled", "limit": 100 }
 ```
 
 Page through orders created after a given time:
+
 ```json
 { "created_at_min": "2025-03-01T00:00:00Z", "limit": 250, "since_id": "450789469" }
 ```

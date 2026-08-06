@@ -19,6 +19,7 @@ Tools for reading and editing GitHub issues. Server runs on **port 3001**
 ## Tools
 
 ### `github_list_issues` — list/filter issues
+
 Required: `owner` (string), `repo` (string). Optional filters:
 
 | Param | Type | Notes |
@@ -36,29 +37,35 @@ Required: `owner` (string), `repo` (string). Optional filters:
 | page | number | ≥1 |
 
 ### `github_update_issue` — edit an issue
+
 Required: `owner`, `repo`, `issue_number` (number). Optional (only send what you change):
 `title` (string), `body` (string), `state` (`open`\|`closed`), `labels` (string[] — **replaces
 all** labels), `assignees` (string[] — **replaces all**), `milestone` (number, or `null` to clear).
 
 ### `github_add_labels` — add labels (keeps existing)
+
 Required: `owner`, `repo`, `issue_number`, `labels` (string[]).
 
 ### `github_remove_label` — remove one label
+
 Required: `owner`, `repo`, `issue_number`, `label` (string).
 
 ## Examples
 
 List open bugs:
+
 ```json
 { "owner": "acme", "repo": "web", "state": "open", "labels": "bug", "sort": "updated", "direction": "desc" }
 ```
 
 Close an issue and set its labels (replaces all existing labels):
+
 ```json
 { "owner": "acme", "repo": "web", "issue_number": 42, "state": "closed", "labels": ["wontfix"] }
 ```
 
 Add labels without disturbing existing ones:
+
 ```json
 { "owner": "acme", "repo": "web", "issue_number": 42, "labels": ["needs-triage", "p2"] }
 ```

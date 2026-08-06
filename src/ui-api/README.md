@@ -82,6 +82,7 @@ IGNORE_AUTH=true
 **WARNING**: This should **NEVER** be used in production. It's designed for local development only.
 
 When enabled:
+
 - Authentication uses browser fingerprints instead of Okta tokens
 - No Okta configuration required
 - Logs show `[DEV AUTH]` prefix
@@ -211,6 +212,7 @@ bun run tsc --noEmit
 **Symptom**: `ECONNREFUSED` errors when calling Dapr
 
 **Solution**:
+
 - Verify Dapr is running: `dapr list`
 - Check `DAPR_HTTP_PORT` matches sidecar configuration (default: 3500)
 - Restart with: `make run-ui-api`
@@ -220,6 +222,7 @@ bun run tsc --noEmit
 **Symptom**: 403 Forbidden on authenticated endpoints
 
 **Solution**:
+
 - Verify `OKTA_ISSUER` and `OKTA_CLIENT_ID` match frontend configuration
 - Check token audience is `api://default`
 - Ensure frontend is sending `Authorization: Bearer <token>` header
@@ -230,6 +233,7 @@ bun run tsc --noEmit
 **Symptom**: Dapr errors about missing state stores
 
 **Solution**:
+
 - Check Dapr components are configured in `~/.dapr/components/`
 - Verify state store names match constants in `consts.ts`
 - Run `dapr init` to reset Dapr components
@@ -239,6 +243,7 @@ bun run tsc --noEmit
 **Symptom**: 401 Unauthorized from Azure DevOps endpoints
 
 **Solution**:
+
 - Verify `AZDO_API_KEY` is a valid Personal Access Token
 - Check PAT has required scopes (Work Items: Read, Teams: Read)
 - Ensure `AZDO_ORGANIZATION` and `AZDO_PROJECT` are correct
@@ -248,6 +253,7 @@ bun run tsc --noEmit
 **Symptom**: Still getting Okta validation errors with `IGNORE_AUTH=true`
 
 **Solution**:
+
 - Verify `.env` file has `IGNORE_AUTH=true` (not `false` or commented)
 - Restart the server after changing environment variables
 - Check frontend also has `VUE_APP_IGNORE_AUTH=true` in `envconfig.js`

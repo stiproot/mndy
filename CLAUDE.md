@@ -2,6 +2,81 @@
 
 Project analytics platform for Azure DevOps integration.
 
+## Conventions come from plugins
+
+The repo's working conventions are carried by installed Claude Code plugins
+(`.claude/settings.json`), not restated here. Follow the plugin's skill; this file holds
+only mndy's concrete policy on top of it.
+
+| Plugin | Owns |
+| --- | --- |
+| `effect-claude-primitives` | Effect-TS patterns — services, schema, error channel, concurrency |
+| `hex-arch` | Ports-and-adapters layering (`domain` / `infrastructure` / `presentation`) |
+| `plan-management` | The plan doc lifecycle |
+| `code-comprehension` | Generated code diagrams (`gen-code-diagram`) |
+| `c4-mermaid-plugin` | C4 architecture diagrams |
+| `mndy-mcp` | This repo's own MCP usage surface (local marketplace) |
+
+`effect-claude-primitives` resolves through a **user-level** marketplace pointing at a
+local checkout, so it is deliberately absent from `.claude/settings.json`. A fresh clone
+needs it added once:
+
+```bash
+claude plugin marketplace add https://github.com/stiproot/effect-claude-primitives
+```
+
+## Plans
+
+Non-trivial work is scoped and tracked in a plan doc — a living log, not a frozen spec.
+**Follow the `plan-management` skill** for the lifecycle; mndy's concrete policy:
+
+- Active plans: `docs/plans/<name>.md`. Archived: `docs/plans/impl/<name>.md`.
+- A plan with several independent phases becomes a directory —
+  `docs/plans/<name>/README.md` (index + shared context) plus numbered parts, each with
+  its own status line. It archives as a unit, gated on every part being `Complete`.
+- There is no index file: the `docs/plans/` listing plus each plan's status line **is** the
+  index.
+- Every plan declares `Status:` (`Planning | Active | Blocked | Deferred | Complete`) and
+  `Established:`. A `Deferred` plan must carry `Revisit when:`; an archived one, `Lifted to:`.
+- Never leave a plan in `~/.claude/plans/` — move it into `docs/plans/` as soon as it is real.
+- Before archiving, **lift every piece of lasting context to its one long-lived home**
+  (this file, a rule under `.claude/rules/`, a skill, a lint guard, or a code comment).
+  Plans are transient; knowledge left inside one is lost when it is filed away.
+- **Source code never cites `docs/plans/*`** — state the rationale in the comment itself
+  or cite the durable home.
+
+## Where code lives
+
+**Reusable machinery lives in `packages/`. Apps are containers.**
+
+An MCP server or a service is a *wrapper*: a composition root plus a presentation layer
+(tool schemas, registration, HTTP wiring, config). The logic it wraps — domain models, KPI
+math, platform clients — belongs in a package, reusable by another server, a worker, or a
+test without dragging a server along.
+
+| Layer | Home |
+| --- | --- |
+| Pure domain + ports (no I/O) | `packages/js/<name>-core/src/domain/` |
+| Outbound adapters (vendor SDKs, HTTP) | `packages/js/<name>-core/src/infrastructure/` |
+| Inbound adapters (MCP tools, routes) | `apps/<name>/src/presentation/` |
+| Composition root (wiring) | `apps/<name>/src/index.ts` |
+
+Business logic inside `apps/` is in the wrong place. The boundaries are machine-checked by
+`.dependency-cruiser.cjs`; see the `hex-arch` skill for the layering rules.
+
+## Diagrams
+
+Diagrams live in `docs/diagrams/` and are of two kinds:
+
+- **Generated** — class, component and sequence diagrams extracted from the source by
+  `gen-code-diagram` (the `code-comprehension` plugin, also a root devDependency so CI can
+  run it). These are checked, not hand-edited: `gen-code-diagram --check --dir docs/diagrams`
+  fails the build when a diagram has drifted from the code it describes.
+- **Authored** — C4 context/container/component views written by hand via the
+  `c4-mermaid-plugin` skills, for architecture that no extractor can infer.
+
+Prefer a generated diagram wherever one is possible; hand-drawn code diagrams rot.
+
 ## Architecture
 
 Microservices architecture using Dapr:

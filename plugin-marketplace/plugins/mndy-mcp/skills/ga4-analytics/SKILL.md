@@ -45,6 +45,7 @@ Build a report from date ranges, metrics, and (optionally) dimensions and a filt
 `addToCarts`, `checkouts`, `itemsViewed`.
 
 **`dimensionFilter`** shape — `{ fieldName, stringFilter?, inListFilter? }`:
+
 - `stringFilter`: `{ matchType, value, caseSensitive? }` where `matchType` is one of
   `EXACT`, `BEGINS_WITH`, `ENDS_WITH`, `CONTAINS`, `FULL_REGEXP`, `PARTIAL_REGEXP`.
 - `inListFilter`: `{ values: string[], caseSensitive? }`.
@@ -52,6 +53,7 @@ Build a report from date ranges, metrics, and (optionally) dimensions and a filt
 ## Examples
 
 Last 7 days of sessions and conversions by channel:
+
 ```json
 {
   "dateRanges": [{ "startDate": "7daysAgo", "endDate": "today" }],
@@ -61,6 +63,7 @@ Last 7 days of sessions and conversions by channel:
 ```
 
 Top pages for organic search only, March 2025:
+
 ```json
 {
   "dateRanges": [{ "startDate": "2025-03-01", "endDate": "2025-03-31" }],

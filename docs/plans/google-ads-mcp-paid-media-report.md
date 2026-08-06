@@ -12,6 +12,7 @@
 Build a Google Ads MCP server to enable comprehensive paid media reporting across Google Ads, Meta Ads, GA4, and Shopify. This will allow generation of markdown reports similar to the sample PDF at `docs/reports/samples/arthur-ford-paid-media-overview-3-months.pdf`.
 
 **Key Deliverables:**
+
 1. Google Ads MCP server with campaign performance tools
 2. Dapr integration for data persistence
 3. Google Ads analyst agent in cc-svc
@@ -23,13 +24,16 @@ Build a Google Ads MCP server to enable comprehensive paid media reporting acros
 ## 🎯 Objectives
 
 ### Primary Goal
+
 Enable users to request 3-month paid media reports that synthesize data from:
+
 - **Google Ads** - Paid search/display advertising (NEW)
 - **Meta Ads** - Facebook/Instagram advertising (EXISTS)
 - **GA4** - Website analytics (EXISTS)
 - **Shopify** - E-commerce data (EXISTS)
 
 ### Report Structure
+
 - Executive summary with health score
 - Platform performance comparison table
 - Campaign analysis (top performers, underperformers)
@@ -42,6 +46,7 @@ Enable users to request 3-month paid media reports that synthesize data from:
 ## 📊 Current State Analysis
 
 ### Existing Infrastructure
+
 ✅ **Meta Ads MCP** - Full advertising data (spend, ROAS, conversions)
 ✅ **GA4 MCP** - Website traffic and conversion analytics
 ✅ **Shopify MCP** - E-commerce sales and order data
@@ -49,6 +54,7 @@ Enable users to request 3-month paid media reports that synthesize data from:
 ✅ **Brand Insights** - Multi-agent orchestration system
 
 ### Critical Gap
+
 ❌ **Google Ads MCP** - Required for paid search/display advertising data
 
 ---
@@ -56,6 +62,7 @@ Enable users to request 3-month paid media reports that synthesize data from:
 ## 🏗️ Architecture Overview
 
 ### Data Flow
+
 ```
 User Request (POST /brand-insights)
     ↓
@@ -78,6 +85,7 @@ Return JSON + Markdown Report
 ```
 
 ### Google Ads MCP Components
+
 ```
 google-ads-mcp (port 3006)
 ├── Tools
@@ -101,8 +109,10 @@ google-ads-mcp (port 3006)
 ### Phase 1: Google Ads MCP Server ⏳
 
 #### 1.1 Directory Structure ✅
+
 **Status:** Ready to create
 **Files:**
+
 ```
 src/google-ads-mcp/
 ├── src/
@@ -122,9 +132,11 @@ src/google-ads-mcp/
 ```
 
 #### 1.2 Core Types & Configuration ⏳
+
 **File:** `src/google-ads-mcp/src/types.ts`
 
 **Configuration:**
+
 ```typescript
 ServerConfig: { port: 3006, logLevel: "info" }
 GoogleAdsConfig: {
@@ -137,6 +149,7 @@ GoogleAdsConfig: {
 ```
 
 **Error Types:**
+
 - `GoogleAdsApiError` - API failures with status/code
 - `GoogleAdsQuotaError` - 15K ops/day limit exceeded
 - `GoogleAdsAuthError` - OAuth token issues
@@ -144,21 +157,25 @@ GoogleAdsConfig: {
 - `ConfigError` - Missing/invalid config
 
 #### 1.3 GoogleAdsClient Service ⏳
+
 **File:** `src/google-ads-mcp/src/services/google-ads.service.ts`
 
 **Dependencies:** `google-ads-api` npm package (v15.3.0)
 
 **Methods:**
+
 - `getCampaigns(customerId?, status?, limit?)` - List campaigns
 - `getPerformance(input)` - GAQL query for metrics
 
 **Resilience Patterns:**
+
 - ✅ 60-second timeout on all API calls
 - ✅ Exponential backoff retry (3 attempts)
 - ✅ OpenTelemetry spans for observability
 - ✅ Type-safe error handling
 
 **GAQL Query Example:**
+
 ```sql
 SELECT
   campaign.id, campaign.name, campaign.status,
@@ -173,14 +190,17 @@ LIMIT 100
 ```
 
 #### 1.4 Tool: google_ads_get_campaigns ⏳
+
 **File:** `src/google-ads-mcp/src/tools/get-campaigns.ts`
 
 **Parameters:**
+
 - `customerId?: string` - Account ID (optional, uses default)
 - `status?: Array<"ENABLED" | "PAUSED" | "REMOVED">` - Filter by status
 - `limit?: number` - Max results (default 100, max 500)
 
 **Returns:**
+
 ```typescript
 {
   summary: string,
@@ -197,9 +217,11 @@ LIMIT 100
 ```
 
 #### 1.5 Tool: google_ads_get_performance ⏳
+
 **File:** `src/google-ads-mcp/src/tools/get-performance.ts`
 
 **Parameters:**
+
 - `customerId?: string` - Account ID (optional)
 - `level?: "account" | "campaign" | "ad_group" | "keyword"` - Aggregation level (default: campaign)
 - `datePreset?: string` - "LAST_7_DAYS" | "LAST_30_DAYS" | "LAST_90_DAYS" | etc.
@@ -209,6 +231,7 @@ LIMIT 100
 - `limit?: number` - Max results (default 100, max 1000)
 
 **Metrics Returned:**
+
 | Metric | Source | Calculation |
 |--------|--------|-------------|
 | spend | metrics.cost_micros | / 1,000,000 |
@@ -223,6 +246,7 @@ LIMIT 100
 | conversion_rate | metrics.conversions_rate | × 100 (%) |
 
 **Returns:**
+
 ```typescript
 {
   summary: string,
@@ -243,16 +267,20 @@ LIMIT 100
 ```
 
 #### 1.6 Server Bootstrap ⏳
+
 **File:** `src/google-ads-mcp/src/index.ts`
 
 **Pattern:** Follow github-issues-mcp (not original template)
+
 - Effect.gen for async startup
 - createMcpApp with tool registration
 - SIGINT handler for graceful shutdown
 - Provide GoogleAdsClient.Default at top level
 
 #### 1.7 Configuration Files ⏳
+
 **Files:**
+
 - `package.json` - Dependencies, scripts
 - `tsconfig.json` - TypeScript config
 - `Dockerfile` - Container image
@@ -260,6 +288,7 @@ LIMIT 100
 - `README.md` - Setup guide with OAuth flow
 
 **Key Dependencies:**
+
 ```json
 {
   "dependencies": {
@@ -272,17 +301,20 @@ LIMIT 100
 ```
 
 #### 1.8 Authentication Setup Documentation ⏳
+
 **README Section:** OAuth 2.0 Setup Guide
 
 **Steps:**
+
 1. Create OAuth 2.0 credentials in Google Cloud Console
-2. Apply for Developer Token at https://ads.google.com/aw/apicenter
+2. Apply for Developer Token at <https://ads.google.com/aw/apicenter>
 3. Generate Refresh Token using OAuth 2.0 Playground:
-   - URL: https://developers.google.com/oauthplayground/
+   - URL: <https://developers.google.com/oauthplayground/>
    - Scope: `https://www.googleapis.com/auth/adwords`
 4. Configure environment variables in `.env`
 
 **Rate Limits:**
+
 - Test Access: Test accounts only, no prod limit
 - Basic Access: 15,000 operations/day (application required)
 - Standard Access: Higher limits (by invitation)
@@ -292,9 +324,11 @@ LIMIT 100
 ### Phase 2: Dapr MCP Integration ⏳
 
 #### 2.1 Data Submission Tool ⏳
+
 **File:** `src/dapr-mcp/src/tools/submit-google-ads-data.ts`
 
 **Schema:**
+
 ```typescript
 {
   stateKey: string,  // "google-ads-{brandId}-{startDate}-{endDate}"
@@ -324,15 +358,18 @@ LIMIT 100
 ```
 
 **Pattern:** Follow `submit-meta-data.ts`
+
 - Effect.gen for effect composition
 - Schema validation with Effect Schema
 - TTL calculation based on date range
 - Structured output with success flag
 
 #### 2.2 Tool Registration ⏳
+
 **File:** `src/dapr-mcp/src/tools/index.ts`
 
 **Update:**
+
 ```typescript
 import { registerSubmitGoogleAdsDataTool } from "./submit-google-ads-data.js";
 
@@ -349,9 +386,11 @@ export * from "./submit-google-ads-data.js";  // ADD
 ### Phase 3: Brand Insights Integration ⏳
 
 #### 3.1 Google Ads Analyst Agent ⏳
+
 **File:** `src/cc-svc/src/agents/index.ts`
 
 **Functions to Add:**
+
 ```typescript
 // MCP server getter
 export function getGoogleAdsMcpServer(): McpClient | null {
@@ -384,6 +423,7 @@ export function createGoogleAdsAnalystAgent(): Agent | null {
 ```
 
 **Update:**
+
 ```typescript
 export function getAvailableAnalyticsSources() {
   return {
@@ -396,9 +436,11 @@ export function getAvailableAnalyticsSources() {
 ```
 
 #### 3.2 Google Ads Analyst Prompts ⏳
+
 **File:** `src/cc-svc/src/prompts/brand-insights.prompt.ts`
 
 **System Prompt:**
+
 ```typescript
 export const GOOGLE_ADS_ANALYST_PROMPT = `...
 ## Your Task
@@ -416,6 +458,7 @@ export const GOOGLE_ADS_ANALYST_PROMPT = `...
 ```
 
 **Task Prompt Builder:**
+
 ```typescript
 export function buildGoogleAdsAnalystPrompt(
   startDate: string,
@@ -439,9 +482,11 @@ submit_google_ads_data expects:
 ```
 
 #### 3.3 Brand Insights Service Updates ⏳
+
 **File:** `src/cc-svc/src/services/brand-insights.service.ts`
 
 **Add Google Ads Execution:**
+
 ```typescript
 const useGoogleAds = availableSources.googleAds && (options?.includeGoogleAds !== false);
 
@@ -458,6 +503,7 @@ if (useGoogleAds) {
 ```
 
 **Add Method:**
+
 ```typescript
 private async runGoogleAdsAnalyst(startDate: string, endDate: string): Promise<string> {
   const agent = createGoogleAdsAnalystAgent();
@@ -471,6 +517,7 @@ private async runGoogleAdsAnalyst(startDate: string, endDate: string): Promise<s
 ```
 
 **Update Synthesis:**
+
 ```typescript
 const googleAdsAnalysis = analysisResults.find((r) => r.source === "google-ads")?.result ?? null;
 
@@ -483,9 +530,11 @@ const result = await this.synthesizeResults(
 ```
 
 #### 3.4 Schema Updates ⏳
+
 **File:** `src/cc-svc/src/schemas/brand-insights.schema.ts`
 
 **Request Schema:**
+
 ```typescript
 export const brandInsightsRequestSchema = z.object({
   dateRange: dateRangeSchema,
@@ -499,6 +548,7 @@ export const brandInsightsRequestSchema = z.object({
 ```
 
 **Response Schema:**
+
 ```typescript
 export const googleAdsAnalysisSchema = z.object({
   totalSpend: z.number(),
@@ -526,9 +576,11 @@ export const brandInsightsResponseSchema = z.object({
 ```
 
 #### 3.5 Brand Orchestrator Prompt Updates ⏳
+
 **File:** `src/cc-svc/src/prompts/brand-insights.prompt.ts`
 
 **Update System Prompt:**
+
 ```typescript
 export const BRAND_ORCHESTRATOR_PROMPT = `...
 ## Your Task
@@ -549,6 +601,7 @@ You will receive analysis from:
 ```
 
 **Update Synthesis Prompt Builder:**
+
 ```typescript
 export function buildBrandSynthesisPrompt(
   startDate: string, endDate: string,
@@ -571,9 +624,11 @@ export function buildBrandSynthesisPrompt(
 ```
 
 #### 3.6 Configuration Updates ⏳
+
 **File:** `src/cc-svc/src/config/env.ts`
 
 **Add Environment Variable:**
+
 ```typescript
 export const envSchema = z.object({
   // ... existing
@@ -585,6 +640,7 @@ export const envSchema = z.object({
 **Files:** `src/cc-svc/.env.template` and `src/cc-svc/.env`
 
 **Add:**
+
 ```bash
 GOOGLE_ADS_MCP_URL=http://localhost:3006/mcp
 ```
@@ -594,11 +650,13 @@ GOOGLE_ADS_MCP_URL=http://localhost:3006/mcp
 ### Phase 4: Testing & Scripts ⏳
 
 #### 4.1 Paid Media Test Script ⏳
+
 **File:** `scripts/src/test-paid-media-report.ts`
 
 **Purpose:** Test end-to-end report generation with all 4 sources
 
 **Request:**
+
 ```typescript
 const request = {
   dateRange: {
@@ -615,15 +673,18 @@ const request = {
 ```
 
 **Features:**
+
 - SSE streaming with real-time progress
 - Markdown tool usage tracking
 - Error handling and reporting
 - Exit codes (0=success, 1=error)
 
 #### 4.2 Package Scripts ⏳
+
 **File:** `scripts/package.json`
 
 **Add:**
+
 ```json
 {
   "scripts": {
@@ -637,11 +698,13 @@ const request = {
 ### Phase 5: Documentation & Infrastructure ⏳
 
 #### 5.1 Marketing Analytics Rules ⏳
+
 **File:** `.claude/rules/marketing-analytics.md`
 
 **Add Google Ads Section:**
 
 **Data Normalization Table:**
+
 | Standard | GA4 | Meta | Shopify | Google Ads |
 |----------|-----|------|---------|------------|
 | spend | - | spend | - | cost_micros/1M |
@@ -654,19 +717,23 @@ const request = {
 | cpm | - | cpm | - | average_cpm/1M |
 
 **Google Ads Specifics:**
+
 - Cost fields in micros (÷ 1,000,000)
 - CTR as decimal (× 100 for %)
 - ROAS = conversions_value / cost
 - Conversion rate = conversions_rate × 100
 
 **Rate Limits:**
+
 - Basic access: 15,000 operations/day
 - Implement caching to minimize API calls
 
 #### 5.2 Workspace & Build Configuration ⏳
+
 **File:** `package.json` (root)
 
 **Add to Workspaces:**
+
 ```json
 {
   "workspaces": [
@@ -678,21 +745,24 @@ const request = {
 **File:** `Makefile`
 
 **Add Targets:**
+
 ```makefile
 run-google-ads-mcp: build-google-ads-mcp ## Run Google Ads MCP (port 3006)
-	bun run --cwd src/google-ads-mcp start
+ bun run --cwd src/google-ads-mcp start
 
 build-google-ads-mcp: ## Build Google Ads MCP
-	bun run --cwd src/mcp-core build
-	bun run --cwd src/google-ads-mcp build
+ bun run --cwd src/mcp-core build
+ bun run --cwd src/google-ads-mcp build
 
 build-mcp: build-mcp-core build-ga4-mcp build-meta-ads-mcp build-shopify-mcp build-dapr-mcp build-github-issues-mcp build-markdown-mcp build-google-ads-mcp  ## Build all MCP servers
 ```
 
 #### 5.3 Docker Compose ⏳
+
 **File:** `docker-compose.yml`
 
 **Add Service:**
+
 ```yaml
 google-ads-mcp:
   build:
@@ -715,9 +785,11 @@ google-ads-mcp:
 ```
 
 #### 5.4 Google Ads MCP README ⏳
+
 **File:** `src/google-ads-mcp/README.md`
 
 **Sections:**
+
 1. Overview & features
 2. Setup & authentication guide
 3. Configuration reference
@@ -732,6 +804,7 @@ google-ads-mcp:
 ## ✅ Success Criteria
 
 ### Google Ads MCP
+
 - [ ] Server runs on port 3006
 - [ ] `google_ads_get_campaigns` returns campaign list
 - [ ] `google_ads_get_performance` returns metrics at campaign level
@@ -740,17 +813,20 @@ google-ads-mcp:
 - [ ] Tagged errors map correctly from Google Ads API
 
 ### Dapr Integration
+
 - [ ] `submit_google_ads_data` persists to Dapr cache
 - [ ] TTL calculation works based on date range
 - [ ] Schema validation catches invalid data
 
 ### Brand Insights Integration
+
 - [ ] Google Ads analyst agent executes successfully
 - [ ] Brand insights endpoint accepts `includeGoogleAds` option
 - [ ] Orchestrator synthesizes all 4 data sources
 - [ ] Health score includes paid advertising efficiency
 
 ### Report Generation
+
 - [ ] Markdown report generated with all sections
 - [ ] Platform comparison table includes Google Ads
 - [ ] Campaign analysis shows top performers
@@ -758,6 +834,7 @@ google-ads-mcp:
 - [ ] Report structure matches sample PDF layout
 
 ### Testing
+
 - [ ] `npm run test:paid-media` completes successfully
 - [ ] SSE streaming works with all 4 sources
 - [ ] Error handling gracefully degrades if one source fails
@@ -767,6 +844,7 @@ google-ads-mcp:
 ## 📁 Files Checklist
 
 ### New Files
+
 - [ ] `src/google-ads-mcp/src/index.ts`
 - [ ] `src/google-ads-mcp/src/types.ts`
 - [ ] `src/google-ads-mcp/src/services/google-ads.service.ts`
@@ -782,6 +860,7 @@ google-ads-mcp:
 - [ ] `scripts/src/test-paid-media-report.ts`
 
 ### Modified Files
+
 - [ ] `src/cc-svc/src/agents/index.ts`
 - [ ] `src/cc-svc/src/prompts/brand-insights.prompt.ts`
 - [ ] `src/cc-svc/src/services/brand-insights.service.ts`
@@ -801,17 +880,20 @@ google-ads-mcp:
 ## 🔗 Key References
 
 ### MCP Server Patterns
+
 - `src/meta-ads-mcp/` - Similar advertising MCP (primary reference)
 - `src/ga4-mcp/` - Analytics MCP pattern
 - `src/github-issues-mcp/` - Bootstrap pattern (Effect.gen)
 - `.claude/rules/mcp-server.md` - MCP server standards
 
 ### Agent Integration
+
 - `src/cc-svc/src/agents/index.ts` - Agent creation patterns
 - `src/cc-svc/src/prompts/brand-insights.prompt.ts` - Prompt templates
 - `src/cc-svc/src/services/brand-insights.service.ts` - Service orchestration
 
 ### Data Persistence
+
 - `src/dapr-mcp/src/tools/submit-meta-data.ts` - Data submission pattern
 - `src/dapr-mcp/src/tools/submit-ga4-data.ts` - Schema reference
 
@@ -820,13 +902,16 @@ google-ads-mcp:
 ## 📝 Implementation Notes
 
 ### Authentication Complexity
+
 Google Ads OAuth 2.0 setup is more complex than Meta:
+
 1. Requires separate Developer Token (application process)
 2. Test access vs Basic access (quota differences)
 3. Refresh token generation via OAuth Playground
 4. Customer ID format (10 digits, no dashes)
 
 ### Quota Management
+
 - Basic access: 15,000 operations/day
 - Each GAQL query = 1 operation
 - Implement caching strategy:
@@ -834,13 +919,17 @@ Google Ads OAuth 2.0 setup is more complex than Meta:
   - Performance data: 15 min - 24 hours (based on date range)
 
 ### ROAS Consistency
+
 Ensure ROAS calculation is consistent across platforms:
+
 - Google Ads: `conversions_value / cost`
 - Meta Ads: `action_value / spend`
 - Formula: `revenue / spend` (standardized)
 
 ### Cross-Platform Attribution
+
 GA4 conversions may not match paid platform conversions due to:
+
 - Different attribution windows
 - Cookie tracking differences
 - Conversion tracking setup variations
@@ -848,7 +937,9 @@ GA4 conversions may not match paid platform conversions due to:
 Document this in report as "Attribution Note"
 
 ### Markdown Report Output
+
 The orchestrator already has markdown MCP access. Reports will be saved to:
+
 - Directory: `docs/reports/generated/`
 - Filename: `brand-insights-{startDate}-{endDate}.md`
 - Manual comparison with PDF sample required
@@ -872,29 +963,37 @@ The orchestrator already has markdown MCP access. Reports will be saved to:
 ## ⚠️ Risks & Mitigation
 
 ### Risk 1: OAuth Setup Complexity
+
 **Impact:** High - Blocks all development
 **Mitigation:**
+
 - Document step-by-step OAuth flow in README
 - Provide troubleshooting guide
 - Consider test mode with mock data initially
 
 ### Risk 2: API Quota Limits
+
 **Impact:** Medium - Could limit production usage
 **Mitigation:**
+
 - Implement aggressive caching
 - Monitor quota usage via logging
 - Apply for Standard access if needed
 
 ### Risk 3: GAQL Query Complexity
+
 **Impact:** Medium - Complex queries may be slow/expensive
 **Mitigation:**
+
 - Start with simple queries (campaign-level only)
 - Optimize field selection (only request needed fields)
 - Test with large accounts to validate performance
 
 ### Risk 4: Cross-Platform Data Discrepancies
+
 **Impact:** Low - May confuse users
 **Mitigation:**
+
 - Document attribution differences in report
 - Provide data reconciliation guidance
 - Focus on trends rather than exact matches
@@ -906,6 +1005,7 @@ The orchestrator already has markdown MCP access. Reports will be saved to:
 **Overall Progress:** 0% (0/17 tasks completed)
 
 ### Phase 1: Google Ads MCP (0/8)
+
 - [ ] Directory structure
 - [ ] types.ts
 - [ ] GoogleAdsClient Service
@@ -916,10 +1016,12 @@ The orchestrator already has markdown MCP access. Reports will be saved to:
 - [ ] README.md
 
 ### Phase 2: Dapr Integration (0/2)
+
 - [ ] submit_google_ads_data tool
 - [ ] Tool registration
 
 ### Phase 3: Brand Insights Integration (0/6)
+
 - [ ] Google Ads analyst agent
 - [ ] Google Ads prompts
 - [ ] Service updates
@@ -928,10 +1030,12 @@ The orchestrator already has markdown MCP access. Reports will be saved to:
 - [ ] Configuration
 
 ### Phase 4: Testing (0/2)
+
 - [ ] Test script
 - [ ] Package scripts
 
 ### Phase 5: Documentation (0/4)
+
 - [ ] Marketing analytics rules
 - [ ] Workspace config
 - [ ] Docker compose

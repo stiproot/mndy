@@ -10,6 +10,7 @@ account, Shopify store) in their `.env`. This skill lets a user pick a **brand p
 without restarting servers — by passing the brand's identifiers on each tool call.
 
 This works because the GA4 and Meta tools already accept per-call overrides:
+
 - `ga4_run_report` accepts `propertyId`
 - `meta_get_insights` / `meta_get_campaigns` accept `adAccountId`
 

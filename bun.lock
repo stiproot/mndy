@@ -5,6 +5,7 @@
     "": {
       "name": "mndy",
       "devDependencies": {
+        "@stiproot/code-comprehension": "github:stiproot/code-comprehension",
         "dotenv": "^16.4.5",
         "effect": "^3.12.5",
         "markdownlint-cli": "^0.43.0",
@@ -950,6 +951,8 @@
     "@soda/get-current-script": ["@soda/get-current-script@1.0.2", "", {}, "sha512-T7VNNlYVM1SgQ+VsMYhnDkcGmWhQdL0bDyGm5TlQ3GBXnJscEClUUOKduWTmm2zCnvNLC1hc3JpuXjs/nFOc5w=="],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
+
+    "@stiproot/code-comprehension": ["@stiproot/code-comprehension@github:stiproot/code-comprehension#34fa377", { "peerDependencies": { "typescript": ">=5 <7" }, "optionalPeers": ["typescript"], "bin": { "gen-code-diagram": "plugins/code-comprehension/skills/generated-diagrams/scripts/gen-code-diagram.mjs", "render-diagram": "plugins/code-comprehension/skills/generated-diagrams/scripts/render.sh" } }, "stiproot-code-comprehension-34fa377", "sha512-DjQeGNmMCoqMVdVU5zI1eQIGzbp1YqRRvY9g2wwEvmGNgokZ716L9TKa+9/04tMysSx550+bPumBUOzKVp6N+A=="],
 
     "@tootallnate/once": ["@tootallnate/once@2.0.0", "", {}, "sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A=="],
 

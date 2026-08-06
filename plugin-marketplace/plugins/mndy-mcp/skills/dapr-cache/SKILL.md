@@ -20,6 +20,7 @@ actors. Server runs on **port 3006** (`http://localhost:3006/mcp`).
 ## State-key conventions
 
 Tools key data by convention — follow these formats:
+
 - Cached source data: `{source}-{brandId}-{startDate}-{endDate}`
   (e.g. `ga4-default-2025-03-01-2025-03-07`)
 - Brand report: `brand-{brandId}` (e.g. `brand-default`)
@@ -27,12 +28,14 @@ Tools key data by convention — follow these formats:
 ## Read tools
 
 ### `get_cached_data` — read cached source data (TTL-validated)
+
 | Param | Type | Required | Notes |
 |---|---|---|---|
 | source | enum | **yes** | `ga4`\|`shopify`\|`meta` |
 | stateKey | string | **yes** | `{source}-{brandId}-{startDate}-{endDate}` |
 
 ### `get_brand_report` — read a persisted brand report (no TTL)
+
 | Param | Type | Required | Notes |
 |---|---|---|---|
 | stateKey | string | **yes** | `brand-{brandId}` |
@@ -40,7 +43,9 @@ Tools key data by convention — follow these formats:
 ## Write tools
 
 ### `submit_ga4_data` / `submit_shopify_data` / `submit_meta_data`
+
 Cache a source's analytics data. TTL is derived automatically from the date range. Each takes:
+
 - `stateKey` (string, **required**) — `{source}-{brandId}-{startDate}-{endDate}`
 - `data` (object, **required**) — the analytics payload, which always includes
   `dateRange: { startDate, endDate }` (YYYY-MM-DD) plus source-specific fields:
@@ -55,6 +60,7 @@ Cache a source's analytics data. TTL is derived automatically from the date rang
     `conversions`, `roas`), optional `observations[]`.
 
 ### `submit_brand_report` — persist a synthesized brand report (no TTL, history-tracked)
+
 - `stateKey` (string, **required**) — `brand-{brandId}`
 - `report` (object, **required**) with:
   - `brand.analyzedAt` (ISO timestamp)
@@ -69,6 +75,7 @@ Cache a source's analytics data. TTL is derived automatically from the date rang
 ## Actor tools
 
 ### `dapr_actor_get_state` — invoke an actor method to read
+
 | Param | Type | Required | Notes |
 |---|---|---|---|
 | actorType | string | **yes** | e.g. `BrandInsightsActor` (must be registered) |
@@ -77,22 +84,26 @@ Cache a source's analytics data. TTL is derived automatically from the date rang
 | payload | any | no | optional JSON args for the method |
 
 ### `dapr_actor_save_state` — invoke an actor method to save
+
 Same as above, but `payload` (the data to save) is **required**, and `method` is a
 save method (e.g. `SaveReport`, `SetState`).
 
 ## Examples
 
 Read cached GA4 data:
+
 ```json
 { "source": "ga4", "stateKey": "ga4-default-2025-03-01-2025-03-07" }
 ```
 
 Read a brand report:
+
 ```json
 { "stateKey": "brand-default" }
 ```
 
 Invoke an actor to fetch a report:
+
 ```json
 { "actorType": "BrandInsightsActor", "actorId": "brand-default", "method": "GetReport" }
 ```

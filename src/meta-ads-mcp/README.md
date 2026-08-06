@@ -24,6 +24,7 @@ Choose based on your use case:
 #### Development (Quick Start)
 
 Use the [Graph API Explorer](https://developers.facebook.com/tools/explorer/):
+
 1. Select your app
 2. Click "Generate Access Token"
 3. Select permissions: `ads_read`, `read_insights`
@@ -34,6 +35,7 @@ Use the [Graph API Explorer](https://developers.facebook.com/tools/explorer/):
 #### Production (System User - Recommended)
 
 **Manual Generation:**
+
 1. Go to [Business Manager](https://business.facebook.com/settings/) → Settings → System Users
 2. Create a system user with Admin role
 3. Assign the system user to your ad accounts
@@ -61,10 +63,12 @@ curl -X POST \
 **For 60-day expiring tokens:** Add `-F "set_token_expires_in_60_days=true"`
 
 **Requirements:**
+
 - Initial admin access token (to make API calls)
 - `appsecret_proof` = HMAC-SHA256(access_token, app_secret)
 
 **Resources:**
+
 - [Install Apps and Generate Tokens](https://developers.facebook.com/docs/business-management-apis/system-users/install-apps-and-generate-tokens/)
 - [System User Access Token Handling](https://developers.facebook.com/docs/marketing-api/guides/smb/system-user-access-token-handling/)
 
@@ -104,6 +108,7 @@ LOG_LEVEL=info
 ### Token Security
 
 **Best Practices:**
+
 1. Never commit tokens to version control
 2. Use environment variables or secret management systems
 3. Rotate tokens periodically (even if permanent)
@@ -159,6 +164,7 @@ Fetch advertising insights from Meta Marketing API.
 | `limit` | number | No | Max results (default 50, max 500) |
 
 **Date Presets:**
+
 - `today`, `yesterday`
 - `last_3d`, `last_7d`, `last_14d`, `last_28d`, `last_30d`, `last_90d`
 - `this_month`, `last_month`

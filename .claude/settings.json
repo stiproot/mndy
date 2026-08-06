@@ -5,10 +5,39 @@
         "source": "directory",
         "path": "./plugin-marketplace"
       }
+    },
+    "c4-mermaid": {
+      "source": {
+        "source": "github",
+        "repo": "stiproot/c4-mermaid-plugin"
+      }
+    },
+    "code-comprehension-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "stiproot/code-comprehension"
+      }
+    },
+    "hex-arch-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "stiproot/hex-arch"
+      }
+    },
+    "plan-management-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "stiproot/plan-management"
+      }
     }
   },
   "enabledPlugins": {
-    "mndy-mcp@mndy": true
+    "mndy-mcp@mndy": true,
+    "effect-claude-primitives@effect-primitives": true,
+    "c4-mermaid-plugin@c4-mermaid": true,
+    "code-comprehension@code-comprehension-marketplace": true,
+    "hex-arch@hex-arch-marketplace": true,
+    "plan-management@plan-management-marketplace": true
   },
   "hooks": {
     "PreToolUse": [

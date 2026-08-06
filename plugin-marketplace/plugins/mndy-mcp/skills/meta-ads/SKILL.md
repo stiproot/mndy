@@ -23,12 +23,14 @@ on **port 3004** (`http://localhost:3004/mcp`).
 ## Tools
 
 ### `meta_get_campaigns` — list campaigns
+
 | Param | Type | Required | Notes |
 |---|---|---|---|
 | adAccountId | string | no | overrides default `META_AD_ACCOUNT_ID` |
 | limit | number | no | 1–500 (default 100) |
 
 ### `meta_get_insights` — performance metrics
+
 | Param | Type | Required | Notes |
 |---|---|---|---|
 | adAccountId | string | no | overrides default account |
@@ -51,11 +53,13 @@ on **port 3004** (`http://localhost:3004/mcp`).
 ## Examples
 
 Campaign-level insights for the last 30 days:
+
 ```json
 { "level": "campaign", "datePreset": "last_30d" }
 ```
 
 Ad-level insights for a custom range, specific campaigns:
+
 ```json
 {
   "level": "ad",

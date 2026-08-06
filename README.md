@@ -288,6 +288,7 @@ Choose the appropriate method based on your use case:
 5. Click "Generate Access Token" and copy the token
 
 ⚠️ **Important Limitations:**
+
 - Expires in 1-2 hours
 - Cannot select "no expiry" option in the UI
 - For longer-lived tokens, see the token exchange API or use system users
@@ -309,6 +310,7 @@ Choose the appropriate method based on your use case:
 8. Click "Generate Token" and copy it securely
 
 ✅ **Benefits:**
+
 - Permanent tokens (no expiry) or 60-day expiry (configurable)
 - Recommended for production use
 - More secure than user tokens
@@ -318,11 +320,13 @@ Choose the appropriate method based on your use case:
 **Best for:** Automated provisioning, infrastructure-as-code
 
 System user tokens can be generated programmatically using Meta's Business Management APIs. This requires:
+
 1. An existing admin access token
 2. A system user ID
 3. Your app ID and app secret
 
 **Install the app for the system user:**
+
 ```bash
 curl \
   -F "business_app=YOUR_APP_ID" \
@@ -331,6 +335,7 @@ curl \
 ```
 
 **Generate a permanent access token:**
+
 ```bash
 curl \
   -F "business_app=YOUR_APP_ID" \
@@ -341,12 +346,14 @@ curl \
 ```
 
 **Generate a 60-day expiring token:**
+
 ```bash
 # Add this parameter:
 -F "set_token_expires_in_60_days=true"
 ```
 
 📖 **Documentation:**
+
 - [Business Management APIs - Install Apps and Generate Tokens](https://developers.facebook.com/docs/business-management-apis/system-users/install-apps-and-generate-tokens/)
 - [System User Access Token Handling](https://developers.facebook.com/docs/marketing-api/guides/smb/system-user-access-token-handling/)
 
@@ -373,6 +380,7 @@ PORT=3004
 ```
 
 **Token Recommendations:**
+
 - **Development:** Use Graph API Explorer tokens (short-lived, 1-2 hours)
 - **CI/CD & Testing:** Use long-lived user tokens or system user tokens (60 days)
 - **Production:** Use system user tokens (permanent or 60-day, depending on your security policy)

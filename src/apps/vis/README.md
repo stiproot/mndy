@@ -32,7 +32,7 @@ bun run lint
 
 ### Standalone
 
-Visit http://localhost:8082 to see the chart gallery/demo.
+Visit <http://localhost:8082> to see the chart gallery/demo.
 
 ### As Federated Module
 
@@ -83,6 +83,7 @@ const workItems = azDoUnits.map(unit => AzDoAdapter.toWorkItem(unit));
 ## Data Model
 
 Charts consume `IWorkItem[]` - a generic interface supporting:
+
 - Hierarchical relationships (parent/children)
 - RAG status (red/amber/green)
 - Risk metrics
