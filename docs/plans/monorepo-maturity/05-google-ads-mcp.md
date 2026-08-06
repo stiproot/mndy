@@ -1,6 +1,6 @@
 # 05 — Google Ads MCP
 
-Status: Planning — finish the half-built Google Ads server as a first-class analytics MCP.
+Status: Complete — google-ads-core + a container app on port 3010, wired into the plugin and the brand registry.
 Established: 2026-08-06
 
 Part of [monorepo-maturity](./README.md).

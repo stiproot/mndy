@@ -122,7 +122,7 @@ Microservices architecture using Dapr:
 | `apps/dapr-mcp` | 3006 | **Dapr sidecar + `make docker-compose-infra`** |
 | `apps/markdown-mcp` | 3008 | none |
 | `apps/github-issues-mcp` | 3009 | none |
-| `apps/google-ads-mcp` | — | none (in progress) |
+| `apps/google-ads-mcp` | 3010 | none |
 
 **Only `dapr-mcp` needs infrastructure.** Every other server is a plain HTTP process
 needing nothing but its own `.env` and a free port. See the Modes section for what that
@@ -166,14 +166,14 @@ Use `make help` to see all available commands. The Makefile is the single entry 
 ### MCP Servers
 
 - `make run-github-issues-mcp` - GitHub Issues MCP server (port 3009). [Details](apps/github-issues-mcp/README.md)
-- `make run-analytics-mcps` - GA4 + Meta + Shopify together, no infra needed
-- `make run-ga4-mcp` / `run-meta-ads-mcp` / `run-shopify-mcp` - individually
+- `make run-analytics-mcps` - GA4 + Meta + Shopify + Google Ads together, no infra needed
+- `make run-ga4-mcp` / `run-meta-ads-mcp` / `run-shopify-mcp` / `run-google-ads-mcp` - individually
 - `make run-markdown-mcp` - Markdown MCP server (port 3008)
 - `make run-dapr-mcp` - Dapr MCP server (needs a sidecar + infra, port 3006)
 
-**Multi-brand:** the GA4 and Meta tools take a per-call `propertyId` /
-`adAccountId` that overrides the server's `.env` default, so one running server
-serves many brands without a restart. Brands live in a gitignored
+**Multi-brand:** the GA4, Meta and Google Ads tools take a per-call `propertyId` /
+`adAccountId` / `customerId` that overrides the server's `.env` default, so one running
+server serves many brands without a restart. Brands live in a gitignored
 `mndy-brands.json`; the template is at
 `plugin-marketplace/plugins/mndy-mcp/skills/brands/mndy-brands.example.json`.
 Shopify is single-store per running server. See the `brands` skill.

@@ -1,11 +1,12 @@
 {
-  "$comment": "Per-session brand registry for the mndy analytics MCPs. Copy this file to 'mndy-brands.json' (gitignored) and fill in your brands. The 'brands' skill reads it and applies each brand's GA4 propertyId / Meta adAccountId per tool call. Brand IDs are identifiers, not credentials — but the real file is gitignored so it never leaks. Shopify is single-store per running server (see the shopify skill), so 'shopifyStore' is informational: the running shopify-mcp uses whatever store its own .env is configured with.",
+  "$comment": "Per-session brand registry for the mndy analytics MCPs. Copy this file to 'mndy-brands.json' (gitignored) and fill in your brands. The 'brands' skill reads it and applies each brand's GA4 propertyId / Meta adAccountId / Google Ads customerId per tool call. Brand IDs are identifiers, not credentials — but the real file is gitignored so it never leaks. Shopify is single-store per running server (see the shopify skill), so 'shopifyStore' is informational: the running shopify-mcp uses whatever store its own .env is configured with.",
   "defaultBrand": "example-brand",
   "brands": {
     "example-brand": {
       "label": "Example Brand",
       "ga4PropertyId": "123456789",
       "metaAdAccountId": "act_123456789",
+      "googleAdsCustomerId": "1234567890",
       "shopifyStore": "example-brand.myshopify.com",
       "timezone": "Africa/Johannesburg",
       "currency": "ZAR"

@@ -9,10 +9,11 @@ The analytics MCP servers each start with a hardcoded default account (GA4 prope
 account, Shopify store) in their `.env`. This skill lets a user pick a **brand per session**
 without restarting servers — by passing the brand's identifiers on each tool call.
 
-This works because the GA4 and Meta tools already accept per-call overrides:
+This works because the analytics tools already accept per-call overrides:
 
 - `ga4_run_report` accepts `propertyId`
 - `meta_get_insights` / `meta_get_campaigns` accept `adAccountId`
+- `google_ads_get_performance` / `google_ads_get_campaigns` accept `customerId`
 
 > **Requirement:** the running server's credentials must have access to the brand you select
 > — one GA4 service account can serve every property it's been granted, and one Meta token
@@ -44,6 +45,7 @@ Shape:
       "label": "AF Brands",
       "ga4PropertyId": "261791693",
       "metaAdAccountId": "act_1921195691366438",
+      "googleAdsCustomerId": "1234567890",
       "shopifyStore": "afbrands.myshopify.com",
       "timezone": "Africa/Johannesburg",
       "currency": "ZAR"
@@ -64,6 +66,8 @@ Shape:
    - GA4: pass `propertyId` = the brand's `ga4PropertyId` on every `ga4_run_report` call.
    - Meta: pass `adAccountId` = the brand's `metaAdAccountId` on every
      `meta_get_insights` / `meta_get_campaigns` call.
+   - Google Ads: pass `customerId` = the brand's `googleAdsCustomerId` on every
+     `google_ads_get_performance` / `google_ads_get_campaigns` call.
    - Shopify: **single store per running server.** The `shopify_*` tools have no store
      parameter — they hit whatever store the running `mndy-shopify` server's `.env` points
      at. If the selected brand's `shopifyStore` does not match that server's store, say so

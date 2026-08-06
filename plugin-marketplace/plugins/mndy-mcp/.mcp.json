@@ -16,6 +16,10 @@
       "type": "http",
       "url": "${MNDY_SHOPIFY_MCP_URL:-http://localhost:3005/mcp}"
     },
+    "mndy-google-ads": {
+      "type": "http",
+      "url": "${MNDY_GOOGLE_ADS_MCP_URL:-http://localhost:3010/mcp}"
+    },
     "mndy-dapr": {
       "type": "http",
       "url": "${MNDY_DAPR_MCP_URL:-http://localhost:3006/mcp}"

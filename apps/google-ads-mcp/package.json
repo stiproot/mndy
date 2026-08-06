@@ -1,0 +1,26 @@
+{
+  "name": "google-ads-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for the Google Ads API",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "lint": "depcruise --config ../../.dependency-cruiser.cjs src"
+  },
+  "dependencies": {
+    "mcp-core": "workspace:*",
+    "google-ads-core": "workspace:*",
+    "analytics-core": "workspace:*",
+    "dotenv": "^16.4.5",
+    "effect": "^3.12.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "dependency-cruiser": "^18.0.0",
+    "typescript": "^5.7.0"
+  }
+}

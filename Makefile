@@ -8,7 +8,7 @@ DOCKER ?= podman
 
 .PHONY: install install-node install-python \
         dev serve-ui serve-vis serve-azdo run-ui-api run-azdo-worker run-azdoproxy-worker run-insights-worker run-workflows-worker \
-        run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp run-markdown-mcp run-dapr-mcp run-analytics-mcps run-dapr-actor-svc build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
+        run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp run-google-ads-mcp run-markdown-mcp run-dapr-mcp run-analytics-mcps run-dapr-actor-svc build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
         refresh-meta-token \
         build build-ui build-vis build-azdo build-ui-api \
         lint lint-guards lint-md lint-md-fix lint-python lint-node \
@@ -105,15 +105,19 @@ run-meta-ads-mcp: build-mcp ## Run Meta Ads MCP server (port 3004)
 run-shopify-mcp: build-mcp ## Run Shopify MCP server (port 3005)
 	bun run --cwd apps/shopify-mcp start
 
+run-google-ads-mcp: build-mcp ## Run Google Ads MCP server (port 3010)
+	bun run --cwd apps/google-ads-mcp start
+
 run-markdown-mcp: build-mcp ## Run Markdown MCP server (port 3008)
 	bun run --cwd apps/markdown-mcp start
 
-run-analytics-mcps: build-mcp ## Run the analytics MCP servers together — GA4, Meta Ads, Shopify (ports 3003/3004/3005). No Dapr/infra required. Ctrl-C stops all.
-	@echo "Starting analytics MCP servers: GA4 (3003), Meta Ads (3004), Shopify (3005). Ctrl-C to stop all."
+run-analytics-mcps: build-mcp ## Run every analytics MCP server together — GA4, Meta Ads, Shopify, Google Ads (3003/3004/3005/3010). No Dapr/infra required. Ctrl-C stops all.
+	@echo "Starting analytics MCP servers: GA4 (3003), Meta Ads (3004), Shopify (3005), Google Ads (3010). Ctrl-C to stop all."
 	@trap 'kill 0' INT TERM; \
 		bun run --cwd apps/ga4-mcp start & \
 		bun run --cwd apps/meta-ads-mcp start & \
 		bun run --cwd apps/shopify-mcp start & \
+		bun run --cwd apps/google-ads-mcp start & \
 		wait
 
 run-dapr-mcp: build-dapr ## Run Dapr MCP server with Dapr sidecar (port 3006)
@@ -132,6 +136,7 @@ build-mcp: ## Build all MCP packages
 	bun run --cwd apps/ga4-mcp build
 	bun run --cwd apps/meta-ads-mcp build
 	bun run --cwd apps/shopify-mcp build
+	bun run --cwd apps/google-ads-mcp build
 	bun run --cwd apps/markdown-mcp build
 
 build-dapr: ## Build Dapr core and MCP packages

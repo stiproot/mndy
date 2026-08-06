@@ -68,6 +68,16 @@ shared runtime and the `presentation/` layer, but `data-cache.service.ts` and it
 reusable domain, so the payoff is lower — but the layout is now inconsistent with the four
 analytics servers. Fold it into the same shape when next touched.
 
+### The paid media report is still unbuilt
+
+From [monorepo-maturity/05](./monorepo-maturity/05-google-ads-mcp.md). Its data layer is
+now complete on every platform — Google Ads was the last gap — but the report itself
+(`docs/plans/google-ads-mcp-paid-media-report.md`) has not been written. Build it as a
+cross-platform composition in `packages/js/analytics-core`, not as a tool on any single
+platform's server: it reads Google Ads, Meta, GA4 and Shopify together, so putting it in
+one server's app would both hide it from other consumers and give that server dependencies
+on four platforms.
+
 ### `ui-api` does not compile
 
 From [monorepo-maturity/02](./monorepo-maturity/02-monorepo-restructure.md). `turbo build`
