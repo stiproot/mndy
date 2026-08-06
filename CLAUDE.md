@@ -177,10 +177,25 @@ tests/         cross-service integration tests
 docs/          guides, plans, diagrams
 ```
 
-Workspaces are glob-based: bun takes `apps/*`, `packages/js/*` and `scripts`; uv takes the
-four Python workers plus `packages/py/mndy-framework`. Adding a package means creating the
-directory — there is no list to update. `apps/azdoproxy-api` is C# and deliberately sits
-in neither workspace.
+**One bun workspace, one uv workspace, one lockfile.** Both are glob-based, so adding a
+package means creating the directory — there is no list to update:
+
+| | Globs |
+| --- | --- |
+| bun | `apps/*`, `packages/js/*`, `scripts` |
+| uv | `apps/*-worker`, `packages/py/*` |
+
+uv cannot use plain `apps/*`: it errors on a matched directory with no `pyproject.toml`, and
+most of `apps/` is TypeScript. Hence the `-worker` convention — **a new Python service must
+be named `*-worker`** to join the workspace.
+
+`apps/azdoproxy-api` is C# and deliberately sits in neither. `tools/d3-lab` is a legacy
+sandbox, excluded on purpose in `scripts/check-workspaces.mjs`.
+
+`scripts/check-workspaces.mjs` (in `bun run lint`) fails the build on a manifest that
+belongs to neither workspace, and on any `package-lock.json` / `yarn.lock` — **bun is the
+only package manager here**, and a second one silently resolves part of the repo
+differently.
 
 ### Applications
 

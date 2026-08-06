@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "lint": "bun scripts/check-ports.mjs && bun scripts/check-hex-lint.mjs && bun scripts/check-mcp-parity.mjs && bun scripts/check-secrets.mjs && bun scripts/check-docker-workspace.mjs && bun run lint:md && turbo lint",
+    "lint": "bun scripts/check-workspaces.mjs && bun scripts/check-ports.mjs && bun scripts/check-hex-lint.mjs && bun scripts/check-mcp-parity.mjs && bun scripts/check-secrets.mjs && bun scripts/check-docker-workspace.mjs && bun run lint:md && turbo lint",
     "test": "turbo test",
     "check-ports": "bun scripts/check-ports.mjs",
     "check-hex-lint": "bun scripts/check-hex-lint.mjs",
@@ -27,7 +27,8 @@
     "insights": "bun run --cwd scripts src/contributor-insights.ts",
     "check-mcp-parity": "bun scripts/check-mcp-parity.mjs",
     "check-secrets": "bun scripts/check-secrets.mjs",
-    "check-docker-workspace": "bun scripts/check-docker-workspace.mjs"
+    "check-docker-workspace": "bun scripts/check-docker-workspace.mjs",
+    "check-workspaces": "bun scripts/check-workspaces.mjs"
   },
   "devDependencies": {
     "@stiproot/code-comprehension": "github:stiproot/code-comprehension",

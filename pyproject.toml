@@ -5,10 +5,10 @@ description = "Project analytics platform for Azure DevOps"
 requires-python = ">=3.12"
 
 [tool.uv.workspace]
+# Globs, matching the bun side — a new Python worker joins the workspace by existing,
+# rather than by someone remembering to add it here. `apps/*` cannot be used: uv errors on
+# a matched directory with no pyproject.toml, and most apps/ entries are TypeScript.
 members = [
-    "packages/py/mndy-framework",
-    "apps/azdo-worker",
-    "apps/insights-worker",
-    "apps/azdoproxy-worker",
-    "apps/workflows-worker",
+    "apps/*-worker",
+    "packages/py/*",
 ]
