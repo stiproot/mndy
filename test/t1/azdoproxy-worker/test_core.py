@@ -4,7 +4,7 @@ import os
 
 sys.path.append(
     os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../../../src/azdoproxy-worker/src")
+        os.path.join(os.path.dirname(__file__), "../../../apps/azdoproxy-worker/src")
     )
 )
 

@@ -13,7 +13,7 @@ actors. Server runs on **port 3006** (`http://localhost:3006/mcp`).
 - **Needs a Dapr sidecar and infrastructure**, unlike the other mndy MCP servers.
   1. Start infra: `make docker-compose-infra` (Dapr, MongoDB, RabbitMQ, Zipkin)
   2. Start the server + sidecar: `make run-dapr-mcp`
-- Sidecar connection (in `src/dapr-mcp/.env`, defaults shown): `DAPR_HOST=localhost`,
+- Sidecar connection (in `apps/dapr-mcp/.env`, defaults shown): `DAPR_HOST=localhost`,
   `DAPR_HTTP_PORT=3500`, `DAPR_GRPC_PORT=50001`
 - Verify: `curl -s http://localhost:3006/health`
 

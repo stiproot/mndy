@@ -1,8 +1,8 @@
 x-daprdimage: &daprdimage
   image: daprio/daprd:1.13.2
   volumes:
-    - ../../../src/dapr/components/:/components
-    - ../../../src/dapr/configuration/:/configuration
+    - ../../../config/dapr/components/:/components
+    - ../../../config/dapr/configuration/:/configuration
 
 x-wiremockimage: &wiremockimage
   image: itartifacts.co.uk/imagebuild/docker.io/sheyenrath/wiremock.net-alpine:1.5.53
@@ -76,8 +76,8 @@ services:
     <<: *wiremockimage
     container_name: azure-devops-api
     volumes:
-      - ../../../src/mappings/azureDevOpsApiMappings.json:/app/__admin/mappings/azureDevOpsApiMappings.json
-      - ../../../src/mappings/wiremockHealthMappings.json:/app/__admin/mappings/wiremockHealthMappings.json
+      - ../../../config/mappings/azureDevOpsApiMappings.json:/app/__admin/mappings/azureDevOpsApiMappings.json
+      - ../../../config/mappings/wiremockHealthMappings.json:/app/__admin/mappings/wiremockHealthMappings.json
     command: [
       "dotnet",
       "wiremock-net.dll",
@@ -130,7 +130,7 @@ services:
   mndy-workflows-worker:
     image: xo-feed/mndy/workflows-worker:dev
     build:
-      context: ../../../src/workflows-worker/
+      context: ../../../apps/workflows-worker/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/workflows-worker:dev
@@ -162,7 +162,7 @@ services:
   mndy-azdo-worker:
     image: xo-feed/mndy/azdo-worker:dev
     build:
-      context: ../../../src/azdo-worker/
+      context: ../../../apps/azdo-worker/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/azdo-worker:dev
@@ -195,7 +195,7 @@ services:
   mndy-insights-worker:
     image: xo-feed/mndy/insights-worker:dev
     build:
-      context: ../../../src/insights-worker/
+      context: ../../../apps/insights-worker/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/insights-worker:dev
@@ -227,7 +227,7 @@ services:
   mndy-azdoproxy-worker:
     image: xo-feed/mndy/azdoproxy-worker:dev
     build:
-      context: ../../../src/azdoproxy-worker/
+      context: ../../../apps/azdoproxy-worker/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/azdoproxy-worker:dev
@@ -259,7 +259,7 @@ services:
   mndy-azdoproxy-api:
     image: xo-feed/mndy/azdoproxy-api:dev
     build:
-      context: ../../../src/azdoproxy-api
+      context: ../../../apps/azdoproxy-api
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/azdoproxy-api:dev

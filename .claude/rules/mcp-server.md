@@ -458,8 +458,8 @@ See `tests/integration/{mcp-name}/` for examples.
 
 ## Reference Implementations
 
-- `src/dapr-mcp/` - Multi-tool caching server
-- `src/ga4-mcp/` - Single-tool analytics server
-- `src/github-issues-mcp/` - GitHub integration
+- `apps/dapr-mcp/` - Multi-tool caching server
+- `apps/ga4-mcp/` - Single-tool analytics server
+- `apps/github-issues-mcp/` - GitHub integration
 
 These are canonical examples - follow their patterns.

@@ -5,7 +5,7 @@ from data import test_unit
 
 sys.path.append(
     os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../../../src/azdo-worker")
+        os.path.join(os.path.dirname(__file__), "../../../apps/azdo-worker")
     )
 )
 

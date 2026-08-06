@@ -39,6 +39,11 @@ bld/
 **/.env
 !**/.env.template
 .env.local
+# `**/.env` matches only files named exactly `.env` — dotted variants need their own
+# rules, or they get committed. `src/.core.env` was tracked for exactly this reason.
+**/.*.env
+**/.env.*
+!**/.env.template
 
 # Visual Studio 2015 cache/options directory
 .vs/

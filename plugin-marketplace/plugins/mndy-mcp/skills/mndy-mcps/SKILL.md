@@ -24,7 +24,7 @@ down, its tools simply won't respond — start it (below), then reconnect.
 
 | MCP server (Claude name) | Default URL | Skill | Tools |
 |---|---|---|---|
-| `mndy-github-issues` | `http://localhost:3001/mcp` | `github-issues` | list/update issues, add/remove labels |
+| `mndy-github-issues` | `http://localhost:3009/mcp` | `github-issues` | list/update issues, add/remove labels |
 | `mndy-ga4` | `http://localhost:3003/mcp` | `ga4-analytics` | run GA4 reports |
 | `mndy-meta-ads` | `http://localhost:3004/mcp` | `meta-ads` | campaigns, ad insights |
 | `mndy-shopify` | `http://localhost:3005/mcp` | `shopify` | orders, store analytics |
@@ -71,7 +71,7 @@ make run-ga4-mcp             # port 3003
 make run-meta-ads-mcp        # port 3004
 make run-shopify-mcp         # port 3005
 
-make run-github-issues-mcp   # port 3001 — standalone, no infra
+make run-github-issues-mcp   # port 3009 — standalone, no infra
 make run-dapr-mcp            # port 3006 — REQUIRES a Dapr sidecar + infra
 ```
 
@@ -88,7 +88,7 @@ one foreground command; Ctrl-C stops all three. `make run-dapr-mcp` additionally
 Each server exposes a `/health` endpoint:
 
 ```bash
-curl -s http://localhost:3001/health   # github-issues; swap the port per server
+curl -s http://localhost:3009/health   # github-issues; swap the port per server
 ```
 
 A healthy server returns HTTP 200. If Claude's tools for a server aren't responding,

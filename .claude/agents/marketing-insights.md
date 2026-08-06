@@ -177,7 +177,7 @@ Include top wins, issues, and a prioritized action plan for next week.
 The agent integrates with cc-svc as an orchestrated workflow:
 
 ```typescript
-// src/cc-svc/src/routes/marketing.routes.ts
+// apps/cc-svc/src/routes/marketing.routes.ts
 router.post("/marketing/insights", async (req, res) => {
   const { dateRange, brands, reportType } = req.body;
 

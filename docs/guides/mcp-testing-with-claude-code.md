@@ -32,7 +32,7 @@ The Model Context Protocol (MCP) enables standardized communication between AI m
 | meta-ads-mcp | 3004 | `meta_get_insights`, `meta_get_campaigns` | Facebook/Instagram ads |
 | shopify-mcp | 3005 | `shopify_get_orders`, `shopify_get_analytics` | E-commerce data |
 | dapr-mcp | 3006 | Data persistence (6 tools) | Dapr actor state management |
-| github-issues-mcp | 3001 | Issue management (4 tools) | GitHub issues |
+| github-issues-mcp | 3009 | Issue management (4 tools) | GitHub issues |
 
 **Total:** 15 tools across 5 MCP servers
 
@@ -77,11 +77,11 @@ This cycle takes minutes and provides immediate feedback.
 ### Prerequisites
 
 1. **Credentials configured** - Ensure `.env` files exist for MCPs:
-   - `src/ga4-mcp/.env`
-   - `src/meta-ads-mcp/.env`
-   - `src/shopify-mcp/.env`
-   - `src/dapr-mcp/.env`
-   - `src/github-issues-mcp/.env`
+   - `apps/ga4-mcp/.env`
+   - `apps/meta-ads-mcp/.env`
+   - `apps/shopify-mcp/.env`
+   - `apps/dapr-mcp/.env`
+   - `apps/github-issues-mcp/.env`
 
 2. **Dependencies installed**:
 
@@ -125,7 +125,7 @@ make run-shopify-mcp
 # Terminal 4: Dapr MCP (port 3006)
 make run-dapr-mcp
 
-# Terminal 5: GitHub Issues MCP (port 3001)
+# Terminal 5: GitHub Issues MCP (port 3009)
 make run-github-issues-mcp
 ```
 
@@ -144,7 +144,7 @@ curl http://localhost:3003/health  # GA4 → should return {"status": "ok"}
 curl http://localhost:3004/health  # Meta
 curl http://localhost:3005/health  # Shopify
 curl http://localhost:3006/health  # Dapr
-curl http://localhost:3001/health  # GitHub
+curl http://localhost:3009/health  # GitHub
 ```
 
 ### Step 5: Restart Claude Code CLI
@@ -197,7 +197,7 @@ an env var (e.g. `MNDY_GA4_MCP_URL`) and otherwise defaults to its localhost por
     "mndy-meta-ads":      { "type": "http", "url": "${MNDY_META_MCP_URL:-http://localhost:3004/mcp}" },
     "mndy-shopify":       { "type": "http", "url": "${MNDY_SHOPIFY_MCP_URL:-http://localhost:3005/mcp}" },
     "mndy-dapr":          { "type": "http", "url": "${MNDY_DAPR_MCP_URL:-http://localhost:3006/mcp}" },
-    "mndy-github-issues": { "type": "http", "url": "${MNDY_GITHUB_ISSUES_MCP_URL:-http://localhost:3001/mcp}" }
+    "mndy-github-issues": { "type": "http", "url": "${MNDY_GITHUB_ISSUES_MCP_URL:-http://localhost:3009/mcp}" }
   }
 }
 ```
@@ -544,7 +544,7 @@ Armed with this knowledge, you wrote accurate agent instructions on the first tr
 
    ```bash
    # Verify credentials are set
-   grep META_ACCESS_TOKEN src/meta-ads-mcp/.env
+   grep META_ACCESS_TOKEN apps/meta-ads-mcp/.env
    ```
 
 2. **Check token expiration**:

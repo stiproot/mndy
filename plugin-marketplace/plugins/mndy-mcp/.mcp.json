@@ -2,7 +2,7 @@
   "mcpServers": {
     "mndy-github-issues": {
       "type": "http",
-      "url": "${MNDY_GITHUB_ISSUES_MCP_URL:-http://localhost:3001/mcp}"
+      "url": "${MNDY_GITHUB_ISSUES_MCP_URL:-http://localhost:3009/mcp}"
     },
     "mndy-ga4": {
       "type": "http",

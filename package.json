@@ -3,26 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "description": "Project analytics platform for Azure DevOps",
+  "packageManager": "bun@1.3.14",
   "workspaces": [
-    "src/apps/ui",
-    "src/apps/vis",
-    "src/apps/azdo",
-    "src/ui-api",
-    "src/d3-lab",
-    "src/mcp-core",
-    "src/dapr-core",
-    "src/dapr-mcp",
-    "src/dapr-actor-svc",
-    "src/github-issues-mcp",
-    "src/ga4-mcp",
-    "src/meta-ads-mcp",
-    "src/shopify-mcp",
-    "src/markdown-mcp",
-    "src/cc-core",
-    "src/cc-svc",
+    "apps/*",
+    "packages/js/*",
     "scripts"
   ],
   "scripts": {
+    "build": "turbo build",
+    "lint": "node scripts/check-ports.mjs && node scripts/check-hex-lint.mjs && turbo lint",
+    "test": "turbo test",
+    "check-ports": "node scripts/check-ports.mjs",
+    "check-hex-lint": "node scripts/check-hex-lint.mjs",
     "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**'",
     "lint:md:fix": "markdownlint '**/*.md' --ignore node_modules --ignore '**/node_modules/**' --fix",
     "test:integration": "vitest run tests/integration/",
@@ -36,9 +28,11 @@
   },
   "devDependencies": {
     "@stiproot/code-comprehension": "github:stiproot/code-comprehension",
+    "dependency-cruiser": "^18.0.0",
     "dotenv": "^16.4.5",
     "effect": "^3.12.5",
     "markdownlint-cli": "^0.43.0",
+    "turbo": "^2.9.16",
     "vitest": "^3.0.0"
   }
 }

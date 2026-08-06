@@ -83,5 +83,5 @@ results (e.g. report AOV in the brand's `currency`).
 
 Because Shopify auth is per-store (OAuth client credentials bound to one store), true
 per-session Shopify switching isn't available yet. To analyse a different store, point
-`src/shopify-mcp/.env` at that store and restart `mndy-shopify` — or run one shopify-mcp
+`apps/shopify-mcp/.env` at that store and restart `mndy-shopify` — or run one shopify-mcp
 per store on separate ports. GA4 and Meta switch freely per call.

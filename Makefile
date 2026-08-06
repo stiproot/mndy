@@ -11,7 +11,7 @@ DOCKER ?= podman
         run-github-issues-mcp run-ga4-mcp run-meta-ads-mcp run-shopify-mcp run-markdown-mcp run-dapr-mcp run-analytics-mcps run-dapr-actor-svc build-mcp build-dapr build-dapr-actor-svc build-cc build-cc-svc run-cc-svc \
         refresh-meta-token \
         build build-ui build-vis build-azdo build-ui-api \
-        lint lint-md lint-md-fix lint-python lint-node lint-vis \
+        lint lint-guards lint-md lint-md-fix lint-python lint-node \
         lock lock-python lock-node \
         docker-compose docker-compose-infra docker-compose-arm docker-compose-arm-infra docker-compose-ai docker-compose-ai-arm \
         test-integration test-integration-watch test-mcp test-ga4-mcp test-meta-ads-mcp test-shopify-mcp test-dapr-mcp test-cc-svc test-cc-svc-dapr-mcp test-cc-svc-brand-insights test-cc-svc-data-collection test-cc-svc-brand-analysis test-cc-svc-brand-e2e \
@@ -35,13 +35,13 @@ install-python: ## Install Python dependencies (uv workspace)
 # ==============================================================================
 
 serve-ui: ## Run frontend dev server (port 8080)
-	bun run --cwd src/apps/ui serve
+	bun run --cwd apps/ui serve
 
 serve-vis: ## Run vis dev server (port 8082)
-	bun run --cwd src/apps/vis serve
+	bun run --cwd apps/vis serve
 
 serve-azdo: ## Run azdo module dev server (port 8083)
-	bun run --cwd src/apps/azdo serve
+	bun run --cwd apps/azdo serve
 
 run-ui-api: build-ui-api ## Run UI API gateway with Dapr (port 3001)
 	dapr run --app-id mndy-ui-api \
@@ -50,42 +50,42 @@ run-ui-api: build-ui-api ## Run UI API gateway with Dapr (port 3001)
 		--scheduler-host-address="" \
 		--dapr-http-port 3500 \
 		--app-port 3001 \
-		--components-path src/dapr/components.localhost \
-		-- bun run --cwd src/ui-api start
+		--components-path config/dapr/components.localhost \
+		-- bun run --cwd apps/ui-api start
 
 run-azdo-worker: ## Run Azure DevOps worker with Dapr (port 6006)
-	cd src/azdo-worker/src && \
+	cd apps/azdo-worker/src && \
 	dapr run --app-id mndy-azdo-worker \
 		--placement-host-address localhost:50000 \
-		--resources-path ../../dapr/components.local/ \
-		--config ../../dapr/configuration/config.yaml \
+		--resources-path ../../../config/dapr/components.localhost/ \
+		--config ../../../config/dapr/configuration/config.yaml \
 		--app-port 6006 \
 		-- uv run --package azdo-worker uvicorn main:app --host 0.0.0.0 --port 6006
 
 run-azdoproxy-worker: ## Run Azure DevOps proxy worker with Dapr (port 6006)
-	cd src/azdoproxy-worker/src && \
+	cd apps/azdoproxy-worker/src && \
 	dapr run --app-id mndy-azdoproxy-worker \
 		--placement-host-address localhost:50000 \
-		--resources-path ../../dapr/components.local/ \
-		--config ../../dapr/configuration/config.yaml \
+		--resources-path ../../../config/dapr/components.localhost/ \
+		--config ../../../config/dapr/configuration/config.yaml \
 		--app-port 6006 \
 		-- uv run --package azdoproxy-worker uvicorn main:app --host 0.0.0.0 --port 6006
 
 run-insights-worker: ## Run insights worker with Dapr (port 6006)
-	cd src/insights-worker/src && \
+	cd apps/insights-worker/src && \
 	dapr run --app-id mndy-insights-worker \
 		--placement-host-address localhost:50000 \
-		--resources-path ../../dapr/components.local/ \
-		--config ../../dapr/configuration/config.yaml \
+		--resources-path ../../../config/dapr/components.localhost/ \
+		--config ../../../config/dapr/configuration/config.yaml \
 		--app-port 6006 \
 		-- uv run --package insights-worker uvicorn main:app --host 0.0.0.0 --port 6006
 
 run-workflows-worker: ## Run workflows worker with Dapr (port 6006)
-	cd src/workflows-worker/src && \
+	cd apps/workflows-worker/src && \
 	dapr run --app-id mndy-workflows-worker \
 		--placement-host-address localhost:50000 \
-		--resources-path ../../dapr/components.local/ \
-		--config ../../dapr/configuration/config.yaml \
+		--resources-path ../../../config/dapr/components.localhost/ \
+		--config ../../../config/dapr/configuration/config.yaml \
 		--app-port 6006 \
 		-- uv run --package workflows-worker uvicorn main:app --host 0.0.0.0 --port 6006
 
@@ -93,27 +93,27 @@ run-workflows-worker: ## Run workflows worker with Dapr (port 6006)
 # MCP Servers
 # ==============================================================================
 
-run-github-issues-mcp: build-mcp ## Run GitHub Issues MCP server (port 3001)
-	bun run --cwd src/github-issues-mcp start
+run-github-issues-mcp: build-mcp ## Run GitHub Issues MCP server (port 3009)
+	bun run --cwd apps/github-issues-mcp start
 
 run-ga4-mcp: build-mcp ## Run GA4 MCP server (port 3003)
-	bun run --cwd src/ga4-mcp start
+	bun run --cwd apps/ga4-mcp start
 
 run-meta-ads-mcp: build-mcp ## Run Meta Ads MCP server (port 3004)
-	bun run --cwd src/meta-ads-mcp start
+	bun run --cwd apps/meta-ads-mcp start
 
 run-shopify-mcp: build-mcp ## Run Shopify MCP server (port 3005)
-	bun run --cwd src/shopify-mcp start
+	bun run --cwd apps/shopify-mcp start
 
 run-markdown-mcp: build-mcp ## Run Markdown MCP server (port 3008)
-	bun run --cwd src/markdown-mcp start
+	bun run --cwd apps/markdown-mcp start
 
 run-analytics-mcps: build-mcp ## Run the analytics MCP servers together — GA4, Meta Ads, Shopify (ports 3003/3004/3005). No Dapr/infra required. Ctrl-C stops all.
 	@echo "Starting analytics MCP servers: GA4 (3003), Meta Ads (3004), Shopify (3005). Ctrl-C to stop all."
 	@trap 'kill 0' INT TERM; \
-		bun run --cwd src/ga4-mcp start & \
-		bun run --cwd src/meta-ads-mcp start & \
-		bun run --cwd src/shopify-mcp start & \
+		bun run --cwd apps/ga4-mcp start & \
+		bun run --cwd apps/meta-ads-mcp start & \
+		bun run --cwd apps/shopify-mcp start & \
 		wait
 
 run-dapr-mcp: build-dapr ## Run Dapr MCP server with Dapr sidecar (port 3006)
@@ -123,24 +123,24 @@ run-dapr-mcp: build-dapr ## Run Dapr MCP server with Dapr sidecar (port 3006)
 		--scheduler-host-address="" \
 		--dapr-http-port 3500 \
 		--app-port 3006 \
-		--components-path src/dapr/components.localhost \
-		-- bun run --cwd src/dapr-mcp start
+		--components-path config/dapr/components.localhost \
+		-- bun run --cwd apps/dapr-mcp start
 
 build-mcp: ## Build all MCP packages
-	bun run --cwd src/mcp-core build
-	bun run --cwd src/github-issues-mcp build
-	bun run --cwd src/ga4-mcp build
-	bun run --cwd src/meta-ads-mcp build
-	bun run --cwd src/shopify-mcp build
-	bun run --cwd src/markdown-mcp build
+	bun run --cwd packages/js/mcp-core build
+	bun run --cwd apps/github-issues-mcp build
+	bun run --cwd apps/ga4-mcp build
+	bun run --cwd apps/meta-ads-mcp build
+	bun run --cwd apps/shopify-mcp build
+	bun run --cwd apps/markdown-mcp build
 
 build-dapr: ## Build Dapr core and MCP packages
-	bun run --cwd src/dapr-core build
-	bun run --cwd src/dapr-mcp build
+	bun run --cwd packages/js/dapr-core build
+	bun run --cwd apps/dapr-mcp build
 
 build-dapr-actor-svc: ## Build Dapr actor service
-	bun run --cwd src/dapr-core build
-	bun run --cwd src/dapr-actor-svc build
+	bun run --cwd packages/js/dapr-core build
+	bun run --cwd apps/dapr-actor-svc build
 
 run-dapr-actor-svc: build-dapr-actor-svc ## Run Dapr actor service with sidecar (port 3007)
 	dapr run --app-id mndy-dapr-actor-svc \
@@ -149,8 +149,8 @@ run-dapr-actor-svc: build-dapr-actor-svc ## Run Dapr actor service with sidecar 
 		--scheduler-host-address="" \
 		--dapr-http-port 3501 \
 		--app-port 3007 \
-		--components-path src/dapr/components.localhost \
-		-- bun run --cwd src/dapr-actor-svc start
+		--components-path config/dapr/components.localhost \
+		-- bun run --cwd apps/dapr-actor-svc start
 
 # ==============================================================================
 # Scripts
@@ -164,13 +164,13 @@ refresh-meta-token: ## Refresh Meta access token and update .env file
 # ==============================================================================
 
 build-cc: ## Build Claude Code core package
-	bun run --cwd src/cc-core build
+	bun run --cwd packages/js/cc-core build
 
 build-cc-svc: build-cc ## Build Claude Code service
-	bun run --cwd src/cc-svc build
+	bun run --cwd apps/cc-svc build
 
 run-cc-svc: build-cc-svc ## Run Claude Code service (port 3002)
-	bun run --cwd src/cc-svc start
+	bun run --cwd apps/cc-svc start
 
 # ==============================================================================
 # Build
@@ -179,22 +179,26 @@ run-cc-svc: build-cc-svc ## Run Claude Code service (port 3002)
 build: build-ui build-vis build-azdo build-ui-api ## Build all services
 
 build-ui: ## Build frontend for production
-	bun run --cwd src/apps/ui build
+	bun run --cwd apps/ui build
 
 build-vis: ## Build vis module
-	bun run --cwd src/apps/vis build
+	bun run --cwd apps/vis build
 
 build-azdo: ## Build azdo module
-	bun run --cwd src/apps/azdo build
+	bun run --cwd apps/azdo build
 
 build-ui-api: ## Build UI API
-	bun run --cwd src/ui-api build
+	bun run --cwd apps/ui-api build
 
 # ==============================================================================
 # Lint
 # ==============================================================================
 
-lint: lint-md lint-node ## Run all linters
+lint: lint-guards lint-md lint-node ## Run all linters
+
+lint-guards: ## Run the repo structure guards (ports, hex boundaries)
+	bun run check-ports
+	bun run check-hex-lint
 
 lint-md: ## Lint markdown files
 	bun run lint:md
@@ -203,18 +207,14 @@ lint-md-fix: ## Fix markdown lint issues
 	bun run lint:md:fix
 
 lint-node: ## Lint Node.js/TypeScript code
-	bun run --cwd src/apps/ui lint
-	bun run --cwd src/apps/vis lint
-	bun run --cwd src/ui-api lint || true
-
-lint-vis: ## Lint vis code
-	bun run --cwd src/apps/vis lint
+	bun run --cwd apps/ui lint
+	bun run --cwd apps/ui-api lint || true
 
 lint-python: ## Lint Python code
-	uv run --package azdo-worker ruff check src/azdo-worker/src || true
-	uv run --package insights-worker ruff check src/insights-worker/src || true
-	uv run --package azdoproxy-worker ruff check src/azdoproxy-worker/src || true
-	uv run --package workflows-worker ruff check src/workflows-worker/src || true
+	uv run --package azdo-worker ruff check apps/azdo-worker/src || true
+	uv run --package insights-worker ruff check apps/insights-worker/src || true
+	uv run --package azdoproxy-worker ruff check apps/azdoproxy-worker/src || true
+	uv run --package workflows-worker ruff check apps/workflows-worker/src || true
 
 # ==============================================================================
 # Lock Files
@@ -301,11 +301,11 @@ clean: clean-node clean-python ## Clean all build artifacts
 
 clean-node: ## Clean Node.js artifacts
 	rm -rf node_modules
-	rm -rf src/apps/ui/node_modules src/apps/ui/dist
-	rm -rf src/apps/vis/node_modules src/apps/vis/dist
-	rm -rf src/apps/azdo/node_modules src/apps/azdo/dist
-	rm -rf src/ui-api/node_modules src/ui-api/dist
-	rm -rf src/d3-lab/node_modules
+	rm -rf apps/ui/node_modules apps/ui/dist
+	rm -rf apps/vis/node_modules apps/vis/dist
+	rm -rf apps/azdo/node_modules apps/azdo/dist
+	rm -rf apps/ui-api/node_modules apps/ui-api/dist
+	rm -rf tools/d3-lab/node_modules
 
 clean-python: ## Clean Python artifacts
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true

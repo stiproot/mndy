@@ -346,7 +346,7 @@ Create a Stripe MCP server on port 3007 with:
 
 **Output:**
 
-**File: `src/stripe-mcp/src/index.ts`**
+**File: `apps/stripe-mcp/src/index.ts`**
 ```typescript
 import { Effect, Config } from "effect";
 import { createMcpApp, createLogger } from "mcp-core";
@@ -391,7 +391,7 @@ const main = Effect.gen(function* () {
 Effect.runPromise(main).catch(() => process.exit(1));
 ```
 
-**File: `src/stripe-mcp/src/types.ts`**
+**File: `apps/stripe-mcp/src/types.ts`**
 ```typescript
 import { Config, Data, Schema } from "effect";
 
@@ -436,7 +436,7 @@ export class ConfigError extends Data.TaggedError("ConfigError")<{
 // Tool schemas will be added here
 ```
 
-**File: `src/stripe-mcp/.env.template`**
+**File: `apps/stripe-mcp/.env.template`**
 ```bash
 # Server Configuration
 PORT=3007

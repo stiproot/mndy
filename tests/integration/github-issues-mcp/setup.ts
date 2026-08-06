@@ -91,7 +91,7 @@ export function sleep(ms: number): Promise<void> {
  * Environment configuration for tests
  */
 export const config = {
-  mcpUrl: process.env.GITHUB_ISSUES_MCP_URL || "http://localhost:3001",
+  mcpUrl: process.env.GITHUB_ISSUES_MCP_URL || "http://localhost:3009",
 
   // Test target repository and user
   testOwner: process.env.TEST_OWNER || "Derivco",

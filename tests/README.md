@@ -45,7 +45,7 @@ bun run test:integration:watch
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `GITHUB_ISSUES_MCP_URL` | No | Server URL (default: `http://localhost:3001`) |
+| `GITHUB_ISSUES_MCP_URL` | No | Server URL (default: `http://localhost:3009`) |
 | `TEST_OWNER` | Yes | GitHub org/user to test against |
 | `TEST_REPO` | Yes | Repository name |
 | `TEST_USERNAME` | Yes | GitHub username for contributor tests |
@@ -94,13 +94,13 @@ docker compose --profile ai up ga4-mcp meta-ads-mcp shopify-mcp -d
 
 ```bash
 # Terminal 1: GA4 MCP
-cd src/ga4-mcp && bun run start
+cd apps/ga4-mcp && bun run start
 
 # Terminal 2: Meta Ads MCP
-cd src/meta-ads-mcp && bun run start
+cd apps/meta-ads-mcp && bun run start
 
 # Terminal 3: Shopify MCP
-cd src/shopify-mcp && bun run start
+cd apps/shopify-mcp && bun run start
 ```
 
 ## Test Structure

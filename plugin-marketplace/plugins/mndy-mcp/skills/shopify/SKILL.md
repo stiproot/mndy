@@ -13,7 +13,7 @@ Reads orders and computes store analytics from the Shopify Admin API. Server run
 - Start the server from the mndy repo root: `make run-shopify-mcp` (or `make run-analytics-mcps`
   to start GA4, Meta Ads, and Shopify together). **No infrastructure needed** — this is a
   standalone HTTP process; no Dapr, no docker-compose.
-- Config in `src/shopify-mcp/.env` (copy from `.env.template`):
+- Config in `apps/shopify-mcp/.env` (copy from `.env.template`):
   - `SHOPIFY_CLIENT_ID` — **required**
   - `SHOPIFY_CLIENT_SECRET` — **required**
   - `SHOPIFY_STORE_URL` — **required**, `your-store.myshopify.com` format
@@ -73,7 +73,7 @@ credentials in its `.env`). So per-session brand switching does **not** apply to
 If the user has selected a brand (see the `brands` skill) whose `shopifyStore` differs from
 the running server's store, say so and treat Shopify data as unavailable for that brand this
 session — do not return another store's numbers as if they were the selected brand's. To
-analyse a different store, repoint `src/shopify-mcp/.env` and restart the server, or run one
+analyse a different store, repoint `apps/shopify-mcp/.env` and restart the server, or run one
 shopify-mcp per store on separate ports.
 
 ## Tips

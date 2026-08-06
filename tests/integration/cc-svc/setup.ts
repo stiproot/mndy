@@ -42,7 +42,7 @@ export function sleep(ms: number): Promise<void> {
 export const config = {
   // Service URLs
   ccSvcUrl: process.env.CC_SVC_URL || "http://localhost:3002",
-  githubIssuesMcpUrl: process.env.GITHUB_ISSUES_MCP_URL || "http://localhost:3001",
+  githubIssuesMcpUrl: process.env.GITHUB_ISSUES_MCP_URL || "http://localhost:3009",
 
   // Analytics MCP URLs
   ga4McpUrl: process.env.GA4_MCP_URL || "",

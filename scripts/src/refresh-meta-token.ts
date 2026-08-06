@@ -9,7 +9,7 @@
  *   bun run refresh-meta-token [options]
  *
  * Options:
- *   --env-file=<path>  Path to .env file (default: src/meta-ads-mcp/.env)
+ *   --env-file=<path>  Path to .env file (default: apps/meta-ads-mcp/.env)
  *   --app-id=<id>      Meta App ID (reads from .env if not provided)
  *   --app-secret=<secret> Meta App Secret (reads from .env if not provided)
  *   --token=<token>    Current access token (reads from .env if not provided)
@@ -17,7 +17,7 @@
  *
  * Examples:
  *   bun run refresh-meta-token
- *   bun run refresh-meta-token --env-file=src/meta-ads-mcp/.env
+ *   bun run refresh-meta-token --env-file=apps/meta-ads-mcp/.env
  *   bun run refresh-meta-token --dry-run
  *
  * Prerequisites:
@@ -64,7 +64,7 @@ function parseArgs(): ParsedArgs {
   const args = process.argv.slice(2);
   const repoRoot = getRepoRoot();
   const parsed: ParsedArgs = {
-    envFilePath: resolve(repoRoot, "src/meta-ads-mcp/.env"),
+    envFilePath: resolve(repoRoot, "apps/meta-ads-mcp/.env"),
     dryRun: false,
     verifyOnly: false,
     skipVerify: false,
@@ -92,7 +92,7 @@ function parseArgs(): ParsedArgs {
     } else if (arg === "--help" || arg === "-h") {
       console.log("Usage: bun run refresh-meta-token [options]");
       console.log("\nOptions:");
-      console.log("  --env-file=<path>     Path to .env file (default: src/meta-ads-mcp/.env)");
+      console.log("  --env-file=<path>     Path to .env file (default: apps/meta-ads-mcp/.env)");
       console.log("  --app-id=<id>         Meta App ID");
       console.log("  --app-secret=<secret> Meta App Secret");
       console.log("  --token=<token>       Current access token");

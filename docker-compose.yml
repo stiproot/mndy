@@ -15,8 +15,8 @@ name: mndy
 x-daprdimage: &daprdimage
   image: daprio/daprd:1.16.9
   volumes:
-    - ./src/dapr/components/:/components
-    - ./src/dapr/configuration/:/configuration
+    - ./config/dapr/components/:/components
+    - ./config/dapr/configuration/:/configuration
 
 services:
   ##############################################
@@ -98,7 +98,7 @@ services:
     image: xo-feed/mndy/workflows-worker:dev
     build:
       context: .
-      dockerfile: src/workflows-worker/Dockerfile
+      dockerfile: apps/workflows-worker/Dockerfile
       tags:
         - xo-feed/mndy/workflows-worker:dev
     ports:
@@ -132,7 +132,7 @@ services:
     image: xo-feed/mndy/azdo-worker:dev
     build:
       context: .
-      dockerfile: src/azdo-worker/Dockerfile
+      dockerfile: apps/azdo-worker/Dockerfile
       tags:
         - xo-feed/mndy/azdo-worker:dev
     ports:
@@ -167,7 +167,7 @@ services:
     image: xo-feed/mndy/insights-worker:dev
     build:
       context: .
-      dockerfile: src/insights-worker/Dockerfile
+      dockerfile: apps/insights-worker/Dockerfile
       tags:
         - xo-feed/mndy/insights-worker:dev
     ports:
@@ -201,7 +201,7 @@ services:
     image: xo-feed/mndy/azdoproxy-worker:dev
     build:
       context: .
-      dockerfile: src/azdoproxy-worker/Dockerfile
+      dockerfile: apps/azdoproxy-worker/Dockerfile
       tags:
         - xo-feed/mndy/azdoproxy-worker:dev
     ports:
@@ -234,7 +234,7 @@ services:
     profiles: [apps]
     image: xo-feed/mndy/azdoproxy-api:dev
     build:
-      context: ./src/azdoproxy-api/
+      context: ./apps/azdoproxy-api/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/azdoproxy-api:dev
@@ -253,7 +253,7 @@ services:
     profiles: [apps]
     image: xo-feed/mndy/ui-api:dev
     build:
-      context: ./src/ui-api/
+      context: ./apps/ui-api/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/ui-api:dev
@@ -289,7 +289,7 @@ services:
     profiles: [apps]
     image: xo-feed/mndy/ui:dev
     build:
-      context: ./src/apps/ui/
+      context: ./apps/ui/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/ui:dev
@@ -307,7 +307,7 @@ services:
     profiles: [apps]
     image: xo-feed/mndy/vis:dev
     build:
-      context: ./src/apps/vis/
+      context: ./apps/vis/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/vis:dev
@@ -321,7 +321,7 @@ services:
     profiles: [apps]
     image: xo-feed/mndy/azdo:dev
     build:
-      context: ./src/apps/azdo/
+      context: ./apps/azdo/
       dockerfile: Dockerfile
       tags:
         - xo-feed/mndy/azdo:dev
@@ -336,16 +336,16 @@ services:
     image: xo-feed/mndy/github-issues-mcp:dev
     build:
       context: .
-      dockerfile: src/github-issues-mcp/Dockerfile
+      dockerfile: apps/github-issues-mcp/Dockerfile
       tags:
         - xo-feed/mndy/github-issues-mcp:dev
     ports:
-      - "3001:3001"
+      - "3009:3009"
     environment:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - PORT=3001
+      - PORT=3009
     healthcheck:
-      test: ["CMD", "bun", "--eval", "fetch('http://localhost:3001/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      test: ["CMD", "bun", "--eval", "fetch('http://localhost:3009/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -359,7 +359,7 @@ services:
     image: xo-feed/mndy/ga4-mcp:dev
     build:
       context: .
-      dockerfile: src/ga4-mcp/Dockerfile
+      dockerfile: apps/ga4-mcp/Dockerfile
       tags:
         - xo-feed/mndy/ga4-mcp:dev
     ports:
@@ -385,7 +385,7 @@ services:
     image: xo-feed/mndy/meta-ads-mcp:dev
     build:
       context: .
-      dockerfile: src/meta-ads-mcp/Dockerfile
+      dockerfile: apps/meta-ads-mcp/Dockerfile
       tags:
         - xo-feed/mndy/meta-ads-mcp:dev
     ports:
@@ -409,7 +409,7 @@ services:
     image: xo-feed/mndy/shopify-mcp:dev
     build:
       context: .
-      dockerfile: src/shopify-mcp/Dockerfile
+      dockerfile: apps/shopify-mcp/Dockerfile
       tags:
         - xo-feed/mndy/shopify-mcp:dev
     ports:
@@ -433,7 +433,7 @@ services:
     image: xo-feed/mndy/cc-svc:dev
     build:
       context: .
-      dockerfile: src/cc-svc/Dockerfile
+      dockerfile: apps/cc-svc/Dockerfile
       tags:
         - xo-feed/mndy/cc-svc:dev
     ports:
@@ -441,7 +441,7 @@ services:
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}
-      - GITHUB_ISSUES_MCP_URL=http://github-issues-mcp:3001/mcp
+      - GITHUB_ISSUES_MCP_URL=http://github-issues-mcp:3009/mcp
       - GA4_MCP_URL=http://ga4-mcp:3003/mcp
       - META_MCP_URL=http://meta-ads-mcp:3004/mcp
       - SHOPIFY_MCP_URL=http://shopify-mcp:3005/mcp

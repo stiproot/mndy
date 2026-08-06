@@ -6,9 +6,9 @@ requires-python = ">=3.12"
 
 [tool.uv.workspace]
 members = [
-    "src/mndy-framework",
-    "src/azdo-worker",
-    "src/insights-worker",
-    "src/azdoproxy-worker",
-    "src/workflows-worker",
+    "packages/py/mndy-framework",
+    "apps/azdo-worker",
+    "apps/insights-worker",
+    "apps/azdoproxy-worker",
+    "apps/workflows-worker",
 ]

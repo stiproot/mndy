@@ -114,7 +114,7 @@ google-ads-mcp (port 3006)
 **Files:**
 
 ```
-src/google-ads-mcp/
+apps/google-ads-mcp/
 ├── src/
 │   ├── index.ts
 │   ├── types.ts
@@ -133,7 +133,7 @@ src/google-ads-mcp/
 
 #### 1.2 Core Types & Configuration ⏳
 
-**File:** `src/google-ads-mcp/src/types.ts`
+**File:** `apps/google-ads-mcp/src/types.ts`
 
 **Configuration:**
 
@@ -158,7 +158,7 @@ GoogleAdsConfig: {
 
 #### 1.3 GoogleAdsClient Service ⏳
 
-**File:** `src/google-ads-mcp/src/services/google-ads.service.ts`
+**File:** `apps/google-ads-mcp/src/services/google-ads.service.ts`
 
 **Dependencies:** `google-ads-api` npm package (v15.3.0)
 
@@ -191,7 +191,7 @@ LIMIT 100
 
 #### 1.4 Tool: google_ads_get_campaigns ⏳
 
-**File:** `src/google-ads-mcp/src/tools/get-campaigns.ts`
+**File:** `apps/google-ads-mcp/src/tools/get-campaigns.ts`
 
 **Parameters:**
 
@@ -218,7 +218,7 @@ LIMIT 100
 
 #### 1.5 Tool: google_ads_get_performance ⏳
 
-**File:** `src/google-ads-mcp/src/tools/get-performance.ts`
+**File:** `apps/google-ads-mcp/src/tools/get-performance.ts`
 
 **Parameters:**
 
@@ -268,7 +268,7 @@ LIMIT 100
 
 #### 1.6 Server Bootstrap ⏳
 
-**File:** `src/google-ads-mcp/src/index.ts`
+**File:** `apps/google-ads-mcp/src/index.ts`
 
 **Pattern:** Follow github-issues-mcp (not original template)
 
@@ -325,7 +325,7 @@ LIMIT 100
 
 #### 2.1 Data Submission Tool ⏳
 
-**File:** `src/dapr-mcp/src/tools/submit-google-ads-data.ts`
+**File:** `apps/dapr-mcp/src/tools/submit-google-ads-data.ts`
 
 **Schema:**
 
@@ -366,7 +366,7 @@ LIMIT 100
 
 #### 2.2 Tool Registration ⏳
 
-**File:** `src/dapr-mcp/src/tools/index.ts`
+**File:** `apps/dapr-mcp/src/tools/index.ts`
 
 **Update:**
 
@@ -387,7 +387,7 @@ export * from "./submit-google-ads-data.js";  // ADD
 
 #### 3.1 Google Ads Analyst Agent ⏳
 
-**File:** `src/cc-svc/src/agents/index.ts`
+**File:** `apps/cc-svc/src/agents/index.ts`
 
 **Functions to Add:**
 
@@ -437,7 +437,7 @@ export function getAvailableAnalyticsSources() {
 
 #### 3.2 Google Ads Analyst Prompts ⏳
 
-**File:** `src/cc-svc/src/prompts/brand-insights.prompt.ts`
+**File:** `apps/cc-svc/src/prompts/brand-insights.prompt.ts`
 
 **System Prompt:**
 
@@ -483,7 +483,7 @@ submit_google_ads_data expects:
 
 #### 3.3 Brand Insights Service Updates ⏳
 
-**File:** `src/cc-svc/src/services/brand-insights.service.ts`
+**File:** `apps/cc-svc/src/services/brand-insights.service.ts`
 
 **Add Google Ads Execution:**
 
@@ -531,7 +531,7 @@ const result = await this.synthesizeResults(
 
 #### 3.4 Schema Updates ⏳
 
-**File:** `src/cc-svc/src/schemas/brand-insights.schema.ts`
+**File:** `apps/cc-svc/src/schemas/brand-insights.schema.ts`
 
 **Request Schema:**
 
@@ -577,7 +577,7 @@ export const brandInsightsResponseSchema = z.object({
 
 #### 3.5 Brand Orchestrator Prompt Updates ⏳
 
-**File:** `src/cc-svc/src/prompts/brand-insights.prompt.ts`
+**File:** `apps/cc-svc/src/prompts/brand-insights.prompt.ts`
 
 **Update System Prompt:**
 
@@ -625,7 +625,7 @@ export function buildBrandSynthesisPrompt(
 
 #### 3.6 Configuration Updates ⏳
 
-**File:** `src/cc-svc/src/config/env.ts`
+**File:** `apps/cc-svc/src/config/env.ts`
 
 **Add Environment Variable:**
 
@@ -637,7 +637,7 @@ export const envSchema = z.object({
 });
 ```
 
-**Files:** `src/cc-svc/.env.template` and `src/cc-svc/.env`
+**Files:** `apps/cc-svc/.env.template` and `apps/cc-svc/.env`
 
 **Add:**
 
@@ -737,7 +737,7 @@ const request = {
 ```json
 {
   "workspaces": [
-    "src/google-ads-mcp"  // ADD
+    "apps/google-ads-mcp"  // ADD
   ]
 }
 ```
@@ -748,11 +748,11 @@ const request = {
 
 ```makefile
 run-google-ads-mcp: build-google-ads-mcp ## Run Google Ads MCP (port 3006)
- bun run --cwd src/google-ads-mcp start
+ bun run --cwd apps/google-ads-mcp start
 
 build-google-ads-mcp: ## Build Google Ads MCP
- bun run --cwd src/mcp-core build
- bun run --cwd src/google-ads-mcp build
+ bun run --cwd packages/js/mcp-core build
+ bun run --cwd apps/google-ads-mcp build
 
 build-mcp: build-mcp-core build-ga4-mcp build-meta-ads-mcp build-shopify-mcp build-dapr-mcp build-github-issues-mcp build-markdown-mcp build-google-ads-mcp  ## Build all MCP servers
 ```
@@ -767,12 +767,12 @@ build-mcp: build-mcp-core build-ga4-mcp build-meta-ads-mcp build-shopify-mcp bui
 google-ads-mcp:
   build:
     context: .
-    dockerfile: src/google-ads-mcp/Dockerfile
+    dockerfile: apps/google-ads-mcp/Dockerfile
   container_name: google-ads-mcp
   ports:
     - "3006:3006"
   env_file:
-    - src/google-ads-mcp/.env
+    - apps/google-ads-mcp/.env
   networks:
     - mndy
   profiles:
@@ -786,7 +786,7 @@ google-ads-mcp:
 
 #### 5.4 Google Ads MCP README ⏳
 
-**File:** `src/google-ads-mcp/README.md`
+**File:** `apps/google-ads-mcp/README.md`
 
 **Sections:**
 
@@ -845,30 +845,30 @@ google-ads-mcp:
 
 ### New Files
 
-- [ ] `src/google-ads-mcp/src/index.ts`
-- [ ] `src/google-ads-mcp/src/types.ts`
-- [ ] `src/google-ads-mcp/src/services/google-ads.service.ts`
-- [ ] `src/google-ads-mcp/src/tools/index.ts`
-- [ ] `src/google-ads-mcp/src/tools/get-campaigns.ts`
-- [ ] `src/google-ads-mcp/src/tools/get-performance.ts`
-- [ ] `src/google-ads-mcp/package.json`
-- [ ] `src/google-ads-mcp/tsconfig.json`
-- [ ] `src/google-ads-mcp/Dockerfile`
-- [ ] `src/google-ads-mcp/.env.template`
-- [ ] `src/google-ads-mcp/README.md`
-- [ ] `src/dapr-mcp/src/tools/submit-google-ads-data.ts`
+- [ ] `apps/google-ads-mcp/src/index.ts`
+- [ ] `apps/google-ads-mcp/src/types.ts`
+- [ ] `apps/google-ads-mcp/src/services/google-ads.service.ts`
+- [ ] `apps/google-ads-mcp/src/tools/index.ts`
+- [ ] `apps/google-ads-mcp/src/tools/get-campaigns.ts`
+- [ ] `apps/google-ads-mcp/src/tools/get-performance.ts`
+- [ ] `apps/google-ads-mcp/package.json`
+- [ ] `apps/google-ads-mcp/tsconfig.json`
+- [ ] `apps/google-ads-mcp/Dockerfile`
+- [ ] `apps/google-ads-mcp/.env.template`
+- [ ] `apps/google-ads-mcp/README.md`
+- [ ] `apps/dapr-mcp/src/tools/submit-google-ads-data.ts`
 - [ ] `scripts/src/test-paid-media-report.ts`
 
 ### Modified Files
 
-- [ ] `src/cc-svc/src/agents/index.ts`
-- [ ] `src/cc-svc/src/prompts/brand-insights.prompt.ts`
-- [ ] `src/cc-svc/src/services/brand-insights.service.ts`
-- [ ] `src/cc-svc/src/schemas/brand-insights.schema.ts`
-- [ ] `src/cc-svc/src/config/env.ts`
-- [ ] `src/cc-svc/.env.template`
-- [ ] `src/cc-svc/.env`
-- [ ] `src/dapr-mcp/src/tools/index.ts`
+- [ ] `apps/cc-svc/src/agents/index.ts`
+- [ ] `apps/cc-svc/src/prompts/brand-insights.prompt.ts`
+- [ ] `apps/cc-svc/src/services/brand-insights.service.ts`
+- [ ] `apps/cc-svc/src/schemas/brand-insights.schema.ts`
+- [ ] `apps/cc-svc/src/config/env.ts`
+- [ ] `apps/cc-svc/.env.template`
+- [ ] `apps/cc-svc/.env`
+- [ ] `apps/dapr-mcp/src/tools/index.ts`
 - [ ] `scripts/package.json`
 - [ ] `package.json` (root)
 - [ ] `Makefile`
@@ -881,21 +881,21 @@ google-ads-mcp:
 
 ### MCP Server Patterns
 
-- `src/meta-ads-mcp/` - Similar advertising MCP (primary reference)
-- `src/ga4-mcp/` - Analytics MCP pattern
-- `src/github-issues-mcp/` - Bootstrap pattern (Effect.gen)
+- `apps/meta-ads-mcp/` - Similar advertising MCP (primary reference)
+- `apps/ga4-mcp/` - Analytics MCP pattern
+- `apps/github-issues-mcp/` - Bootstrap pattern (Effect.gen)
 - `.claude/rules/mcp-server.md` - MCP server standards
 
 ### Agent Integration
 
-- `src/cc-svc/src/agents/index.ts` - Agent creation patterns
-- `src/cc-svc/src/prompts/brand-insights.prompt.ts` - Prompt templates
-- `src/cc-svc/src/services/brand-insights.service.ts` - Service orchestration
+- `apps/cc-svc/src/agents/index.ts` - Agent creation patterns
+- `apps/cc-svc/src/prompts/brand-insights.prompt.ts` - Prompt templates
+- `apps/cc-svc/src/services/brand-insights.service.ts` - Service orchestration
 
 ### Data Persistence
 
-- `src/dapr-mcp/src/tools/submit-meta-data.ts` - Data submission pattern
-- `src/dapr-mcp/src/tools/submit-ga4-data.ts` - Schema reference
+- `apps/dapr-mcp/src/tools/submit-meta-data.ts` - Data submission pattern
+- `apps/dapr-mcp/src/tools/submit-ga4-data.ts` - Schema reference
 
 ---
 

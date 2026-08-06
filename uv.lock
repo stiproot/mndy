@@ -162,7 +162,7 @@ wheels = [
 [[package]]
 name = "azdo-worker"
 version = "0.1.0"
-source = { editable = "src/azdo-worker" }
+source = { editable = "apps/azdo-worker" }
 dependencies = [
     { name = "dapr" },
     { name = "dapr-ext-fastapi-dev" },
@@ -189,7 +189,7 @@ requires-dist = [
 [[package]]
 name = "azdoproxy-worker"
 version = "0.1.0"
-source = { editable = "src/azdoproxy-worker" }
+source = { editable = "apps/azdoproxy-worker" }
 dependencies = [
     { name = "dapr" },
     { name = "dapr-ext-fastapi-dev" },
@@ -584,7 +584,7 @@ wheels = [
 [[package]]
 name = "insights-worker"
 version = "0.1.0"
-source = { editable = "src/insights-worker" }
+source = { editable = "apps/insights-worker" }
 dependencies = [
     { name = "dapr" },
     { name = "dapr-ext-fastapi-dev" },
@@ -627,7 +627,7 @@ source = { virtual = "." }
 [[package]]
 name = "mndy-framework"
 version = "0.1.0"
-source = { editable = "src/mndy-framework" }
+source = { editable = "packages/py/mndy-framework" }
 dependencies = [
     { name = "dapr" },
     { name = "environs" },
@@ -1041,7 +1041,7 @@ wheels = [
 [[package]]
 name = "workflows-worker"
 version = "0.1.0"
-source = { editable = "src/workflows-worker" }
+source = { editable = "apps/workflows-worker" }
 dependencies = [
     { name = "dapr" },
     { name = "dapr-ext-fastapi-dev" },
@@ -1062,7 +1062,7 @@ requires-dist = [
     { name = "environs" },
     { name = "fastapi" },
     { name = "httpx" },
-    { name = "mndy-framework", editable = "src/mndy-framework" },
+    { name = "mndy-framework", editable = "packages/py/mndy-framework" },
     { name = "pyxi-azdo-http-client" },
     { name = "requests" },
     { name = "typing-extensions" },

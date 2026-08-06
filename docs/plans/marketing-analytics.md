@@ -41,7 +41,7 @@ secrets/
 ### Phase 2: MCP Servers
 
 ```
-src/ga4-mcp/
+apps/ga4-mcp/
 ├── Dockerfile
 ├── package.json
 ├── tsconfig.json
@@ -53,7 +53,7 @@ src/ga4-mcp/
     ├── services/ga4.ts
     └── tools/run-report.ts
 
-src/meta-ads-mcp/
+apps/meta-ads-mcp/
 ├── Dockerfile
 ├── package.json
 ├── tsconfig.json
@@ -66,7 +66,7 @@ src/meta-ads-mcp/
     ├── tools/get-insights.ts
     └── types/facebook-nodejs-business-sdk.d.ts
 
-src/shopify-mcp/
+apps/shopify-mcp/
 ├── Dockerfile
 ├── package.json
 ├── tsconfig.json
@@ -114,7 +114,7 @@ package.json (added test scripts)
 ### Phase 3-5: Brand Insights Service
 
 ```
-src/cc-svc/src/
+apps/cc-svc/src/
 ├── agents/
 │   └── index.ts  (GA4, Shopify, Meta, Brand Orchestrator agents)
 ├── prompts/

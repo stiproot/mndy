@@ -13,7 +13,7 @@ on **port 3004** (`http://localhost:3004/mcp`).
 - Start the server from the mndy repo root: `make run-meta-ads-mcp` (or `make run-analytics-mcps`
   to start GA4, Meta Ads, and Shopify together). **No infrastructure needed** — this is a
   standalone HTTP process; no Dapr, no docker-compose.
-- Config in `src/meta-ads-mcp/.env` (copy from `.env.template`):
+- Config in `apps/meta-ads-mcp/.env` (copy from `.env.template`):
   - `META_ACCESS_TOKEN` — **required** (System User token recommended). Scopes: `ads_read`,
     `read_insights`.
   - `META_AD_ACCOUNT_ID` — **required**, with the `act_` prefix (e.g. `act_123456789`)
@@ -84,7 +84,7 @@ see that ad account.
 ## Troubleshooting
 
 - **`Error validating access token: Session has expired ...`** — the `META_ACCESS_TOKEN`
-  in `src/meta-ads-mcp/.env` has expired. This is a credential issue, not a bad request.
+  in `apps/meta-ads-mcp/.env` has expired. This is a credential issue, not a bad request.
   Refresh it from the mndy repo root with `make refresh-meta-token` (updates the `.env`),
   then restart the server. A long-lived System User token is recommended to avoid expiry.
 - **`Invalid OAuth access token`** — the token is malformed or lacks `ads_read` /

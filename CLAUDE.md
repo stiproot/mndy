@@ -77,31 +77,65 @@ Diagrams live in `docs/diagrams/` and are of two kinds:
 
 Prefer a generated diagram wherever one is possible; hand-drawn code diagrams rot.
 
-## Architecture
+## Repository layout
+
+```text
+apps/          things you run
+packages/js/   TypeScript libraries — the reusable machinery
+packages/py/   Python libraries
+config/        declarative infrastructure (Dapr components, wiremock mappings)
+tools/         loose scripts and sandboxes
+scripts/       repo tooling — the check-*.mjs lint guards live here
+tests/         cross-service integration tests
+docs/          guides, plans, diagrams
+```
+
+Workspaces are glob-based: bun takes `apps/*`, `packages/js/*` and `scripts`; uv takes the
+four Python workers plus `packages/py/mndy-framework`. Adding a package means creating the
+directory — there is no list to update. `apps/azdoproxy-api` is C# and deliberately sits
+in neither workspace.
+
+### Applications
 
 Microservices architecture using Dapr:
 
-- `src/ui/` - Vue 3 + TypeScript + Quasar frontend
-- `src/ui-api/` - Express.js API gateway (Node/TS)
-- `src/azdo-worker/` - Azure DevOps data collection (Python/FastAPI)
-- `src/insights-worker/` - Analytics processing (Python/FastAPI)
-- `src/workflows-worker/` - Workflow orchestration (Python/FastAPI)
-- `src/mndy-framework/` - Shared Python package (used by all workers)
+| App | Stack | Notes |
+| --- | --- | --- |
+| `apps/ui` | Vue 3 + TypeScript + Quasar | main frontend |
+| `apps/vis`, `apps/azdo` | Vue 3 | satellite frontends |
+| `apps/ui-api` | Express.js | API gateway (port 3001) |
+| `apps/azdo-worker` | Python/FastAPI | Azure DevOps data collection |
+| `apps/azdoproxy-worker` | Python/FastAPI | Azure DevOps proxy |
+| `apps/insights-worker` | Python/FastAPI | analytics processing |
+| `apps/workflows-worker` | Python/FastAPI | workflow orchestration |
+| `apps/azdoproxy-api` | C#/.NET | Azure DevOps proxy API |
+| `apps/cc-svc` | Node/TS | code-comprehension service (port 3002) |
+| `apps/dapr-actor-svc` | Node/TS | Dapr actor host (port 3007) |
 
-MCP (Model Context Protocol) servers:
+### MCP servers
 
-- `src/mcp-core/` - Shared TypeScript library for building MCP servers
-- `src/github-issues-mcp/` - GitHub Issues MCP server (port 3001)
-- `src/ga4-mcp/` - Google Analytics 4 MCP server (port 3003)
-- `src/meta-ads-mcp/` - Meta Ads MCP server (port 3004)
-- `src/shopify-mcp/` - Shopify MCP server (port 3005)
-- `src/dapr-mcp/` - Dapr state/cache MCP server (port 3006, requires a Dapr sidecar)
-- `src/markdown-mcp/` - Markdown MCP server (port 3008)
-- `src/google-ads-mcp/` - Google Ads MCP server (in progress; no make target yet)
+| Server | Port | Infrastructure |
+| --- | --- | --- |
+| `apps/ga4-mcp` | 3003 | none |
+| `apps/meta-ads-mcp` | 3004 | none |
+| `apps/shopify-mcp` | 3005 | none |
+| `apps/dapr-mcp` | 3006 | **Dapr sidecar + `make docker-compose-infra`** |
+| `apps/markdown-mcp` | 3008 | none |
+| `apps/github-issues-mcp` | 3009 | none |
+| `apps/google-ads-mcp` | — | none (in progress) |
 
-The analytics servers (GA4, Meta Ads, Shopify) and github-issues need **no
-infrastructure** — they are plain HTTP processes needing only their own `.env`.
-Only `dapr-mcp` requires a Dapr sidecar plus `make docker-compose-infra`.
+**Only `dapr-mcp` needs infrastructure.** Every other server is a plain HTTP process
+needing nothing but its own `.env` and a free port. See the Modes section for what that
+enables.
+
+### Shared packages
+
+| Package | Role |
+| --- | --- |
+| `packages/js/mcp-core` | the MCP server framework every `*-mcp` app is built on |
+| `packages/js/dapr-core` | Dapr client wrapper |
+| `packages/js/cc-core` | code-comprehension core |
+| `packages/py/mndy-framework` | shared Python package used by all workers |
 
 ## Commands
 
@@ -131,7 +165,7 @@ Use `make help` to see all available commands. The Makefile is the single entry 
 
 ### MCP Servers
 
-- `make run-github-issues-mcp` - GitHub Issues MCP server (port 3001). [Details](src/github-issues-mcp/README.md)
+- `make run-github-issues-mcp` - GitHub Issues MCP server (port 3009). [Details](apps/github-issues-mcp/README.md)
 - `make run-analytics-mcps` - GA4 + Meta + Shopify together, no infra needed
 - `make run-ga4-mcp` / `run-meta-ads-mcp` / `run-shopify-mcp` - individually
 - `make run-markdown-mcp` - Markdown MCP server (port 3008)
@@ -191,9 +225,9 @@ Each service has its own linting configuration:
 
 **Services being migrated (in order):**
 
-1. `src/github-issues-mcp/` - **Completed** (Effect Services, Schema, Config)
-2. `src/mcp-core/` - Pending
-3. `src/ui-api/` - Pending (highest complexity)
+1. `apps/github-issues-mcp/` - **Completed** (Effect Services, Schema, Config)
+2. `packages/js/mcp-core/` - Pending
+3. `apps/ui-api/` - Pending (highest complexity)
 
 **Standards:** See `docs/guides/effect-ts-standards.md` for comprehensive patterns
 

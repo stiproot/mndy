@@ -56,10 +56,10 @@ access to the accounts you list — one GA4 service account and one Meta token c
 every property/ad account they've been granted.
 
 **Shopify is the exception:** its tools have no store parameter, so a running `mndy-shopify`
-serves exactly one store. To analyse another store, repoint `src/shopify-mcp/.env` and
+serves exactly one store. To analyse another store, repoint `apps/shopify-mcp/.env` and
 restart, or run one shopify-mcp per store on separate ports.
 
-By default the plugin connects to the servers on `localhost` (ports 3001/3003/3004/3005/3006).
+By default the plugin connects to the servers on `localhost` (ports 3003/3004/3005/3006/3009).
 To target Docker or a remote host, set the override env vars before launching Claude Code:
 `MNDY_GITHUB_ISSUES_MCP_URL`, `MNDY_GA4_MCP_URL`, `MNDY_META_MCP_URL`,
 `MNDY_SHOPIFY_MCP_URL`, `MNDY_DAPR_MCP_URL`.

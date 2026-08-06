@@ -6,7 +6,7 @@ description: Check, refresh, or replace the Meta (Facebook/Instagram) access tok
 # Meta access token: verify & refresh
 
 The `mndy-meta-ads` server authenticates with `META_ACCESS_TOKEN` in
-`src/meta-ads-mcp/.env`. USER tokens expire (~60 days); an expired token makes every Meta
+`apps/meta-ads-mcp/.env`. USER tokens expire (~60 days); an expired token makes every Meta
 tool fail. This skill covers checking, refreshing, and permanently fixing it.
 
 The helper is `scripts/src/refresh-meta-token.ts`, run from the mndy repo root.
@@ -50,7 +50,7 @@ bun run --cwd scripts refresh-meta-token --token=<FRESH_SHORT_LIVED_TOKEN>
 USER tokens keep expiring. A **System User** token from Meta Business Settings does not
 expire. Create a System User under the business, assign it the ad account with the analytics
 permissions, and generate a token with `ads_read` + `read_insights`. Put it in
-`src/meta-ads-mcp/.env` as `META_ACCESS_TOKEN` and restart the server. Verify with step 1
+`apps/meta-ads-mcp/.env` as `META_ACCESS_TOKEN` and restart the server. Verify with step 1
 (`Type: SYSTEM_USER`, `Expires: never`).
 
 ## After any change

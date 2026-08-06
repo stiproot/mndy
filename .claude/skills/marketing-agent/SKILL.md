@@ -22,7 +22,7 @@ When creating a new marketing analytics agent, use this structure:
 
 ### 1. Agent Definition File
 
-Create in `src/cc-svc/src/agents/marketing/`:
+Create in `apps/cc-svc/src/agents/marketing/`:
 
 ```typescript
 // {agent-name}.agent.ts

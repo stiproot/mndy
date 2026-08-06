@@ -4,7 +4,7 @@ import os
 
 sys.path.append(
     os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../../../src/insights-worker")
+        os.path.join(os.path.dirname(__file__), "../../../apps/insights-worker")
     )
 )
 

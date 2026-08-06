@@ -5,16 +5,16 @@ description: Use the mndy GitHub Issues MCP server (mndy-github-issues) to list,
 
 # GitHub Issues MCP (`mndy-github-issues`)
 
-Tools for reading and editing GitHub issues. Server runs on **port 3001**
-(`http://localhost:3001/mcp`).
+Tools for reading and editing GitHub issues. Server runs on **port 3009**
+(`http://localhost:3009/mcp`).
 
 ## Prerequisites
 
 - Start the server from the mndy repo root: `make run-github-issues-mcp`
-- Config in `src/github-issues-mcp/.env` (copy from `.env.template`):
+- Config in `apps/github-issues-mcp/.env` (copy from `.env.template`):
   - `GITHUB_TOKEN` — GitHub PAT. Optional for public repos; needs `repo` scope for private
     repos and for any write (update/label) operations.
-- Verify: `curl -s http://localhost:3001/health`
+- Verify: `curl -s http://localhost:3009/health`
 
 ## Tools
 

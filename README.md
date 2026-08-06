@@ -30,19 +30,19 @@ mndy is built on a modern cloud-native microservices architecture using Dapr (Di
 ### Services
 
 - `src/ui/` - Vue 3 + TypeScript + Quasar frontend with D3.js visualizations. [Details](src/ui/README.md)
-- `src/ui-api/` - Express.js API gateway for authentication and data operations. [Details](src/ui-api/README.md)
-- `src/azdo-worker/` - Python FastAPI service for Azure DevOps data collection
-- `src/azdoproxy-worker/` - Python FastAPI proxy for Azure DevOps API
-- `src/insights-worker/` - Python FastAPI analytics and data processing service
-- `src/workflows-worker/` - Python FastAPI workflow orchestration service
+- `apps/ui-api/` - Express.js API gateway for authentication and data operations. [Details](apps/ui-api/README.md)
+- `apps/azdo-worker/` - Python FastAPI service for Azure DevOps data collection
+- `apps/azdoproxy-worker/` - Python FastAPI proxy for Azure DevOps API
+- `apps/insights-worker/` - Python FastAPI analytics and data processing service
+- `apps/workflows-worker/` - Python FastAPI workflow orchestration service
 
 ### MCP Servers
 
-- `src/mcp-core/` - TypeScript shared library for building MCP servers
-- `src/github-issues-mcp/` - GitHub Issues MCP server for AI assistants. [Details](src/github-issues-mcp/README.md)
-- `src/ga4-mcp/` - Google Analytics 4 MCP server. [Details](src/ga4-mcp/README.md)
-- `src/meta-ads-mcp/` - Meta (Facebook/Instagram) Ads MCP server. [Details](src/meta-ads-mcp/README.md)
-- `src/shopify-mcp/` - Shopify Admin API MCP server. [Details](src/shopify-mcp/README.md)
+- `packages/js/mcp-core/` - TypeScript shared library for building MCP servers
+- `apps/github-issues-mcp/` - GitHub Issues MCP server for AI assistants. [Details](apps/github-issues-mcp/README.md)
+- `apps/ga4-mcp/` - Google Analytics 4 MCP server. [Details](apps/ga4-mcp/README.md)
+- `apps/meta-ads-mcp/` - Meta (Facebook/Instagram) Ads MCP server. [Details](apps/meta-ads-mcp/README.md)
+- `apps/shopify-mcp/` - Shopify Admin API MCP server. [Details](apps/shopify-mcp/README.md)
 
 ### AI Services
 
@@ -84,7 +84,7 @@ For detailed architecture diagrams, see [docs/architecture.html](docs/architectu
 
    ```bash
    # Example for ui-api
-   cp src/ui-api/.env.template src/ui-api/.env
+   cp apps/ui-api/.env.template apps/ui-api/.env
    # Edit the file and add your credentials
    ```
 
@@ -95,7 +95,7 @@ For detailed architecture diagrams, see [docs/architecture.html](docs/architectu
 
 3. **Configure Okta (optional)**
 
-   If using Okta authentication, update the Okta environment variables in `src/ui-api/.env`:
+   If using Okta authentication, update the Okta environment variables in `apps/ui-api/.env`:
 
    ```bash
    OKTA_ISSUER=https://your-okta-domain.okta.com/oauth2/default
@@ -183,13 +183,13 @@ For authentication using Okta:
 
 Each service has its own `.env.template` file:
 
-- `src/ui-api/.env.template` - UI API configuration
-- `src/azdo-worker/.env.template` - Azure DevOps worker
-- `src/azdoproxy-worker/.env.template` - AzDo proxy worker
-- `src/insights-worker/.env.template` - Insights worker
-- `src/workflows-worker/.env.template` - Workflows worker
-- `src/github-issues-mcp/.env.template` - GitHub Issues MCP server
-- `src/cc-svc/.env.template` - Claude Code service
+- `apps/ui-api/.env.template` - UI API configuration
+- `apps/azdo-worker/.env.template` - Azure DevOps worker
+- `apps/azdoproxy-worker/.env.template` - AzDo proxy worker
+- `apps/insights-worker/.env.template` - Insights worker
+- `apps/workflows-worker/.env.template` - Workflows worker
+- `apps/github-issues-mcp/.env.template` - GitHub Issues MCP server
+- `apps/cc-svc/.env.template` - Claude Code service
 
 Copy each template to `.env` and configure with your credentials.
 
@@ -244,7 +244,7 @@ The marketing analytics MCP servers connect to Google Analytics 4, Meta Ads, and
 **Environment Variables:**
 
 ```bash
-# In src/ga4-mcp/.env
+# In apps/ga4-mcp/.env
 GOOGLE_APPLICATION_CREDENTIALS=/path/to/secrets/ga4-service-account.json
 GA4_PROPERTY_ID=123456789
 PORT=3003
@@ -368,7 +368,7 @@ curl \
 **Environment Variables:**
 
 ```bash
-# In src/meta-ads-mcp/.env
+# In apps/meta-ads-mcp/.env
 
 # Access token (use system user token for production)
 META_ACCESS_TOKEN=EAAxxxxxxxxxxxxxxx...
@@ -434,7 +434,7 @@ Your store URL is in the format: `your-store-name.myshopify.com`
 **Environment Variables:**
 
 ```bash
-# In src/shopify-mcp/.env
+# In apps/shopify-mcp/.env
 SHOPIFY_CLIENT_ID=your-client-id
 SHOPIFY_CLIENT_SECRET=your-client-secret
 SHOPIFY_STORE_URL=your-store.myshopify.com
@@ -463,9 +463,9 @@ cp tests/.env.template tests/.env
 docker compose --profile ai up ga4-mcp meta-ads-mcp shopify-mcp -d
 
 # Or run individually for development
-cd src/ga4-mcp && bun run dev
-cd src/meta-ads-mcp && bun run dev
-cd src/shopify-mcp && bun run dev
+cd apps/ga4-mcp && bun run dev
+cd apps/meta-ads-mcp && bun run dev
+cd apps/shopify-mcp && bun run dev
 ```
 
 **3. Run the tests:**
@@ -544,7 +544,7 @@ npm run dev
 **UI API Development:**
 
 ```bash
-cd src/ui-api
+cd apps/ui-api
 npm install
 npm run dev
 ```

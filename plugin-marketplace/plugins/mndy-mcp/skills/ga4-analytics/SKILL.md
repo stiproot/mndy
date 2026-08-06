@@ -12,7 +12,7 @@ Runs Google Analytics 4 reports. Server runs on **port 3003** (`http://localhost
 - Start the server from the mndy repo root: `make run-ga4-mcp` (or `make run-analytics-mcps`
   to start GA4, Meta Ads, and Shopify together). **No infrastructure needed** — this is a
   standalone HTTP process; no Dapr, no docker-compose.
-- Config in `src/ga4-mcp/.env` (copy from `.env.template`):
+- Config in `apps/ga4-mcp/.env` (copy from `.env.template`):
   - `GA4_PROPERTY_ID` — **required**, numeric property ID from GA4 Admin
   - `GOOGLE_APPLICATION_CREDENTIALS` — path to a service-account JSON key with the
     `analytics.readonly` scope, granted access to the property
